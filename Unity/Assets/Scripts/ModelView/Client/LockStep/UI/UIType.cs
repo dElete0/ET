@@ -8,5 +8,6 @@ namespace ET.Client
 	    public const string UILSLogin = "UILSLogin";
 	    public const string UILSLobby = "UILSLobby";
 		public const string UILSRoom = "UILSRoom";
+		public const string UILSGame = "UILSGame";
     }
 }

@@ -111,8 +111,8 @@ namespace ET.Analyzer
         /// <summary>
         /// 检查实体成员
         /// </summary>
-        private void AnalyzeEntityMember(SemanticModelAnalysisContext context, INamedTypeSymbol namedTypeSymbol)
-        {
+        private void AnalyzeEntityMember(SemanticModelAnalysisContext context, INamedTypeSymbol namedTypeSymbol) {
+            if (!AnalyzerGlobalSetting.EnableAnalyzeEntityMember) return;
             foreach (var member in namedTypeSymbol.GetMembers())
             {
                 if (member is not IFieldSymbol fieldSymbol)

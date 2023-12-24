@@ -250,6 +250,196 @@ namespace ET
 
 	}
 
+	[Message(OuterMessage.CardInfo)]
+	[MemoryPackable]
+	public partial class CardInfo: MessageObject
+	{
+		public static CardInfo Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(CardInfo), isFromPool) as CardInfo; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long CardId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int ConfigId { get; set; }
+
+		[MemoryPackOrder(2)]
+		public int Type { get; set; }
+
+		[MemoryPackOrder(3)]
+		public int Attack { get; set; }
+
+		[MemoryPackOrder(4)]
+		public int HP { get; set; }
+
+		[MemoryPackOrder(5)]
+		public int Cost { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardId = default;
+			this.ConfigId = default;
+			this.Type = default;
+			this.Attack = default;
+			this.HP = default;
+			this.Cost = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.M2C_GetHandCard)]
+	[MemoryPackable]
+	public partial class M2C_GetHandCard: MessageObject, IMessage
+	{
+		public static M2C_GetHandCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2C_GetHandCard), isFromPool) as M2C_GetHandCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int Error { get; set; }
+
+		[MemoryPackOrder(1)]
+		public CardInfo Card { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Error = default;
+			this.Card = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.M2C_CreateHero)]
+	[MemoryPackable]
+	public partial class M2C_CreateHero: MessageObject, IMessage
+	{
+		public static M2C_CreateHero Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2C_CreateHero), isFromPool) as M2C_CreateHero; 
+		}
+
+		[MemoryPackOrder(0)]
+		public CardInfo Card { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.M2C_CreateCardUnit)]
+	[MemoryPackable]
+	public partial class M2C_CreateCardUnit: MessageObject, IMessage
+	{
+		public static M2C_CreateCardUnit Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2C_CreateCardUnit), isFromPool) as M2C_CreateCardUnit; 
+		}
+
+		[MemoryPackOrder(0)]
+		public CardInfo Unit { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Unit = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.M2C_CreateAgents)]
+	[MemoryPackable]
+	public partial class M2C_CreateAgents: MessageObject, IMessage
+	{
+		public static M2C_CreateAgents Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2C_CreateAgents), isFromPool) as M2C_CreateAgents; 
+		}
+
+		[MemoryPackOrder(0)]
+		public CardInfo Agent1 { get; set; }
+
+		[MemoryPackOrder(1)]
+		public CardInfo Agent2 { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Agent1 = default;
+			this.Agent2 = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.M2C_GetHandCardsFromGroup)]
+	[MemoryPackable]
+	public partial class M2C_GetHandCardsFromGroup: MessageObject, IMessage
+	{
+		public static M2C_GetHandCardsFromGroup Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2C_GetHandCardsFromGroup), isFromPool) as M2C_GetHandCardsFromGroup; 
+		}
+
+		[MemoryPackOrder(0)]
+		public CardInfo Card { get; set; }
+
+		[MemoryPackOrder(1)]
+		public long Id { get; set; }
+
+		[MemoryPackOrder(2)]
+		public int Error { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			this.Id = default;
+			this.Error = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.M2C_CreateRoomInfo)]
+	[MemoryPackable]
+	public partial class M2C_CreateRoomInfo: MessageObject, IMessage
+	{
+		public static M2C_CreateRoomInfo Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2C_CreateRoomInfo), isFromPool) as M2C_CreateRoomInfo; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<UnitInfo> Unit { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Unit.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	[Message(OuterMessage.M2C_CreateUnits)]
 	[MemoryPackable]
 	public partial class M2C_CreateUnits: MessageObject, IMessage
@@ -301,6 +491,32 @@ namespace ET
 		public static M2C_StartSceneChange Create(bool isFromPool = true) 
 		{ 
 			return ObjectPool.Instance.Fetch(typeof(M2C_StartSceneChange), isFromPool) as M2C_StartSceneChange; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long SceneInstanceId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public string SceneName { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.SceneInstanceId = default;
+			this.SceneName = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.M2C_CreateRoom)]
+	[MemoryPackable]
+	public partial class M2C_CreateRoom: MessageObject, IMessage
+	{
+		public static M2C_CreateRoom Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2C_CreateRoom), isFromPool) as M2C_CreateRoom; 
 		}
 
 		[MemoryPackOrder(0)]
@@ -969,6 +1185,170 @@ namespace ET
 
 	}
 
+	[ResponseType(nameof(M2C_CardAttack))]
+	[Message(OuterMessage.C2M_CardAttack)]
+	[MemoryPackable]
+	public partial class C2M_CardAttack: MessageObject, ISessionRequest
+	{
+		public static C2M_CardAttack Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2M_CardAttack), isFromPool) as C2M_CardAttack; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.M2C_CardAttack)]
+	[MemoryPackable]
+	public partial class M2C_CardAttack: MessageObject, ISessionResponse
+	{
+		public static M2C_CardAttack Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2C_CardAttack), isFromPool) as M2C_CardAttack; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int Error { get; set; }
+
+		[MemoryPackOrder(2)]
+		public string Message { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			this.Error = default;
+			this.Message = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[ResponseType(nameof(M2C_TurnOver))]
+	[Message(OuterMessage.C2M_TurnOver)]
+	[MemoryPackable]
+	public partial class C2M_TurnOver: MessageObject, ISessionRequest
+	{
+		public static C2M_TurnOver Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2M_TurnOver), isFromPool) as C2M_TurnOver; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.M2C_TurnOver)]
+	[MemoryPackable]
+	public partial class M2C_TurnOver: MessageObject, ISessionResponse
+	{
+		public static M2C_TurnOver Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2C_TurnOver), isFromPool) as M2C_TurnOver; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int Error { get; set; }
+
+		[MemoryPackOrder(2)]
+		public string Message { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			this.Error = default;
+			this.Message = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[ResponseType(nameof(G2C_FightWithAi))]
+	[Message(OuterMessage.C2G_FightWithAi)]
+	[MemoryPackable]
+	public partial class C2G_FightWithAi: MessageObject, ISessionRequest
+	{
+		public static C2G_FightWithAi Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2G_FightWithAi), isFromPool) as C2G_FightWithAi; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(OuterMessage.G2C_FightWithAi)]
+	[MemoryPackable]
+	public partial class G2C_FightWithAi: MessageObject, ISessionResponse
+	{
+		public static G2C_FightWithAi Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(G2C_FightWithAi), isFromPool) as G2C_FightWithAi; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int Error { get; set; }
+
+		[MemoryPackOrder(2)]
+		public string Message { get; set; }
+
+// 自己unitId
+		[MemoryPackOrder(3)]
+		public long MyId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			this.Error = default;
+			this.Message = default;
+			this.MyId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	public static class OuterMessage
 	{
 		 public const ushort HttpGetRouterResponse = 10002;
@@ -979,31 +1359,45 @@ namespace ET
 		 public const ushort G2C_EnterMap = 10007;
 		 public const ushort MoveInfo = 10008;
 		 public const ushort UnitInfo = 10009;
-		 public const ushort M2C_CreateUnits = 10010;
-		 public const ushort M2C_CreateMyUnit = 10011;
-		 public const ushort M2C_StartSceneChange = 10012;
-		 public const ushort M2C_RemoveUnits = 10013;
-		 public const ushort C2M_PathfindingResult = 10014;
-		 public const ushort C2M_Stop = 10015;
-		 public const ushort M2C_PathfindingResult = 10016;
-		 public const ushort M2C_Stop = 10017;
-		 public const ushort C2G_Ping = 10018;
-		 public const ushort G2C_Ping = 10019;
-		 public const ushort G2C_Test = 10020;
-		 public const ushort C2M_Reload = 10021;
-		 public const ushort M2C_Reload = 10022;
-		 public const ushort C2R_Login = 10023;
-		 public const ushort R2C_Login = 10024;
-		 public const ushort C2G_LoginGate = 10025;
-		 public const ushort G2C_LoginGate = 10026;
-		 public const ushort G2C_TestHotfixMessage = 10027;
-		 public const ushort C2M_TestRobotCase = 10028;
-		 public const ushort M2C_TestRobotCase = 10029;
-		 public const ushort C2M_TestRobotCase2 = 10030;
-		 public const ushort M2C_TestRobotCase2 = 10031;
-		 public const ushort C2M_TransferMap = 10032;
-		 public const ushort M2C_TransferMap = 10033;
-		 public const ushort C2G_Benchmark = 10034;
-		 public const ushort G2C_Benchmark = 10035;
+		 public const ushort CardInfo = 10010;
+		 public const ushort M2C_GetHandCard = 10011;
+		 public const ushort M2C_CreateHero = 10012;
+		 public const ushort M2C_CreateCardUnit = 10013;
+		 public const ushort M2C_CreateAgents = 10014;
+		 public const ushort M2C_GetHandCardsFromGroup = 10015;
+		 public const ushort M2C_CreateRoomInfo = 10016;
+		 public const ushort M2C_CreateUnits = 10017;
+		 public const ushort M2C_CreateMyUnit = 10018;
+		 public const ushort M2C_StartSceneChange = 10019;
+		 public const ushort M2C_CreateRoom = 10020;
+		 public const ushort M2C_RemoveUnits = 10021;
+		 public const ushort C2M_PathfindingResult = 10022;
+		 public const ushort C2M_Stop = 10023;
+		 public const ushort M2C_PathfindingResult = 10024;
+		 public const ushort M2C_Stop = 10025;
+		 public const ushort C2G_Ping = 10026;
+		 public const ushort G2C_Ping = 10027;
+		 public const ushort G2C_Test = 10028;
+		 public const ushort C2M_Reload = 10029;
+		 public const ushort M2C_Reload = 10030;
+		 public const ushort C2R_Login = 10031;
+		 public const ushort R2C_Login = 10032;
+		 public const ushort C2G_LoginGate = 10033;
+		 public const ushort G2C_LoginGate = 10034;
+		 public const ushort G2C_TestHotfixMessage = 10035;
+		 public const ushort C2M_TestRobotCase = 10036;
+		 public const ushort M2C_TestRobotCase = 10037;
+		 public const ushort C2M_TestRobotCase2 = 10038;
+		 public const ushort M2C_TestRobotCase2 = 10039;
+		 public const ushort C2M_TransferMap = 10040;
+		 public const ushort M2C_TransferMap = 10041;
+		 public const ushort C2G_Benchmark = 10042;
+		 public const ushort G2C_Benchmark = 10043;
+		 public const ushort C2M_CardAttack = 10044;
+		 public const ushort M2C_CardAttack = 10045;
+		 public const ushort C2M_TurnOver = 10046;
+		 public const ushort M2C_TurnOver = 10047;
+		 public const ushort C2G_FightWithAi = 10048;
+		 public const ushort G2C_FightWithAi = 10049;
 	}
 }

@@ -40,6 +40,7 @@ namespace ET.Server
 
         public static Dictionary<long, AOIEntity> GetBeSeePlayers(this AOIEntity self)
         {
+            Log.Warning(self.BeSeePlayers.ToString());
             return self.BeSeePlayers;
         }
 

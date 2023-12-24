@@ -7,6 +7,7 @@ namespace ET.Client
     {
         protected override async ETTask Run(Scene scene, AfterUnitCreate args)
         {
+            Log.Error("AfterUnitCreate");
             Unit unit = args.Unit;
             // Unit View层
             string assetsName = $"Assets/Bundles/Unit/Unit.prefab";

@@ -53,7 +53,7 @@ namespace ET.Server
             session.LastRecvTime = TimeInfo.Instance.ClientFrameTime();
 
             (ActorId actorId, object message) = MessageSerializeHelper.ToMessage(self.AService, memoryBuffer);
-            
+            Log.Warning((actorId == default).ToString());
             if (message is IResponse response)
             {
                 self.HandleIActorResponse(response);
@@ -168,9 +168,11 @@ namespace ET.Server
 
         private static void SendInner(this ProcessOuterSender self, ActorId actorId, MessageObject message)
         {
-            if (actorId == default)
-            {
-                throw new Exception($"actor id is 0: {message}");
+            if (actorId == default) {
+                string error = $"actor id is 0: {message.GetType() + " " + message.ToString()}";
+                Log.Warning("?????");
+                Log.Error(error);
+                throw new Exception(error);
             }
 
             Fiber fiber = self.Fiber();

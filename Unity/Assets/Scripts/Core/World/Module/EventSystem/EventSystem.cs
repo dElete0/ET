@@ -126,7 +126,7 @@ namespace ET
             {
                 return;
             }
-
+            
             SceneType sceneType = scene.SceneType;
             foreach (EventInfo eventInfo in iEvents)
             {
@@ -135,7 +135,6 @@ namespace ET
                     continue;
                 }
 
-                
                 if (!(eventInfo.IEvent is AEvent<S, T> aEvent))
                 {
                     Log.Error($"event error: {eventInfo.IEvent.GetType().FullName}");

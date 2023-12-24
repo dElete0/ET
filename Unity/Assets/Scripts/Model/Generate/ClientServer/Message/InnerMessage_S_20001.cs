@@ -729,6 +729,79 @@ namespace ET
 
 	}
 
+	[ResponseType(nameof(M2M_CreateUnitInRoomResponse))]
+	[Message(InnerMessage.M2M_CreateUnitInRoomRequest)]
+	[MemoryPackable]
+	public partial class M2M_CreateUnitInRoomRequest: MessageObject, IRequest
+	{
+		public static M2M_CreateUnitInRoomRequest Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2M_CreateUnitInRoomRequest), isFromPool) as M2M_CreateUnitInRoomRequest; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public ActorId OldActorId { get; set; }
+
+		[MemoryPackOrder(2)]
+		public byte[] Unit { get; set; }
+
+		[MemoryPackOrder(3)]
+		public List<byte[]> Entitys { get; set; } = new();
+
+		[MemoryPackOrder(4)]
+		public long RoomId { get; set; }
+
+		[MemoryPackOrder(5)]
+		public long PlayerId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			this.OldActorId = default;
+			this.Unit = default;
+			this.Entitys.Clear();
+			this.RoomId = default;
+			this.PlayerId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(InnerMessage.M2M_CreateUnitInRoomResponse)]
+	[MemoryPackable]
+	public partial class M2M_CreateUnitInRoomResponse: MessageObject, IResponse
+	{
+		public static M2M_CreateUnitInRoomResponse Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2M_CreateUnitInRoomResponse), isFromPool) as M2M_CreateUnitInRoomResponse; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int Error { get; set; }
+
+		[MemoryPackOrder(2)]
+		public string Message { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			this.Error = default;
+			this.Message = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	public static class InnerMessage
 	{
 		 public const ushort ObjectQueryRequest = 20002;
@@ -754,5 +827,7 @@ namespace ET
 		 public const ushort ObjectQueryResponse = 20022;
 		 public const ushort M2M_UnitTransferRequest = 20023;
 		 public const ushort M2M_UnitTransferResponse = 20024;
+		 public const ushort M2M_CreateUnitInRoomRequest = 20025;
+		 public const ushort M2M_CreateUnitInRoomResponse = 20026;
 	}
 }

@@ -61,6 +61,51 @@ message UnitInfo
 	MoveInfo MoveInfo = 7;
 }
 
+message CardInfo
+{
+	int64 CardId = 1;
+	int32 ConfigId = 2;
+	int32 Type = 3;
+	int32 Attack = 4;
+	int32 HP = 5;
+	int32 Cost = 6;
+}
+
+message M2C_GetHandCard // IMessage
+{
+	int32 Error = 1;
+	CardInfo Card = 2;
+}
+
+message M2C_CreateHero // IMessage
+{
+	CardInfo Card = 1;
+}
+
+message M2C_CreateCardUnit // IMessage
+{
+	CardInfo Unit = 1;
+}
+
+message M2C_CreateAgents // IMessage
+{
+	CardInfo Agent1 = 1;
+	CardInfo Agent2 = 2;
+}
+
+message M2C_GetHandCardsFromGroup //IMessage
+{
+	CardInfo Card = 1;
+	int64 Id = 2;
+	int32 Error = 3;
+}
+
+message M2C_CreateRoomInfo // IMessage
+{
+	repeated UnitInfo Unit = 1;
+
+}
+
 message M2C_CreateUnits // IMessage
 {
 	repeated UnitInfo Units = 1;
@@ -72,6 +117,12 @@ message M2C_CreateMyUnit // IMessage
 }
 
 message M2C_StartSceneChange // IMessage
+{
+	int64 SceneInstanceId = 1;
+	string SceneName = 2;	
+}
+
+message M2C_CreateRoom // IMessage
 {
 	int64 SceneInstanceId = 1;
 	string SceneName = 2;	
@@ -232,4 +283,45 @@ message G2C_Benchmark // ISessionResponse
 	int32 RpcId = 1;
 	int32 Error = 2;
 	string Message = 3;
+}
+
+//ResponseType M2C_CardAttack
+message C2M_CardAttack // ISessionRequest
+{
+	int32 RpcId = 1;
+}
+
+message M2C_CardAttack // ISessionResponse
+{
+	int32 RpcId = 1;
+	int32 Error = 2;
+	string Message = 3;
+}
+
+//ResponseType M2C_TurnOver
+message C2M_TurnOver // ISessionRequest
+{
+	int32 RpcId = 1;
+}
+
+message M2C_TurnOver // ISessionResponse
+{
+	int32 RpcId = 1;
+	int32 Error = 2;
+	string Message = 3;
+}
+
+//ResponseType G2C_FightWithAi
+message C2G_FightWithAi // ISessionRequest
+{
+	int32 RpcId = 1;
+}
+
+message G2C_FightWithAi // ISessionResponse
+{
+	int32 RpcId = 1;
+	int32 Error = 2;
+	string Message = 3;
+	// 自己unitId
+	int64 MyId = 4;
 }

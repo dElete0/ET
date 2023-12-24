@@ -6,6 +6,7 @@
     {
         protected override async ETTask Run(Scene scene, UnitEnterSightRange args)
         {
+            Log.Warning("????怎么就执行了？");
             AOIEntity a = args.A;
             AOIEntity b = args.B;
             if (a.Id == b.Id)

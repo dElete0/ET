@@ -3,9 +3,17 @@
     public struct SceneChangeStart
     {
     }
+
+    public struct RoomChangeStart {
+        
+    }
     
     public struct SceneChangeFinish
     {
+    }
+
+    public struct RoomChangeFinish {
+        
     }
     
     public struct AfterCreateClientScene
@@ -23,6 +31,12 @@
     public struct LoginFinish
     {
     }
+
+    public struct FindEnemy {
+        
+    }
+    
+    public struct FightWithAi {}
 
     public struct EnterMapFinish
     {
