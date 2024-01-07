@@ -45,6 +45,19 @@ namespace ET
             }
         }
 
+        private EntityRef<CGWorld> cgWorld;
+        public CGWorld CGWorld {
+            get
+            {
+                return this.cgWorld;
+            }
+            set
+            {
+                this.AddChild(value);
+                this.cgWorld = value;
+            }
+        }
+
         public bool IsReplay { get; set; }
         
         public int SpeedMultiply { get; set; }

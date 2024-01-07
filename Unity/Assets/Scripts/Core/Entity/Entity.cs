@@ -283,9 +283,17 @@ namespace ET
             }
         }
 
-        public T GetParent<T>() where T : Entity
-        {
-            return this.Parent as T;
+        public T GetParent<T>() where T : Entity {
+            Entity o = this.Parent;
+            if (this.Parent == null) {
+                return null;
+            }
+
+            if (this.Parent is T) {
+                return this.Parent as T;
+            }
+
+            return o.GetParent<T>();
         }
 
         [BsonIgnoreIfDefault]

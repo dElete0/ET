@@ -170,7 +170,6 @@ namespace ET.Server
         {
             if (actorId == default) {
                 string error = $"actor id is 0: {message.GetType() + " " + message.ToString()}";
-                Log.Warning("?????");
                 Log.Error(error);
                 throw new Exception(error);
             }

@@ -18,10 +18,10 @@ namespace ET.Client
                 return;
             }
 
-            Component_Card cards = unit.GetComponent<Component_Unit_RoomInfo>().Player.GetComponent<Component_Card>();
+            /*Component_Card cards = unit.GetComponent<Component_Unit_RoomInfo>().Player.GetComponent<Component_Card>();
             Component_Player_HandCards handCards = cards.GetComponent<Component_Player_HandCards>();
             GameCard card = GameCardFactory.Create(cards, message.Card);
-            handCards.HandCards.Add(card);
+            handCards.HandCards.Add(card);*/
             await ETTask.CompletedTask;
         }
     }

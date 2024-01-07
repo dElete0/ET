@@ -11,4 +11,10 @@ namespace ET
 			this.SceneType = sceneType;
 		}
 	}
+	
+	public class GameEventAttribute: BaseAttribute
+	{
+
+		public GameEventAttribute() { }
+	}
 }

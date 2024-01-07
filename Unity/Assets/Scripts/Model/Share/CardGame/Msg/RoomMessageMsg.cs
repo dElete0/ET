@@ -1,0 +1,13 @@
+namespace ET {
+    public static class RoomMessageMsg {
+        
+    }
+
+    public enum Room2C_OperateFailType {
+        None = 0,
+        //当前无法行动
+        CantOperateNow = 1,
+        //费用不足
+        NotEnoughCost = 2,
+    }
+}

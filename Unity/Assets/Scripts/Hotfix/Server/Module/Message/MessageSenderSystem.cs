@@ -18,6 +18,8 @@ namespace ET.Server
                 return;
             }
             
+            Log.Warning("发送消息：" + message.GetType() + " 到 " + actorId);
+            
             // 发给NetInner纤程
             A2NetInner_Message a2NetInnerMessage = A2NetInner_Message.Create();
             a2NetInnerMessage.FromAddress = fiber.Address;

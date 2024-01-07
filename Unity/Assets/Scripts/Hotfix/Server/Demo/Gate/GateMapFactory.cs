@@ -13,10 +13,6 @@ namespace ET.Server
             scene.AddComponent<RoomManagerComponent>();
             
             scene.AddComponent<MailBoxComponent, MailBoxType>(MailBoxType.UnOrderedMessage);
-
-            //CardGame
-            scene.AddComponent<Component_Rooms>();
-            scene.AddComponent<Component_GameAI>();
             
             return scene;
         }

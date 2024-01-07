@@ -19,11 +19,15 @@ namespace ET.Analyzer
 
              context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
              context.EnableConcurrentExecution();
-             context.RegisterSymbolAction(this.Analyzer, SymbolKind.NamedType);
+
+             if (AnalyzerGlobalSetting.EnableAnalyzeEntityFather) {
+                 context.RegisterSymbolAction(this.Analyzer, SymbolKind.NamedType);
+             }
          }
 
          private void Analyzer(SymbolAnalysisContext context)
          {
+             
              if (!(context.Symbol is INamedTypeSymbol namedTypeSymbol))
              {
                  return;
@@ -42,7 +46,18 @@ namespace ET.Analyzer
                  return;
              }
 
-             if (namedTypeSymbol.BaseType?.ToString()!="ET.LSEntity" && t == Definition.EntityType)
+             if (t=="ET.CGEntity")
+             {
+                 foreach (SyntaxReference? declaringSyntaxReference in namedTypeSymbol.DeclaringSyntaxReferences)
+                 {
+                     SyntaxNode classSyntax = declaringSyntaxReference.GetSyntax();
+                     Diagnostic diagnostic = Diagnostic.Create(EntityClassDeclarationAnalyzerRule.Rule, classSyntax.GetLocation(), namedTypeSymbol.Name,Definition.CGEntityType );
+                     context.ReportDiagnostic(diagnostic);
+                 }
+                 return;
+             }
+
+             if (namedTypeSymbol.BaseType?.ToString()!="ET.CGEntity" && namedTypeSymbol.BaseType?.ToString()!="ET.LSEntity" && t == Definition.EntityType)
              {
                  foreach (SyntaxReference? declaringSyntaxReference in namedTypeSymbol.DeclaringSyntaxReferences)
                  {

@@ -8,14 +8,14 @@ namespace ET.Server
     {
         public static GameRoom Create(Scene scene, GameRoomType type)
         {
-            Component_Rooms rooms = scene.GetComponent<Component_Rooms>();
+            scene.RemoveComponent<Component_Rooms>();
+            Component_Rooms rooms = scene.AddComponent<Component_Rooms>();
             switch (type)
             {
                 case GameRoomType.Ai:
                     {
                         GameRoom room = rooms.AddChild<GameRoom, GameRoomType>(GameRoomType.Ai);
                         room.AddComponent<Component_Room_GamePlayer, int>(2);
-                        GamePlayer aiPlayer = GamePlayerFactory.CreatePlayer(scene, room, GamePlayerType.ai, null);
                         return room;
                     }
                 default:

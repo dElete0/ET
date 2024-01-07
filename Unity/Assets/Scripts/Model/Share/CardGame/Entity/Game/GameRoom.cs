@@ -4,7 +4,18 @@ namespace ET {
     public partial class GameRoom : Entity, IAwake<GameRoomType>, IUpdate {
         public GameRoomType type;
         public GameState state;
-        public GamePlayer NowPlayer;
+        private EntityRef<GamePlayer> nowPlayer;
+
+        public GamePlayer NowPlayer {
+            get
+            {
+                return this.nowPlayer;
+            }
+            set
+            {
+                this.nowPlayer = value;
+            }
+        }
     }
 
     public enum GameRoomType {

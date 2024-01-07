@@ -7,17 +7,17 @@ namespace ET.Server
         protected override async ETTask Run(Session session, C2G_FightWithAi request, G2C_FightWithAi response)
         {
             Player player = session.GetComponent<SessionPlayerComponent>().Player;
-            player.RemoveComponent<GateMapComponent>();
-            // 在Gate上动态创建一个Map Scene，把Unit从DB中加载放进来，然后传送到真正的Map中，这样登陆跟传送的逻辑就完全一样了
             GateMapComponent gateMapComponent = player.AddComponent<GateMapComponent>();
             gateMapComponent.Scene = await GateMapFactory.Create(gateMapComponent, player.Id, IdGenerater.Instance.GenerateInstanceId(), "GateMap");
-
             Scene scene = gateMapComponent.Scene;
-            Log.Debug(scene.SceneType.ToString());
-
-            // 这里可以从DB中加载Player
-            GameRoom room = GameRoomFactory.Create(scene, GameRoomType.Ai);
-            GamePlayer gamePlayer = GamePlayerFactory.CreatePlayer(scene, room, GamePlayerType.man, player);
+            
+            // 先在Gate上创建一个GameRoom,随后创建两个GamePlayer,随后将两个unit传送到Map上，最后让room失效
+            
+            GameRoom room = GameRoomFactory.Create(session.Root(), GameRoomType.Ai);
+            GamePlayer aiPlayer = GamePlayerFactory.CreatePlayer(room, GamePlayerType.ai);
+            GamePlayer gamePlayer = GamePlayerFactory.CreatePlayer(room, GamePlayerType.man);
+            aiPlayer.unit = UnitFactory.Create(scene, 0, UnitType.Monster);
+            gamePlayer.unit = UnitFactory.Create(scene, player.Id, UnitType.Player);
             
             //StartSceneConfig startSceneConfig = StartSceneConfigCategory.Instance.GetBySceneName(session.Zone(), "Map1");
             response.MyId = player.Id;
@@ -25,8 +25,7 @@ namespace ET.Server
             // Todo 服务器发送进入战斗场景的逻辑
             Log.Warning("Todo 服务器发送进入战斗场景的逻辑");
 
-            // 等到一帧的最后面再传送，先让G2C_EnterMap返回，否则传送消息可能比G2C_EnterMap还早
-            //TransferHelper.TransferAtFrameFinish(unit, startSceneConfig.ActorId, startSceneConfig.Name).Coroutine();
+            await ETTask.CompletedTask;
         }
     }
 }

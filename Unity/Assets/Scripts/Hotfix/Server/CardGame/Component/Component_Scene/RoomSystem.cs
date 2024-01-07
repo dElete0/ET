@@ -24,10 +24,12 @@ namespace ET.Server {
                 case GameState.Wait:
                     {
                         Component_Room_GamePlayer players = self.GetComponent<Component_Room_GamePlayer>();
-                        if (players.PlayerMax <= players.PlayerCount) {
+                        if (players.PlayerMax == players.PlayerCount) {
                             self.state = GameState.Build;
                             Log.Debug("房间进入Build状态");
                             EventSystem.Instance.Publish(self.Parent.Scene(), new GameEventType_GameStart() {room = self});
+                        } else if (players.PlayerMax < players.PlayerCount) {
+                            Log.Error("房间人数还能超了么？");
                         }
                         break;
                     }

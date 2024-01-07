@@ -194,3 +194,20 @@ message M2M_CreateUnitInRoomResponse // IResponse
 	int32 Error = 2;
 	string Message = 3;
 }
+
+//ResponseType M2M_GameRoomMoveToMapResponse
+message M2M_GameRoomMoveToMapRequest // IRequest
+{
+	int32 RpcId = 1;
+	ActorId OldActorId = 2;
+	bytes GameRoom = 3;
+	repeated bytes Entitys = 4;
+	repeated bytes Units = 5;
+}
+
+message M2M_GameRoomMoveToMapResponse // IResponse
+{
+	int32 RpcId = 1;
+	int32 Error = 2;
+	string Message = 3;
+}

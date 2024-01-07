@@ -5,7 +5,9 @@
         [EnableAccessEntiyChild]
         public static async ETTask<UI> Create(Entity scene, string uiType, UILayer uiLayer)
         {
-            return await scene.GetComponent<UIComponent>().Create(uiType, uiLayer);
+            UI ui = await scene.GetComponent<UIComponent>().Create(uiType, uiLayer);
+            ui.GameObject.SetActive(true);
+            return ui;
         }
         
         [EnableAccessEntiyChild]
@@ -13,6 +15,14 @@
         {
             scene.GetComponent<UIComponent>().Remove(uiType);
             await ETTask.CompletedTask;
+        }
+        
+        [EnableAccessEntiyChild]
+        public static async ETTask<UI> Get(Entity scene, string uiType)
+        {
+            UI ui = scene.GetComponent<UIComponent>().Get(uiType);
+            await ETTask.CompletedTask;
+            return ui;
         }
     }
 }

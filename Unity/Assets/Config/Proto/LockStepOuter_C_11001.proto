@@ -14,6 +14,27 @@ message G2C_Match // ISessionResponse
 	string Message = 3;
 }
 
+//ResponseType G2C_MatchWithAi
+message C2G_MatchWithAi // ISessionRequest
+{
+	int32 RpcId = 1;
+}
+
+message G2C_MatchWithAi // ISessionResponse
+{
+	int32 RpcId = 1;
+	int32 Error = 2;
+	string Message = 3;
+}
+
+// 匹配成功，通知客户端切换场景
+message Match2C_NotifyGameMatchSuccess // IMessage
+{
+	int32 RpcId = 1;
+	// 房间的ActorId
+	ActorId ActorId = 2;
+}
+
 // 匹配成功，通知客户端切换场景
 message Match2G_NotifyMatchSuccess // IMessage
 {
@@ -24,6 +45,16 @@ message Match2G_NotifyMatchSuccess // IMessage
 
 // 客户端通知房间切换场景完成
 message C2Room_ChangeSceneFinish // IRoomMessage
+{
+	int64 PlayerId = 1;
+}
+
+message C2Room_ChangeGameSceneFinish // IRoomMessage
+{
+	int64 PlayerId = 1;
+}
+
+message CardGameUnitInfo
 {
 	int64 PlayerId = 1;
 }
@@ -40,6 +71,12 @@ message Room2C_Start // IMessage
 {
 	int64 StartTime = 1;
 	repeated LockStepUnitInfo UnitInfo = 2;
+}
+
+message Room2C_CGStart // IMessage
+{
+	int64 StartTime = 1;
+	repeated CardGameUnitInfo UnitInfo = 2;
 }
 
 message FrameMessage // IMessage
@@ -79,3 +116,257 @@ message G2C_Reconnect // IMessage
 	int32 Frame = 3;
 }
 
+message RoomCardInfo
+{
+	int64 CardId = 1;
+	int32 BaseId = 2;
+	
+	int32 Type = 3;
+	int32 Attack = 4;
+	int32 HP = 5;
+
+	int32 Cost = 6;
+	
+	int32 Red = 7;
+	int32 Blue = 8;
+	int32 White = 9;
+	int32 Green = 10;
+	int32 Black = 11;
+	int32 Grey = 12;
+
+	bool CantBeAttackTarget = 13;
+	bool CantBeMagicTarget = 14;
+
+	int32 UseCardType = 15;
+	int32 CardType = 16;
+	int32 AttackCount = 17;
+}
+
+message Room2C_GetHandCardFromGroup // IMessage
+{
+	RoomCardInfo CardInfo = 1;
+}
+
+message Room2C_EnemyGetHandCardFromGroup // IMessage
+{
+	RoomCardInfo CardInfo = 1;
+}
+
+message Room2C_GetCard // IMessage
+{
+	RoomCardInfo CardInfo = 1;
+}
+
+message Room2C_EnemyGetCard // IMessage
+{
+	RoomCardInfo CardInfo = 1;
+}
+
+message Room2C_MyGroupCount // IMessage
+{
+	int32 Count = 1;
+}
+
+message Room2C_EnemyGroupCount // IMessage
+{
+	int32 Count = 1;
+}
+
+message C2Room_TurnOver // IRoomMessage
+{
+	int64 PlayerId = 1;
+}
+
+message Room2C_TurnStart // IMessage
+{
+	bool IsThisClient = 1;
+	int32 Cost = 2;
+	int32 CostD = 3;
+	int32 Red = 4;
+	int32 Blue = 5;
+	int32 Green = 6;
+	int32 White = 7;
+	int32 Black = 8;
+	int32 Grey = 9;
+}
+
+message Room2C_NewHero // IMessage
+{
+	RoomCardInfo Hero = 1;
+}
+
+message Room2C_NewAgent // IMessage
+{
+	RoomCardInfo Agent1 = 1;
+	RoomCardInfo Agent2 = 2;
+}
+
+message Room2C_EnemyNewHero // IMessage
+{
+	RoomCardInfo Hero = 1;
+}
+
+message Room2C_EnemyNewAgent // IMessage
+{
+	RoomCardInfo Agent1 = 1;
+	RoomCardInfo Agent2 = 2;
+}
+
+message Room2C_GroupCount // IMessage
+{
+	int32 Count = 1;
+}
+
+message Room2C_CardBoom // IMessage
+{
+	RoomCardInfo Card = 1;
+}
+
+message Room2C_EnemyCardBoom // IMessage
+{
+	RoomCardInfo Card = 1;
+}
+
+message C2Room_Attack // IRoomMessage
+{
+	int64 PlayerId = 1;
+	int64 Actor = 2;
+	int64 Target = 3;
+}
+
+message Room2C_Attack // IMessage
+{
+	int64 Actor = 1;
+	int64 Target = 2;
+}
+
+message C2Room_UseCard // IRoomMessage
+{
+	int64 PlayerId = 1;
+	int64 Card = 2;
+	int64 Target = 3;
+	int32 Pos = 4;
+}
+
+// 发现
+message C2Room_SelectCard // IRoomMessage
+{
+	int64 PlayerId = 1;
+	int64 Card = 2;
+}
+
+message Room2C_UseCard // IMessage
+{
+	RoomCardInfo Card = 1;
+	bool IsThisClient = 2;
+	RoomCardInfo Target = 3;
+}
+
+message Room2C_OperateFail // IMessage
+{
+	int32 FailId = 1;
+}
+
+message C2Room_Effect // IRoomMessage
+{
+	int64 PlayerId = 1;
+	int32 EffectType = 2;
+}
+
+message Room2C_Effect // IMessage 
+{
+	int32 EffectType = 1;
+	bool IsThisClient = 2;
+}
+
+message C2Room_EffectToCard // IRoomMessage
+{
+	int64 PlayerId = 1;
+	int32 EffectType = 2;
+	RoomCardInfo Card = 3;
+}
+
+message Room2C_EffectToCard // IMessage 
+{
+	int32 EffectType = 1;
+	RoomCardInfo Card = 2;
+	bool IsThisClient = 3;
+}
+
+message C2Room_EffectToCards // IRoomMessage
+{
+	int64 PlayerId = 1;
+	int32 EffectType = 2;
+	repeated RoomCardInfo Card = 3;
+}
+
+message Room2C_EffectToCards // IMessage 
+{
+	int32 EffectType = 1;
+	repeated RoomCardInfo Card = 2;
+	bool IsThisClient = 3;
+	int32 Num1 = 4;
+	int32 Num2 = 5;
+	int32 Num3 = 6;
+}
+
+message C2Room_EffectCardToCard // IRoomMessage
+{
+	int64 PlayerId = 1;
+	int32 EffectType = 2;
+	RoomCardInfo Actor = 3;
+	RoomCardInfo Target = 4;
+	int32 Num1 = 4;
+	int32 Num2 = 5;
+	int32 Num3 = 6;
+}
+
+message Room2C_GetHandCardFromShowCard // IMessage
+{
+	int64 CardId = 1;
+}
+
+message Room2C_EnemyGetHandCardFromShowCard // IMessage
+{
+	int64 CardId = 1;
+}
+
+message Room2C_EffectCardToCard // IMessage
+{
+	int32 EffectType = 1;
+	RoomCardInfo Actor = 2;
+	RoomCardInfo Target = 3;
+	int32 Num1 = 4;
+	int32 Num2 = 5;
+	int32 Num3 = 6;
+}
+
+message Room2C_CallUnit // IMessage
+{
+	RoomCardInfo Card = 1;
+}
+
+message Room2C_EnemyCallUnit // IMessage
+{
+	RoomCardInfo Card = 1;
+}
+
+message Room2C_CardGetDamage // IMessage
+{
+	RoomCardInfo Card = 1;
+	int32 hurt = 2;
+}
+
+message Room2C_Cost // IMessage
+{
+	int32 Now = 1;
+	int32 Max = 2;
+	bool IsMy = 3;
+}
+
+message Room2C_GetColor // IMessage
+{
+	int32 Color = 1;
+	int32 Num = 2;
+	bool IsMy = 3;
+}

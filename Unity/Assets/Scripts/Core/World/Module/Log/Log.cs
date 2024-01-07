@@ -65,6 +65,22 @@ namespace ET
             GetLog().Warning(msg);
         }
 
+        public static void Warning(int i) {
+            GetLog().Warning(i.ToString());
+        }
+
+        public static void Warning(long i) {
+            GetLog().Warning(i.ToString());
+        }
+
+        public static void Warning(float f) {
+            GetLog().Warning(f.ToString());
+        }
+
+        public static void Warning(bool istrue) {
+            GetLog().Warning(istrue.ToString());
+        }
+
         public static void Error(string msg)
         {
             StackTrace st = new(1, true);

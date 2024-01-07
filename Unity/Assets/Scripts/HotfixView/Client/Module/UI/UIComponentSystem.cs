@@ -18,6 +18,7 @@ namespace ET.Client
 		public static async ETTask<UI> Create(this UIComponent self, string uiType, UILayer uiLayer)
 		{
 			UI ui = await self.UIGlobalComponent.OnCreate(self, uiType, uiLayer);
+			//Log.Warning(self.InstanceId.ToString() + " : " + uiType);
 			self.UIs.Add(uiType, ui);
 			return ui;
 		}
@@ -38,7 +39,9 @@ namespace ET.Client
 		public static UI Get(this UIComponent self, string name)
 		{
 			UI ui = null;
-			self.UIs.TryGetValue(name, out ui);
+			if (!self.UIs.TryGetValue(name, out ui)) {
+				Log.Warning(self.InstanceId.ToString() + "没找到UI: " + name);	
+			}
 			return ui;
 		}
 	}

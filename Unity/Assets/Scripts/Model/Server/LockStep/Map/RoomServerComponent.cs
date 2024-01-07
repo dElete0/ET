@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 
-namespace ET.Server
-{
+namespace ET {
     [ComponentOf(typeof(Room))]
-    public class RoomServerComponent: Entity, IAwake<List<long>>
-    {
+    public class RoomServerComponent : Entity, IAwake<List<long>> {
+    
     }
 }

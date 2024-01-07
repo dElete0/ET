@@ -18,6 +18,9 @@ namespace ET.Server
             root.AddComponent<RoomManagerComponent>();
             root.AddComponent<LocationProxyComponent>();
             root.AddComponent<MessageLocationSenderComponent>();
+            
+            //CardGame
+            root.AddComponent<Component_Rooms>();
 
             await ETTask.CompletedTask;
         }

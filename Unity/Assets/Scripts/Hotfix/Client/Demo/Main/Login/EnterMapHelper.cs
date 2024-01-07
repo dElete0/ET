@@ -33,5 +33,16 @@ namespace ET.Client
                 Log.Error(e);
             }	
         }
+
+        public static async ETTask GameMatchWithAi(Fiber fiber) {
+            try
+            {
+                G2C_MatchWithAi g2CEnterMap = await fiber.Root.GetComponent<ClientSenderCompnent>().Call(new C2G_MatchWithAi()) as G2C_MatchWithAi;
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+            }	
+        }
     }
 }

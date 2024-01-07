@@ -30,6 +30,24 @@ namespace ET
                 self.PlayerIds.Add(unitInfo.PlayerId);
             }
         }
+        
+        public static void Init(this Room self, List<CardGameUnitInfo> unitInfos, long startTime, int frame = -1)
+        {
+            self.StartTime = startTime;
+            self.AuthorityFrame = frame;
+            self.PredictionFrame = frame;
+            self.FrameBuffer = new FrameBuffer(frame);
+            self.FixedTimeCounter = new FixedTimeCounter(self.StartTime, 0, CGConstValue.UpdateInterval);
+            CGWorld cgWorld = self.CGWorld;
+            cgWorld.Frame = frame + 1;
+            cgWorld.AddComponent<CGUnitComponent>();
+            for (int i = 0; i < unitInfos.Count; ++i)
+            {
+                CardGameUnitInfo unitInfo = unitInfos[i];
+                CGUnitFactory.Init(cgWorld, unitInfo);
+                self.PlayerIds.Add(unitInfo.PlayerId);
+            }
+        }
 
         public static void Update(this Room self, OneFrameInputs oneFrameInputs)
         {

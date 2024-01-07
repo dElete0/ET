@@ -17,6 +17,22 @@ message Match2G_Match // IResponse
 	string Message = 3;
 }
 
+
+//ResponseType Match2G_MatchWithAi
+message G2Match_MatchWithAi // IRequest
+{
+	int32 RpcId = 1;
+	
+	int64 Id = 2;
+}
+
+message Match2G_MatchWithAi // IResponse
+{
+	int32 RpcId = 1;
+	int32 Error = 2;
+	string Message = 3;
+}
+
 //ResponseType Map2Match_GetRoom
 message Match2Map_GetRoom // IRequest
 {
@@ -25,6 +41,23 @@ message Match2Map_GetRoom // IRequest
 }
 
 message Map2Match_GetRoom // IResponse
+{
+	int32 RpcId = 1;
+	int32 Error = 2;
+	string Message = 3;
+	
+	// 房间的ActorId
+	ActorId ActorId = 4;
+}
+
+//ResponseType Map2Match_GetGameRoom
+message Match2Map_GetGameRoom // IRequest
+{
+	int32 RpcId = 1;
+	repeated int64 PlayerIds = 2;
+}
+
+message Map2Match_GetGameRoom // IResponse
 {
 	int32 RpcId = 1;
 	int32 Error = 2;
@@ -60,6 +93,20 @@ message RoomManager2Room_Init // IRequest
 }
 
 message Room2RoomManager_Init // IResponse
+{
+	int32 RpcId = 1;
+	int32 Error = 2;
+	string Message = 3;
+}
+
+//ResponseType Room2RoomManager_CGInit
+message RoomManager2Room_CGInit // IRequest
+{
+	int32 RpcId = 1;
+	repeated int64 PlayerIds = 2;
+}
+
+message Room2RoomManager_CGInit // IResponse
 {
 	int32 RpcId = 1;
 	int32 Error = 2;

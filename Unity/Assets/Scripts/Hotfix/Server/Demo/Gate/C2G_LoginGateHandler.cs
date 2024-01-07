@@ -8,6 +8,7 @@ namespace ET.Server
     {
         protected override async ETTask Run(Session session, C2G_LoginGate request, G2C_LoginGate response)
         {
+            Log.Warning("走了登录逻辑");
             Scene root = session.Root();
             string account = root.GetComponent<GateSessionKeyComponent>().Get(request.Key);
             if (account == null)

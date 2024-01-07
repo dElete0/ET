@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ET;
 using UnityEngine;
 //Object并非C#基础中的Object，而是 UnityEngine.Object
 using Object = UnityEngine.Object;
@@ -120,6 +121,7 @@ public class ReferenceCollector: MonoBehaviour, ISerializationCallbackReceiver
 		Object dictGo;
 		if (!dict.TryGetValue(key, out dictGo))
 		{
+			Log.Error(this.gameObject.ToString() + "RC上未找到：" + key);
 			return null;
 		}
 		return dictGo as T;

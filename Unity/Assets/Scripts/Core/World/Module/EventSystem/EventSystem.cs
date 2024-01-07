@@ -47,6 +47,7 @@ namespace ET
                     {
                         this.allEvents.Add(eventType, new List<EventInfo>());
                     }
+                    //Log.Warning(eventType.ToString());
                     this.allEvents[eventType].Add(eventInfo);
                 }
             }

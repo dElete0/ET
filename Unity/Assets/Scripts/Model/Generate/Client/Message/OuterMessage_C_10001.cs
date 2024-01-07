@@ -519,17 +519,13 @@ namespace ET
 			return ObjectPool.Instance.Fetch(typeof(M2C_CreateRoom), isFromPool) as M2C_CreateRoom; 
 		}
 
-		[MemoryPackOrder(0)]
-		public long SceneInstanceId { get; set; }
-
 		[MemoryPackOrder(1)]
-		public string SceneName { get; set; }
+		public string UI { get; set; }
 
 		public override void Dispose() 
 		{
 			if (!this.IsFromPool) return;
-			this.SceneInstanceId = default;
-			this.SceneName = default;
+			this.UI = default;
 			
 			ObjectPool.Instance.Recycle(this); 
 		}

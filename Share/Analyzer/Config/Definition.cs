@@ -5,6 +5,8 @@
         public const string EntityType = "ET.Entity";
 
         public const string LSEntityType = "ET.LSEntity";
+
+        public const string CGEntityType = "ET.CGEntity";
         
         public const string ETTask = "ETTask";
 
@@ -78,12 +80,22 @@
         public const string LSEntitySystemAttribute = "LSEntitySystem";
         public const string LSEntitySystemAttributeMetaName = "ET.LSEntitySystemAttribute";
         public const string LSEntitySystemOfAttribute = "ET.LSEntitySystemOfAttribute";
+        
+        public const string CGEntitySystemAttribute = "CGEntitySystem";
+        public const string CGEntitySystemAttributeMetaName = "ET.CGEntitySystemAttribute";
+        public const string CGEntitySystemOfAttribute = "ET.CGEntitySystemOfAttribute";
 
         public const string ILSRollbackInterface = "ET.ILSRollback";
         public const string LSRollbackMethod = "LSRollback";
 
         public const string ILSUpdateInterface = "ET.ILSUpdate";
         public const string LSUpdateMethod = "LSUpdate";
+        
+        public const string ICGRollbackInterface = "ET.ILSRollback";
+        public const string CGRollbackMethod = "LSRollback";
+
+        public const string ICGUpdateInterface = "ET.ICGUpdate";
+        public const string CGUpdateMethod = "CGUpdate";
 
         public const string ETLog = "ET.Log";
     }

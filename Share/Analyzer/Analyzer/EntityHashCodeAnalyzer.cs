@@ -54,7 +54,7 @@ namespace ET.Analyzer
             var baseType = namedTypeSymbol.BaseType?.ToString();
             
             // 筛选出实体类
-            if (baseType!= Definition.EntityType && baseType != Definition.LSEntityType)
+            if (baseType!= Definition.EntityType && baseType != Definition.LSEntityType && baseType != Definition.CGEntityType)
             {
                 return;
             }

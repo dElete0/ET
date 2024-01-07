@@ -56,6 +56,87 @@ namespace ET
 
 	}
 
+	[ResponseType(nameof(G2C_MatchWithAi))]
+	[Message(LockStepOuter.C2G_MatchWithAi)]
+	[MemoryPackable]
+	public partial class C2G_MatchWithAi: MessageObject, ISessionRequest
+	{
+		public static C2G_MatchWithAi Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2G_MatchWithAi), isFromPool) as C2G_MatchWithAi; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.G2C_MatchWithAi)]
+	[MemoryPackable]
+	public partial class G2C_MatchWithAi: MessageObject, ISessionResponse
+	{
+		public static G2C_MatchWithAi Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(G2C_MatchWithAi), isFromPool) as G2C_MatchWithAi; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int Error { get; set; }
+
+		[MemoryPackOrder(2)]
+		public string Message { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			this.Error = default;
+			this.Message = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+// 匹配成功，通知客户端切换场景
+	[Message(LockStepOuter.Match2C_NotifyGameMatchSuccess)]
+	[MemoryPackable]
+	public partial class Match2C_NotifyGameMatchSuccess: MessageObject, IMessage
+	{
+		public static Match2C_NotifyGameMatchSuccess Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Match2C_NotifyGameMatchSuccess), isFromPool) as Match2C_NotifyGameMatchSuccess; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+// 房间的ActorId
+		[MemoryPackOrder(1)]
+		public ActorId ActorId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			this.ActorId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 // 匹配成功，通知客户端切换场景
 	[Message(LockStepOuter.Match2G_NotifyMatchSuccess)]
 	[MemoryPackable]
@@ -92,6 +173,50 @@ namespace ET
 		public static C2Room_ChangeSceneFinish Create(bool isFromPool = true) 
 		{ 
 			return ObjectPool.Instance.Fetch(typeof(C2Room_ChangeSceneFinish), isFromPool) as C2Room_ChangeSceneFinish; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.C2Room_ChangeGameSceneFinish)]
+	[MemoryPackable]
+	public partial class C2Room_ChangeGameSceneFinish: MessageObject, IRoomMessage
+	{
+		public static C2Room_ChangeGameSceneFinish Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_ChangeGameSceneFinish), isFromPool) as C2Room_ChangeGameSceneFinish; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.CardGameUnitInfo)]
+	[MemoryPackable]
+	public partial class CardGameUnitInfo: MessageObject
+	{
+		public static CardGameUnitInfo Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(CardGameUnitInfo), isFromPool) as CardGameUnitInfo; 
 		}
 
 		[MemoryPackOrder(0)]
@@ -152,6 +277,32 @@ namespace ET
 
 		[MemoryPackOrder(1)]
 		public List<LockStepUnitInfo> UnitInfo { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.StartTime = default;
+			this.UnitInfo.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_CGStart)]
+	[MemoryPackable]
+	public partial class Room2C_CGStart: MessageObject, IMessage
+	{
+		public static Room2C_CGStart Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_CGStart), isFromPool) as Room2C_CGStart; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long StartTime { get; set; }
+
+		[MemoryPackOrder(1)]
+		public List<CardGameUnitInfo> UnitInfo { get; set; } = new();
 
 		public override void Dispose() 
 		{
@@ -324,19 +475,1133 @@ namespace ET
 
 	}
 
+	[Message(LockStepOuter.RoomCardInfo)]
+	[MemoryPackable]
+	public partial class RoomCardInfo: MessageObject
+	{
+		public static RoomCardInfo Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(RoomCardInfo), isFromPool) as RoomCardInfo; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long CardId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int BaseId { get; set; }
+
+		[MemoryPackOrder(2)]
+		public int Type { get; set; }
+
+		[MemoryPackOrder(3)]
+		public int Attack { get; set; }
+
+		[MemoryPackOrder(4)]
+		public int HP { get; set; }
+
+		[MemoryPackOrder(5)]
+		public int Cost { get; set; }
+
+		[MemoryPackOrder(6)]
+		public int Red { get; set; }
+
+		[MemoryPackOrder(7)]
+		public int Blue { get; set; }
+
+		[MemoryPackOrder(8)]
+		public int White { get; set; }
+
+		[MemoryPackOrder(9)]
+		public int Green { get; set; }
+
+		[MemoryPackOrder(10)]
+		public int Black { get; set; }
+
+		[MemoryPackOrder(11)]
+		public int Grey { get; set; }
+
+		[MemoryPackOrder(12)]
+		public bool CantBeAttackTarget { get; set; }
+
+		[MemoryPackOrder(13)]
+		public bool CantBeMagicTarget { get; set; }
+
+		[MemoryPackOrder(14)]
+		public int UseCardType { get; set; }
+
+		[MemoryPackOrder(15)]
+		public int CardType { get; set; }
+
+		[MemoryPackOrder(16)]
+		public int AttackCount { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardId = default;
+			this.BaseId = default;
+			this.Type = default;
+			this.Attack = default;
+			this.HP = default;
+			this.Cost = default;
+			this.Red = default;
+			this.Blue = default;
+			this.White = default;
+			this.Green = default;
+			this.Black = default;
+			this.Grey = default;
+			this.CantBeAttackTarget = default;
+			this.CantBeMagicTarget = default;
+			this.UseCardType = default;
+			this.CardType = default;
+			this.AttackCount = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_GetHandCardFromGroup)]
+	[MemoryPackable]
+	public partial class Room2C_GetHandCardFromGroup: MessageObject, IMessage
+	{
+		public static Room2C_GetHandCardFromGroup Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_GetHandCardFromGroup), isFromPool) as Room2C_GetHandCardFromGroup; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo CardInfo { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardInfo = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyGetHandCardFromGroup)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyGetHandCardFromGroup: MessageObject, IMessage
+	{
+		public static Room2C_EnemyGetHandCardFromGroup Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyGetHandCardFromGroup), isFromPool) as Room2C_EnemyGetHandCardFromGroup; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo CardInfo { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardInfo = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_GetCard)]
+	[MemoryPackable]
+	public partial class Room2C_GetCard: MessageObject, IMessage
+	{
+		public static Room2C_GetCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_GetCard), isFromPool) as Room2C_GetCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo CardInfo { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardInfo = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyGetCard)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyGetCard: MessageObject, IMessage
+	{
+		public static Room2C_EnemyGetCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyGetCard), isFromPool) as Room2C_EnemyGetCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo CardInfo { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardInfo = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_MyGroupCount)]
+	[MemoryPackable]
+	public partial class Room2C_MyGroupCount: MessageObject, IMessage
+	{
+		public static Room2C_MyGroupCount Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_MyGroupCount), isFromPool) as Room2C_MyGroupCount; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int Count { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Count = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyGroupCount)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyGroupCount: MessageObject, IMessage
+	{
+		public static Room2C_EnemyGroupCount Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyGroupCount), isFromPool) as Room2C_EnemyGroupCount; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int Count { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Count = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.C2Room_TurnOver)]
+	[MemoryPackable]
+	public partial class C2Room_TurnOver: MessageObject, IRoomMessage
+	{
+		public static C2Room_TurnOver Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_TurnOver), isFromPool) as C2Room_TurnOver; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_TurnStart)]
+	[MemoryPackable]
+	public partial class Room2C_TurnStart: MessageObject, IMessage
+	{
+		public static Room2C_TurnStart Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_TurnStart), isFromPool) as Room2C_TurnStart; 
+		}
+
+		[MemoryPackOrder(0)]
+		public bool IsThisClient { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int Cost { get; set; }
+
+		[MemoryPackOrder(2)]
+		public int CostD { get; set; }
+
+		[MemoryPackOrder(3)]
+		public int Red { get; set; }
+
+		[MemoryPackOrder(4)]
+		public int Blue { get; set; }
+
+		[MemoryPackOrder(5)]
+		public int Green { get; set; }
+
+		[MemoryPackOrder(6)]
+		public int White { get; set; }
+
+		[MemoryPackOrder(7)]
+		public int Black { get; set; }
+
+		[MemoryPackOrder(8)]
+		public int Grey { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.IsThisClient = default;
+			this.Cost = default;
+			this.CostD = default;
+			this.Red = default;
+			this.Blue = default;
+			this.Green = default;
+			this.White = default;
+			this.Black = default;
+			this.Grey = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_NewHero)]
+	[MemoryPackable]
+	public partial class Room2C_NewHero: MessageObject, IMessage
+	{
+		public static Room2C_NewHero Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_NewHero), isFromPool) as Room2C_NewHero; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Hero { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Hero = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_NewAgent)]
+	[MemoryPackable]
+	public partial class Room2C_NewAgent: MessageObject, IMessage
+	{
+		public static Room2C_NewAgent Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_NewAgent), isFromPool) as Room2C_NewAgent; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Agent1 { get; set; }
+
+		[MemoryPackOrder(1)]
+		public RoomCardInfo Agent2 { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Agent1 = default;
+			this.Agent2 = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyNewHero)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyNewHero: MessageObject, IMessage
+	{
+		public static Room2C_EnemyNewHero Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyNewHero), isFromPool) as Room2C_EnemyNewHero; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Hero { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Hero = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyNewAgent)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyNewAgent: MessageObject, IMessage
+	{
+		public static Room2C_EnemyNewAgent Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyNewAgent), isFromPool) as Room2C_EnemyNewAgent; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Agent1 { get; set; }
+
+		[MemoryPackOrder(1)]
+		public RoomCardInfo Agent2 { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Agent1 = default;
+			this.Agent2 = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_GroupCount)]
+	[MemoryPackable]
+	public partial class Room2C_GroupCount: MessageObject, IMessage
+	{
+		public static Room2C_GroupCount Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_GroupCount), isFromPool) as Room2C_GroupCount; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int Count { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Count = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_CardBoom)]
+	[MemoryPackable]
+	public partial class Room2C_CardBoom: MessageObject, IMessage
+	{
+		public static Room2C_CardBoom Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_CardBoom), isFromPool) as Room2C_CardBoom; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Card { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyCardBoom)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyCardBoom: MessageObject, IMessage
+	{
+		public static Room2C_EnemyCardBoom Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyCardBoom), isFromPool) as Room2C_EnemyCardBoom; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Card { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.C2Room_Attack)]
+	[MemoryPackable]
+	public partial class C2Room_Attack: MessageObject, IRoomMessage
+	{
+		public static C2Room_Attack Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_Attack), isFromPool) as C2Room_Attack; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public long Actor { get; set; }
+
+		[MemoryPackOrder(2)]
+		public long Target { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			this.Actor = default;
+			this.Target = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_Attack)]
+	[MemoryPackable]
+	public partial class Room2C_Attack: MessageObject, IMessage
+	{
+		public static Room2C_Attack Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_Attack), isFromPool) as Room2C_Attack; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long Actor { get; set; }
+
+		[MemoryPackOrder(1)]
+		public long Target { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Actor = default;
+			this.Target = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.C2Room_UseCard)]
+	[MemoryPackable]
+	public partial class C2Room_UseCard: MessageObject, IRoomMessage
+	{
+		public static C2Room_UseCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_UseCard), isFromPool) as C2Room_UseCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public long Card { get; set; }
+
+		[MemoryPackOrder(2)]
+		public long Target { get; set; }
+
+		[MemoryPackOrder(3)]
+		public int Pos { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			this.Card = default;
+			this.Target = default;
+			this.Pos = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+// 发现
+	[Message(LockStepOuter.C2Room_SelectCard)]
+	[MemoryPackable]
+	public partial class C2Room_SelectCard: MessageObject, IRoomMessage
+	{
+		public static C2Room_SelectCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_SelectCard), isFromPool) as C2Room_SelectCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public long Card { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			this.Card = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_UseCard)]
+	[MemoryPackable]
+	public partial class Room2C_UseCard: MessageObject, IMessage
+	{
+		public static Room2C_UseCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_UseCard), isFromPool) as Room2C_UseCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Card { get; set; }
+
+		[MemoryPackOrder(1)]
+		public bool IsThisClient { get; set; }
+
+		[MemoryPackOrder(2)]
+		public RoomCardInfo Target { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			this.IsThisClient = default;
+			this.Target = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_OperateFail)]
+	[MemoryPackable]
+	public partial class Room2C_OperateFail: MessageObject, IMessage
+	{
+		public static Room2C_OperateFail Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_OperateFail), isFromPool) as Room2C_OperateFail; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int FailId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.FailId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.C2Room_Effect)]
+	[MemoryPackable]
+	public partial class C2Room_Effect: MessageObject, IRoomMessage
+	{
+		public static C2Room_Effect Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_Effect), isFromPool) as C2Room_Effect; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int EffectType { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			this.EffectType = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_Effect)]
+	[MemoryPackable]
+	public partial class Room2C_Effect: MessageObject, IMessage
+	{
+		public static Room2C_Effect Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_Effect), isFromPool) as Room2C_Effect; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int EffectType { get; set; }
+
+		[MemoryPackOrder(1)]
+		public bool IsThisClient { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.EffectType = default;
+			this.IsThisClient = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.C2Room_EffectToCard)]
+	[MemoryPackable]
+	public partial class C2Room_EffectToCard: MessageObject, IRoomMessage
+	{
+		public static C2Room_EffectToCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_EffectToCard), isFromPool) as C2Room_EffectToCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int EffectType { get; set; }
+
+		[MemoryPackOrder(2)]
+		public RoomCardInfo Card { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			this.EffectType = default;
+			this.Card = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EffectToCard)]
+	[MemoryPackable]
+	public partial class Room2C_EffectToCard: MessageObject, IMessage
+	{
+		public static Room2C_EffectToCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EffectToCard), isFromPool) as Room2C_EffectToCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int EffectType { get; set; }
+
+		[MemoryPackOrder(1)]
+		public RoomCardInfo Card { get; set; }
+
+		[MemoryPackOrder(2)]
+		public bool IsThisClient { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.EffectType = default;
+			this.Card = default;
+			this.IsThisClient = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.C2Room_EffectToCards)]
+	[MemoryPackable]
+	public partial class C2Room_EffectToCards: MessageObject, IRoomMessage
+	{
+		public static C2Room_EffectToCards Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_EffectToCards), isFromPool) as C2Room_EffectToCards; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int EffectType { get; set; }
+
+		[MemoryPackOrder(2)]
+		public List<RoomCardInfo> Card { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			this.EffectType = default;
+			this.Card.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EffectToCards)]
+	[MemoryPackable]
+	public partial class Room2C_EffectToCards: MessageObject, IMessage
+	{
+		public static Room2C_EffectToCards Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EffectToCards), isFromPool) as Room2C_EffectToCards; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int EffectType { get; set; }
+
+		[MemoryPackOrder(1)]
+		public List<RoomCardInfo> Card { get; set; } = new();
+
+		[MemoryPackOrder(2)]
+		public bool IsThisClient { get; set; }
+
+		[MemoryPackOrder(3)]
+		public int Num1 { get; set; }
+
+		[MemoryPackOrder(4)]
+		public int Num2 { get; set; }
+
+		[MemoryPackOrder(5)]
+		public int Num3 { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.EffectType = default;
+			this.Card.Clear();
+			this.IsThisClient = default;
+			this.Num1 = default;
+			this.Num2 = default;
+			this.Num3 = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.C2Room_EffectCardToCard)]
+	[MemoryPackable]
+	public partial class C2Room_EffectCardToCard: MessageObject, IRoomMessage
+	{
+		public static C2Room_EffectCardToCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_EffectCardToCard), isFromPool) as C2Room_EffectCardToCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int EffectType { get; set; }
+
+		[MemoryPackOrder(2)]
+		public RoomCardInfo Actor { get; set; }
+
+		[MemoryPackOrder(3)]
+		public RoomCardInfo Target { get; set; }
+
+		[MemoryPackOrder(3)]
+		public int Num1 { get; set; }
+
+		[MemoryPackOrder(4)]
+		public int Num2 { get; set; }
+
+		[MemoryPackOrder(5)]
+		public int Num3 { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			this.EffectType = default;
+			this.Actor = default;
+			this.Target = default;
+			this.Num1 = default;
+			this.Num2 = default;
+			this.Num3 = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_GetHandCardFromShowCard)]
+	[MemoryPackable]
+	public partial class Room2C_GetHandCardFromShowCard: MessageObject, IMessage
+	{
+		public static Room2C_GetHandCardFromShowCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_GetHandCardFromShowCard), isFromPool) as Room2C_GetHandCardFromShowCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long CardId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyGetHandCardFromShowCard)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyGetHandCardFromShowCard: MessageObject, IMessage
+	{
+		public static Room2C_EnemyGetHandCardFromShowCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyGetHandCardFromShowCard), isFromPool) as Room2C_EnemyGetHandCardFromShowCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long CardId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EffectCardToCard)]
+	[MemoryPackable]
+	public partial class Room2C_EffectCardToCard: MessageObject, IMessage
+	{
+		public static Room2C_EffectCardToCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EffectCardToCard), isFromPool) as Room2C_EffectCardToCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int EffectType { get; set; }
+
+		[MemoryPackOrder(1)]
+		public RoomCardInfo Actor { get; set; }
+
+		[MemoryPackOrder(2)]
+		public RoomCardInfo Target { get; set; }
+
+		[MemoryPackOrder(3)]
+		public int Num1 { get; set; }
+
+		[MemoryPackOrder(4)]
+		public int Num2 { get; set; }
+
+		[MemoryPackOrder(5)]
+		public int Num3 { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.EffectType = default;
+			this.Actor = default;
+			this.Target = default;
+			this.Num1 = default;
+			this.Num2 = default;
+			this.Num3 = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_CallUnit)]
+	[MemoryPackable]
+	public partial class Room2C_CallUnit: MessageObject, IMessage
+	{
+		public static Room2C_CallUnit Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_CallUnit), isFromPool) as Room2C_CallUnit; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Card { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyCallUnit)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyCallUnit: MessageObject, IMessage
+	{
+		public static Room2C_EnemyCallUnit Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyCallUnit), isFromPool) as Room2C_EnemyCallUnit; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Card { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_CardGetDamage)]
+	[MemoryPackable]
+	public partial class Room2C_CardGetDamage: MessageObject, IMessage
+	{
+		public static Room2C_CardGetDamage Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_CardGetDamage), isFromPool) as Room2C_CardGetDamage; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Card { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int hurt { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			this.hurt = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_Cost)]
+	[MemoryPackable]
+	public partial class Room2C_Cost: MessageObject, IMessage
+	{
+		public static Room2C_Cost Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_Cost), isFromPool) as Room2C_Cost; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int Now { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int Max { get; set; }
+
+		[MemoryPackOrder(2)]
+		public bool IsMy { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Now = default;
+			this.Max = default;
+			this.IsMy = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_GetColor)]
+	[MemoryPackable]
+	public partial class Room2C_GetColor: MessageObject, IMessage
+	{
+		public static Room2C_GetColor Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_GetColor), isFromPool) as Room2C_GetColor; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int Color { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int Num { get; set; }
+
+		[MemoryPackOrder(2)]
+		public bool IsMy { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Color = default;
+			this.Num = default;
+			this.IsMy = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	public static class LockStepOuter
 	{
 		 public const ushort C2G_Match = 11002;
 		 public const ushort G2C_Match = 11003;
-		 public const ushort Match2G_NotifyMatchSuccess = 11004;
-		 public const ushort C2Room_ChangeSceneFinish = 11005;
-		 public const ushort LockStepUnitInfo = 11006;
-		 public const ushort Room2C_Start = 11007;
-		 public const ushort FrameMessage = 11008;
-		 public const ushort OneFrameInputs = 11009;
-		 public const ushort Room2C_AdjustUpdateTime = 11010;
-		 public const ushort C2Room_CheckHash = 11011;
-		 public const ushort Room2C_CheckHashFail = 11012;
-		 public const ushort G2C_Reconnect = 11013;
+		 public const ushort C2G_MatchWithAi = 11004;
+		 public const ushort G2C_MatchWithAi = 11005;
+		 public const ushort Match2C_NotifyGameMatchSuccess = 11006;
+		 public const ushort Match2G_NotifyMatchSuccess = 11007;
+		 public const ushort C2Room_ChangeSceneFinish = 11008;
+		 public const ushort C2Room_ChangeGameSceneFinish = 11009;
+		 public const ushort CardGameUnitInfo = 11010;
+		 public const ushort LockStepUnitInfo = 11011;
+		 public const ushort Room2C_Start = 11012;
+		 public const ushort Room2C_CGStart = 11013;
+		 public const ushort FrameMessage = 11014;
+		 public const ushort OneFrameInputs = 11015;
+		 public const ushort Room2C_AdjustUpdateTime = 11016;
+		 public const ushort C2Room_CheckHash = 11017;
+		 public const ushort Room2C_CheckHashFail = 11018;
+		 public const ushort G2C_Reconnect = 11019;
+		 public const ushort RoomCardInfo = 11020;
+		 public const ushort Room2C_GetHandCardFromGroup = 11021;
+		 public const ushort Room2C_EnemyGetHandCardFromGroup = 11022;
+		 public const ushort Room2C_GetCard = 11023;
+		 public const ushort Room2C_EnemyGetCard = 11024;
+		 public const ushort Room2C_MyGroupCount = 11025;
+		 public const ushort Room2C_EnemyGroupCount = 11026;
+		 public const ushort C2Room_TurnOver = 11027;
+		 public const ushort Room2C_TurnStart = 11028;
+		 public const ushort Room2C_NewHero = 11029;
+		 public const ushort Room2C_NewAgent = 11030;
+		 public const ushort Room2C_EnemyNewHero = 11031;
+		 public const ushort Room2C_EnemyNewAgent = 11032;
+		 public const ushort Room2C_GroupCount = 11033;
+		 public const ushort Room2C_CardBoom = 11034;
+		 public const ushort Room2C_EnemyCardBoom = 11035;
+		 public const ushort C2Room_Attack = 11036;
+		 public const ushort Room2C_Attack = 11037;
+		 public const ushort C2Room_UseCard = 11038;
+		 public const ushort C2Room_SelectCard = 11039;
+		 public const ushort Room2C_UseCard = 11040;
+		 public const ushort Room2C_OperateFail = 11041;
+		 public const ushort C2Room_Effect = 11042;
+		 public const ushort Room2C_Effect = 11043;
+		 public const ushort C2Room_EffectToCard = 11044;
+		 public const ushort Room2C_EffectToCard = 11045;
+		 public const ushort C2Room_EffectToCards = 11046;
+		 public const ushort Room2C_EffectToCards = 11047;
+		 public const ushort C2Room_EffectCardToCard = 11048;
+		 public const ushort Room2C_GetHandCardFromShowCard = 11049;
+		 public const ushort Room2C_EnemyGetHandCardFromShowCard = 11050;
+		 public const ushort Room2C_EffectCardToCard = 11051;
+		 public const ushort Room2C_CallUnit = 11052;
+		 public const ushort Room2C_EnemyCallUnit = 11053;
+		 public const ushort Room2C_CardGetDamage = 11054;
+		 public const ushort Room2C_Cost = 11055;
+		 public const ushort Room2C_GetColor = 11056;
 	}
 }

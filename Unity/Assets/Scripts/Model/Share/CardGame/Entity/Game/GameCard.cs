@@ -32,28 +32,4 @@ namespace ET {
         public int Cost;
         public int CostD;
     }
-
-    public enum CardType {
-        Magic = 0,
-        Unit = 1,
-        Plot = 2,
-        Agent = 3,
-        Hero = 4,
-    }
-
-    public enum CardColor {
-        none = 0,
-        red = 1,
-        green = 2,
-        blue = 3,
-        black = 4,
-        white = 5,
-        gruy = 6,
-    }
-
-    public enum CardPos {
-        None = 0,//墓地，未加入手牌等
-        Hand = 1,//手牌
-        Group = 2,
-    }
 }

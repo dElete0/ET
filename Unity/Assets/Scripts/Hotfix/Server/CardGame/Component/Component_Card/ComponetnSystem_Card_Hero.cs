@@ -6,8 +6,8 @@ namespace ET.Server {
         [EntitySystem]
         private static void Awake(this ET.Component_Card_Hero self)
         {
-            self.color1 = CardColor.red;
-            self.color2 = CardColor.red;
+            self.color1 = CardColor.Red;
+            self.color2 = CardColor.Red;
         }
     }
 }

@@ -16,6 +16,7 @@ namespace ET
         
         Demo,
         LockStep,
+        CardGame,
     }
     
     public class Options: Singleton<Options>

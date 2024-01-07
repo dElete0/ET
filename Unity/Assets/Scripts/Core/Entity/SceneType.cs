@@ -24,6 +24,7 @@ namespace ET
 		LockStepServer = 1 << 17,
 		RoomRoot = 1 << 18,
 		Watcher = 1 << 19,
+		CardGameServer = 1 << 20,
 
 		// 客户端
 		Demo = 1 << 30,
@@ -32,6 +33,7 @@ namespace ET
 		LockStepView = 1L << 33,
 		DemoView = 1L << 34,
 		NetClient = 1L << 35,
+		CardGame = 1L << 36,
 
 		All = long.MaxValue,
 	}

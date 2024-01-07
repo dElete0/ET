@@ -8,5 +8,12 @@ namespace ET.Client
 
             public Room2C_Start Message;
         }
+        
+        public struct Wait_Room2C_GameStart: IWaitType
+        {
+            public int Error { get; set; }
+
+            public Room2C_CGStart Message;
+        }
     }
 }

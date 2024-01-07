@@ -124,8 +124,7 @@ message M2C_StartSceneChange // IMessage
 
 message M2C_CreateRoom // IMessage
 {
-	int64 SceneInstanceId = 1;
-	string SceneName = 2;	
+	string UI = 2;
 }
 
 message M2C_RemoveUnits // IMessage

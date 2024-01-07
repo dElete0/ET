@@ -802,6 +802,75 @@ namespace ET
 
 	}
 
+	[ResponseType(nameof(M2M_GameRoomMoveToMapResponse))]
+	[Message(InnerMessage.M2M_GameRoomMoveToMapRequest)]
+	[MemoryPackable]
+	public partial class M2M_GameRoomMoveToMapRequest: MessageObject, IRequest
+	{
+		public static M2M_GameRoomMoveToMapRequest Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2M_GameRoomMoveToMapRequest), isFromPool) as M2M_GameRoomMoveToMapRequest; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public ActorId OldActorId { get; set; }
+
+		[MemoryPackOrder(2)]
+		public byte[] GameRoom { get; set; }
+
+		[MemoryPackOrder(3)]
+		public List<byte[]> Entitys { get; set; } = new();
+
+		[MemoryPackOrder(4)]
+		public List<byte[]> Units { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			this.OldActorId = default;
+			this.GameRoom = default;
+			this.Entitys.Clear();
+			this.Units.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(InnerMessage.M2M_GameRoomMoveToMapResponse)]
+	[MemoryPackable]
+	public partial class M2M_GameRoomMoveToMapResponse: MessageObject, IResponse
+	{
+		public static M2M_GameRoomMoveToMapResponse Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(M2M_GameRoomMoveToMapResponse), isFromPool) as M2M_GameRoomMoveToMapResponse; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int RpcId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public int Error { get; set; }
+
+		[MemoryPackOrder(2)]
+		public string Message { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.RpcId = default;
+			this.Error = default;
+			this.Message = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	public static class InnerMessage
 	{
 		 public const ushort ObjectQueryRequest = 20002;
@@ -829,5 +898,7 @@ namespace ET
 		 public const ushort M2M_UnitTransferResponse = 20024;
 		 public const ushort M2M_CreateUnitInRoomRequest = 20025;
 		 public const ushort M2M_CreateUnitInRoomResponse = 20026;
+		 public const ushort M2M_GameRoomMoveToMapRequest = 20027;
+		 public const ushort M2M_GameRoomMoveToMapResponse = 20028;
 	}
 }

@@ -31,6 +31,7 @@ namespace ET.Analyzer
 
         public override void Initialize(AnalysisContext context)
         {
+            if (!AnalyzerGlobalSetting.EnableCircularDependencyAnalyze) return;
             if (!AnalyzerGlobalSetting.EnableAnalyzer)
             {
                 return;
@@ -135,9 +136,8 @@ namespace ET.Analyzer
         /// 环形依赖分析
         /// </summary>
         private void CircularDependencyAnalyze(CompilationAnalysisContext context, ConcurrentDictionary<string, HashSet<string>> dependencyMap,
-        HashSet<string> staticClassSet)
-        {
-            
+        HashSet<string> staticClassSet) {
+            if (!AnalyzerGlobalSetting.EnableCircularDependencyAnalyze) return;
             // 排除只引用其他静态类的静态类
             while (true)
             {

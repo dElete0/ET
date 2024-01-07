@@ -77,7 +77,7 @@ namespace ET.Analyzer
                 return;
             }
 
-            if (filedSymbol.ContainingType.BaseType?.ToString() != Definition.EntityType && filedSymbol.ContainingType.BaseType?.ToString() != Definition.LSEntityType)
+            if (filedSymbol.ContainingType.BaseType?.ToString() != Definition.EntityType && filedSymbol.ContainingType.BaseType?.ToString() != Definition.LSEntityType && filedSymbol.ContainingType.BaseType?.ToString() != Definition.CGEntityType)
             {
                 return;
             }
@@ -99,7 +99,7 @@ namespace ET.Analyzer
             }
 
             // 实体基类忽略处理
-            if (accessFieldClassSymbol.ToString() is Definition.EntityType or Definition.LSEntityType)
+            if (accessFieldClassSymbol.ToString() is Definition.EntityType or Definition.LSEntityType or Definition.CGEntityType)
             {
                 return;
             }

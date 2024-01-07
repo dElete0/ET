@@ -1,4 +1,6 @@
-﻿namespace ET
+﻿using System;
+
+namespace ET
 {
     [EntitySystemOf(typeof(MailBoxComponent))]
     [FriendOf(typeof(MailBoxComponent))]
@@ -7,10 +9,14 @@
         [EntitySystem]       
         private static void Awake(this MailBoxComponent self, MailBoxType mailBoxType)
         {
-            Fiber fiber = self.Fiber();
-            self.MailBoxType = mailBoxType;
-            self.ParentInstanceId = self.Parent.InstanceId;
-            fiber.Mailboxes.Add(self);
+            try {
+                Fiber fiber = self.Fiber();
+                self.MailBoxType = mailBoxType;
+                self.ParentInstanceId = self.Parent.InstanceId;
+                fiber.Mailboxes.Add(self);
+            } catch (Exception e) {
+                Log.Error(e.ToString());
+            }
         }
         
         [EntitySystem]

@@ -14,6 +14,7 @@ namespace ET.Server
             root.AddComponent<ProcessInnerSender>();
             root.AddComponent<MessageSender>();
             root.AddComponent<MatchComponent>();
+            root.AddComponent<MatchWithAiComponent>();
             root.AddComponent<LocationProxyComponent>();
             root.AddComponent<MessageLocationSenderComponent>();
 

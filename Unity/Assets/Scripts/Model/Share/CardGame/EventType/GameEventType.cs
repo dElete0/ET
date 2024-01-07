@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 namespace ET {
 
     public struct GameEventType_GameStart {
@@ -10,20 +13,20 @@ namespace ET {
     }
 
     public struct GameEventType_GetHandCardsFromGroup {
-        public GamePlayer Target;
-        public GameRoom Room;
-        public Component_Card Cards;
+        public RoomPlayer Target;
+        public Room Room;
         public int Count;
     }
 
     public struct GameEventType_GetHandCard {
-        public GameCard Card;
-        public Component_Player_HandCards HandCards;
+        public RoomPlayer Player;
+        public long Card;
+        public List<long> HandCards;
     }
 
     public struct GameEventType_RemoveCardFromGroup {
-        public GameCard Card;
-        public Component_Player_Group Group;
+        public long Card;
+        public List<long> Group;
     }
 
     public struct GameEventType_TurnOver {
@@ -35,7 +38,11 @@ namespace ET {
     }
 
     public struct GameEventType_GameStartOver {
-        public GameRoom room;
+        public Room Room;
+    }
+
+    public struct GameEventType_GameBuildInMapScene {
+        public GameRoom GameRoom;
     }
     
     //GameEventType结束后的通知

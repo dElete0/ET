@@ -34,8 +34,13 @@ namespace ET.Server
         }
         
         public static void SendToClient(Unit unit, IMessage message) {
-            if (unit.Type() != UnitType.Player) return;
-            unit.Root().GetComponent<MessageLocationSenderComponent>().Get(LocationType.GateSession).Send(unit.Id, message);
+            if (unit.Id == 0 || unit.Type() != UnitType.Player) {
+                Log.Warning("非玩家角色，不传递");
+                return;
+            }
+            Log.Warning(unit.Id.ToString());
+            var messageLocation = unit.Root().GetComponent<MessageLocationSenderComponent>().Get(LocationType.GateSession);
+            messageLocation.Send(unit.Id, message);
         }
         
         /// <summary>
