@@ -5,7 +5,6 @@ namespace ET.Server {
     {
         [EntitySystem]
         private static void Awake(this ET.RoomPlayer self, long id) {
-            Log.Warning(id);
             self.PlayerId = id;
         }
     }

@@ -19,6 +19,7 @@ namespace ET.Server
             {
                 ToDo = (gameEvent) => {
                     self.GetParent<RoomCard>().AttackCount = self.GetParent<RoomCard>().AttackCountMax;
+                    self.GetParent<RoomCard>().IsCallThisTurn = false;
                 }
             });
         }

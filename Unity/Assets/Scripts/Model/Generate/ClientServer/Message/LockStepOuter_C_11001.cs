@@ -535,6 +535,12 @@ namespace ET
 		[MemoryPackOrder(16)]
 		public int AttackCount { get; set; }
 
+		[MemoryPackOrder(17)]
+		public List<int> CardPowers { get; set; } = new();
+
+		[MemoryPackOrder(18)]
+		public int Order { get; set; }
+
 		public override void Dispose() 
 		{
 			if (!this.IsFromPool) return;
@@ -555,6 +561,8 @@ namespace ET
 			this.UseCardType = default;
 			this.CardType = default;
 			this.AttackCount = default;
+			this.CardPowers.Clear();
+			this.Order = default;
 			
 			ObjectPool.Instance.Recycle(this); 
 		}
@@ -1428,10 +1436,14 @@ namespace ET
 		[MemoryPackOrder(0)]
 		public RoomCardInfo Card { get; set; }
 
+		[MemoryPackOrder(1)]
+		public List<long> UnitOrder { get; set; } = new();
+
 		public override void Dispose() 
 		{
 			if (!this.IsFromPool) return;
 			this.Card = default;
+			this.UnitOrder.Clear();
 			
 			ObjectPool.Instance.Recycle(this); 
 		}
@@ -1450,10 +1462,14 @@ namespace ET
 		[MemoryPackOrder(0)]
 		public RoomCardInfo Card { get; set; }
 
+		[MemoryPackOrder(1)]
+		public List<long> UnitOrder { get; set; } = new();
+
 		public override void Dispose() 
 		{
 			if (!this.IsFromPool) return;
 			this.Card = default;
+			this.UnitOrder.Clear();
 			
 			ObjectPool.Instance.Recycle(this); 
 		}
@@ -1546,6 +1562,116 @@ namespace ET
 
 	}
 
+	[Message(LockStepOuter.Room2C_LoseHandCard)]
+	[MemoryPackable]
+	public partial class Room2C_LoseHandCard: MessageObject, IMessage
+	{
+		public static Room2C_LoseHandCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_LoseHandCard), isFromPool) as Room2C_LoseHandCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long CardId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_FlashMyHandCarsOrder)]
+	[MemoryPackable]
+	public partial class Room2C_FlashMyHandCarsOrder: MessageObject, IMessage
+	{
+		public static Room2C_FlashMyHandCarsOrder Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashMyHandCarsOrder), isFromPool) as Room2C_FlashMyHandCarsOrder; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_FlashEnemyHancCardsOrder)]
+	[MemoryPackable]
+	public partial class Room2C_FlashEnemyHancCardsOrder: MessageObject, IMessage
+	{
+		public static Room2C_FlashEnemyHancCardsOrder Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashEnemyHancCardsOrder), isFromPool) as Room2C_FlashEnemyHancCardsOrder; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_FlashMyUnitsOrder)]
+	[MemoryPackable]
+	public partial class Room2C_FlashMyUnitsOrder: MessageObject, IMessage
+	{
+		public static Room2C_FlashMyUnitsOrder Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashMyUnitsOrder), isFromPool) as Room2C_FlashMyUnitsOrder; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_FlashEnemyUnitsOrder)]
+	[MemoryPackable]
+	public partial class Room2C_FlashEnemyUnitsOrder: MessageObject, IMessage
+	{
+		public static Room2C_FlashEnemyUnitsOrder Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashEnemyUnitsOrder), isFromPool) as Room2C_FlashEnemyUnitsOrder; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	public static class LockStepOuter
 	{
 		 public const ushort C2G_Match = 11002;
@@ -1603,5 +1729,10 @@ namespace ET
 		 public const ushort Room2C_CardGetDamage = 11054;
 		 public const ushort Room2C_Cost = 11055;
 		 public const ushort Room2C_GetColor = 11056;
+		 public const ushort Room2C_LoseHandCard = 11057;
+		 public const ushort Room2C_FlashMyHandCarsOrder = 11058;
+		 public const ushort Room2C_FlashEnemyHancCardsOrder = 11059;
+		 public const ushort Room2C_FlashMyUnitsOrder = 11060;
+		 public const ushort Room2C_FlashEnemyUnitsOrder = 11061;
 	}
 }

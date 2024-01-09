@@ -5,7 +5,21 @@ namespace ET.Client
 {
     public class UIUnitInfo {
         public GameObject CardGo;
+        public long CardId;
+        public int BaseId;
+        public int Order;
+        //参数
+        public int DCost;
+        public int DRed;
+        public int DGreen;
+        public int DBlue;
+        public int DGrey;
+        public int DBlack;
+        public int DWhite;
+        public int DAttack;
+        public int DHP;
         
+        // UI
         public Text Name, Info;
         public Image Image;
 
@@ -18,7 +32,9 @@ namespace ET.Client
         public Text Black;
         public Text White;
 
-        public Text Attack;
+        public Text Attack { set; get; }
         public Text HP;
+
+        public GameObject Taunt;
     }
 }

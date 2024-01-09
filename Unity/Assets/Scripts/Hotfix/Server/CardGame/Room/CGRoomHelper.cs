@@ -61,6 +61,10 @@ namespace ET.Server {
             //牌库
             CardGameComponent_Cards cards = player.GetParent<Room>().GetComponent<CardGameComponent_Cards>();
             CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            {
+                RoomCard card = RoomCardFactory.CreateUnitCard(cards, 300008);
+                playerInfo.Groups.Add(card.Id);
+            }
             for (int i = 0; i < 10; i++)
             {
                 RoomCard card = RoomCardFactory.CreateUnitCard(cards, 3000001);
@@ -173,8 +177,11 @@ namespace ET.Server {
             };
         }
 
-        public static RoomCardInfo RoomCard2UnitInfo(this RoomCard roomCard)
-        {
+        public static RoomCardInfo RoomCard2UnitInfo(this RoomCard roomCard) {
+            List<int> powers = new List<int>();
+            foreach (Power_Type type in roomCard.AttributePowers) {
+                powers.Add((int)type);
+            }
             return new RoomCardInfo()
             {
                 CardId = roomCard.Id,
@@ -183,6 +190,7 @@ namespace ET.Server {
                 Attack = roomCard.Attack,
                 HP = roomCard.HP,
                 Cost = roomCard.Cost,
+                CardPowers = powers,
             };
         }
     }

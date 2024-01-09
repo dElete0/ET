@@ -10,19 +10,29 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace ET {
-    public class UIHandCardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
+    public class UIHandCardDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler {
         //执行对目标释放的效果=>里头是发送消息to Server
         public Action<long, int> UseCardToServer;
         //仅Client内部调用
-        public Func<float, bool> TryToDoInClient;
+        public Func<Vector3, bool> TryToDoInClient;
         //拖拽的动态效果
         public Action<GameObject> DragShow;
+        public Action<Vector3> CardPos;
         // CardId
         public long CardId;
+        public int BaseId;
+        public bool IsMy;
+        //鼠标位置
+        Vector3 offset = Vector3.zero;
+        RectTransform rt;
+        private Vector3 GlobalMousePos;
 
+        public static GameObject ShowThis;
+        [Header("场景中Canvas")]
+        public Canvas canvas;
         public static List<UIHandCardDragHandler> IsCardBeDrag = new List<UIHandCardDragHandler>();
 
-        public bool CanBeUsed = true;
+        public Func<bool> CanBeUsed;
         [FormerlySerializedAs("UseCardType")]
         public UIUseCardType UIUseCardType;
         [FormerlySerializedAs("CardType")]
@@ -38,9 +48,22 @@ namespace ET {
         private GraphicRaycaster gra;
         
         private void Awake() {
+            rt = GetComponent<RectTransform>();
             _EventSystem = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
             gra = FindObjectOfType<GraphicRaycaster>();
             rectTransform = GetComponent<RectTransform>();
+        }
+
+        private void Start() {
+            this.canvas = this.transform.parent.parent.parent.parent.GetComponent<Canvas>();
+        }
+        
+        public void OnPointerEnter(PointerEventData eventData) {
+            ShowThis = this.gameObject;
+        }
+        
+        public void OnPointerExit(PointerEventData eventData) {
+            ShowThis = null;
         }
 
         /// <summary>
@@ -48,6 +71,13 @@ namespace ET {
         /// </summary>
         /// <param name="eventData"></param>
         public void OnBeginDrag(PointerEventData eventData) {
+            if (!IsMy) return;
+            if (!this.CanBeUsed()) return;
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.enterEventCamera, out Vector3 globalMousePos)) {
+                // 计算偏移量
+                offset = rt.position - globalMousePos;
+                rt.position = globalMousePos + offset;
+            }
             vector = this.transform.position;
             IsCardBeDrag.Add(this);
         }
@@ -57,11 +87,15 @@ namespace ET {
         /// </summary>
         /// <param name="eventData"></param>
         public void OnDrag(PointerEventData eventData) {
-            //if (!this.CanBeUsed) return;
+            if (!IsMy) return;
             if (this.DragShow != null) this.DragShow.Invoke(null);
-            this.rectTransform.anchoredPosition += eventData.delta;
+            // 将屏幕空间上的点转换为位于给定RectTransform平面上的世界空间中的位置
+            if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.pressEventCamera, out Vector3 globalMousePos)) {
+                this.GlobalMousePos = globalMousePos;
+                rt.position = globalMousePos + offset;
+            }
+            if (this.UICardType == UICardType.Unit) CardPos.Invoke(globalMousePos);
         }
-        
 
         /// <summary>
         /// 结束拖拽时执行一次
@@ -77,7 +111,7 @@ namespace ET {
                 Log.Warning("打出的距离是否足够远");
                 //打出的距离是否足够远
                 if(this.transform.position.y > this.vector.y / 2f) {
-                    if (this.TryToDoInClient.Invoke(0f)) {
+                    if (this.TryToDoInClient.Invoke(this.GlobalMousePos)) {
                     
                     } else{
                         this.rectTransform.position = vector;
@@ -85,49 +119,20 @@ namespace ET {
                 }
             } else if ((int)this.UICardType == (int)UICardType.Unit && (int)this.UIUseCardType == (int)UIUseCardType.NoTarget) {
                 if(this.transform.position.y > this.vector.y / 2f) {
-                    if (this.TryToDoInClient.Invoke(0f)) {
+                    if (this.TryToDoInClient.Invoke(this.GlobalMousePos)) {
                     
                     } else{
                         this.rectTransform.position = vector;
                     }
                 }
             } else if ((int)this.UICardType == (int)UICardType.Magic && (int)this.UIUseCardType == (int)UIUseCardType.ToUnit) {
-                if (this.TryToDoInClient.Invoke(0f)) {
+                if (this.TryToDoInClient.Invoke(this.GlobalMousePos)) {
                     
                 } else{
                     this.rectTransform.position = vector;
                 }
             }
-        }
-
-        public long GetTarget() {
-            var list = GraphicRaycaster(Input.mousePosition);
-
-            foreach (var goGraph in list) {
-                //检测是否再目标上
-                if (goGraph.gameObject.tag.Equals("target")) {
-                    // todo 返回一个值
-                    return 0;
-                }
-            }
-
-            return 0;
-        }
-
-
-
-        /// <summary>
-        /// 定义通过射线读取所在位置的UI对象
-        /// </summary>
-        /// <param name="pos">射线位置</param>
-        /// <returns>返回读取的所有UI对象</returns>
-        private List<RaycastResult> GraphicRaycaster(Vector2 pos)
-        {
-            var mPointerEventData = new PointerEventData(_EventSystem);
-            mPointerEventData.position = pos;
-            List<RaycastResult> results = new List<RaycastResult>();
-            gra.Raycast(mPointerEventData, results);
-            return results;
+            CardPos.Invoke(new Vector3(10000,0,0));
         }
     }
         

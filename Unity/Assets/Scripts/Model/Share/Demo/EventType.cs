@@ -118,12 +118,17 @@ namespace ET.Client {
         public RoomCardInfo Card;
     }
 
+    public struct LoseHandCard {
+        public long CardId;
+    }
+
     public struct EnemyGetHandCardFromGroup {
         public RoomCardInfo Card;
     }
 
     public struct CallUnit {
         public RoomCardInfo Card;
+        public List<long> UnitsOrder;
     }
 
     public struct CardGetDamage {

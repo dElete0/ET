@@ -7,7 +7,6 @@ namespace ET.Server {
     {
         public static void ToDo_GetHandCardsFromGroup(this RoomEventTypeComponent roomEventTypeComponent, RoomPlayer player, int count)
         {
-            Log.Warning("抽卡事件");
             Room room = roomEventTypeComponent.GetParent<Room>();
             CardGameComponent_Player cards = player.GetComponent<CardGameComponent_Player>();
             List<long> group = cards.Groups;

@@ -6,17 +6,27 @@ namespace ET.Server
     [FriendOfAttribute(typeof(ET.Server.CardGameComponent_Player))]
     [FriendOfAttribute(typeof(ET.RoomCard))]
     [FriendOfAttribute(typeof(ET.RoomPlayer))]
+    [FriendOfAttribute(typeof(ET.Server.RoomAIComponent))]
     public class C2Room_UseCardHandler : MessageHandler<Scene, C2Room_UseCard>
     {
         protected override async ETTask Run(Scene root, C2Room_UseCard message)
         {
+            await C2Room_UseCard(root.GetComponent<Room>(), message);
+        }
+
+        public static async ETTask AI2Room_UseCard(RoomAIComponent ai, C2Room_UseCard message)
+        {
+            await C2Room_UseCard(ai.GetParent<Room>(), message);
+        } 
+        private static async ETTask C2Room_UseCard(Room room, C2Room_UseCard message)
+        {
             await ETTask.CompletedTask;
-            Room room = root.GetComponent<Room>();
             CGServerUpdater updater = room.GetComponent<CGServerUpdater>();
             RoomServerComponent roomServerComponent = room.GetComponent<RoomServerComponent>();
             RoomPlayer roomPlayer = roomServerComponent.GetChild<RoomPlayer>(message.PlayerId);
 
-            if (updater.NowPlayer != roomPlayer.Id) {
+            if (updater.NowPlayer != roomPlayer.Id)
+            {
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.CantOperateNow });
                 return;
             }
@@ -26,6 +36,10 @@ namespace ET.Server
             RoomCard target = message.Target == 0 ? null : cardGameComponentCards.GetChild<RoomCard>(message.Target);
             CardGameComponent_Player playerInfo = roomPlayer.GetComponent<CardGameComponent_Player>();
 
+            if (playerInfo.Units.Count >= CardGameComponent_Player.UnitMax) {
+                RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.CantGetMoreUnit });
+                return;
+            }
             if (playerInfo.Cost < card.Cost)
             {
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.NotEnoughCost });
@@ -33,7 +47,7 @@ namespace ET.Server
             }
             RoomEventTypeComponent roomEventTypeComponent = roomPlayer.GetParent<Room>().GetComponent<RoomEventTypeComponent>();
             roomEventTypeComponent.CountClear();
-            roomEventTypeComponent.Event_UseCard(roomPlayer, card, target, 0);
+            roomEventTypeComponent.Event_UseCard(roomPlayer, card, target, message.Pos);
         }
     }
 }

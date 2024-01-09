@@ -31,5 +31,7 @@ namespace ET.Server
         public int Black;
         public int White;
         public int Grey;
+
+        public const int UnitMax = 8;
     }
 }

@@ -14,7 +14,6 @@ namespace ET.Server
 
         public static async ETTask AI2Room_TurnOver(RoomAIComponent ai, C2Room_TurnOver message) {
             await C2Room_TurnOver(ai.GetParent<Room>(), message);
-            ai.IsToDo = false;
         }
 
         public static async ETTask C2Room_TurnOver(Room room, C2Room_TurnOver message)

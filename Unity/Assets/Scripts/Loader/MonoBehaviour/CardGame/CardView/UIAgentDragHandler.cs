@@ -10,7 +10,7 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace ET {
-    public class UIAgentDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
+    public class UIAgentDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler {
         //执行对目标释放的效果=>里头是发送消息to Server
         public Action<long> UseCardToServer;
         //仅Client内部调用
@@ -19,6 +19,7 @@ namespace ET {
         public Action<GameObject> DragShow;
         // CardId
         public long CardId;
+        public int BaseId;
         public bool IsMy;
         public static bool IsCardBeDrag;
 
@@ -33,6 +34,11 @@ namespace ET {
         //需要移动物品的位置组件
         private RectTransform rectTransform;
 
+        //悬停展示
+        private bool IsMouseEnter;
+        private float MoustEnterTime;
+        public Action ShowUIShowCard, HideUIShowCard;
+        
         //UI事件管理器
         private UnityEngine.EventSystems.EventSystem _EventSystem;
         private GraphicRaycaster gra;
@@ -41,6 +47,26 @@ namespace ET {
             _EventSystem = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
             gra = FindObjectOfType<GraphicRaycaster>();
             rectTransform = GetComponent<RectTransform>();
+        }
+        
+        private void Update() {
+            if (this.IsMouseEnter) {
+                this.MoustEnterTime += Time.deltaTime;
+                if (this.MoustEnterTime > 1f) {
+                    this.ShowUIShowCard.Invoke();
+                    this.IsMouseEnter = false;
+                }
+            }
+        }
+
+        public void OnPointerEnter(PointerEventData eventData) {
+            this.IsMouseEnter = true;
+        }
+        
+        public void OnPointerExit(PointerEventData eventData) {
+            this.IsMouseEnter = false;
+            this.MoustEnterTime = 0f;
+            this.HideUIShowCard.Invoke();
         }
 
 

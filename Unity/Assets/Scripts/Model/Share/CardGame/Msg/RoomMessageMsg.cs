@@ -9,5 +9,6 @@ namespace ET {
         CantOperateNow = 1,
         //费用不足
         NotEnoughCost = 2,
+        CantGetMoreUnit = 3,
     }
 }

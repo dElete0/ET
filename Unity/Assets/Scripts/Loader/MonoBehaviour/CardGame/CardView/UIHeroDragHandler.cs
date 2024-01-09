@@ -10,7 +10,7 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace ET {
-    public class UIHeroDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
+    public class UIHeroDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler {
         //执行对目标释放的效果=>里头是发送消息to Server
         public Action<long> UseCardToServer;
         //仅Client内部调用
@@ -19,7 +19,7 @@ namespace ET {
         public Action<GameObject> DragShow;
         // CardId
         public long CardId;
-        public long BaseId;
+        public int BaseId;
 
         public static bool IsCardBeDrag;
 
@@ -60,11 +60,11 @@ namespace ET {
             }
         }
 
-        public void OnMouseEnter() {
+        public void OnPointerEnter(PointerEventData eventData) {
             this.IsMouseEnter = true;
         }
-
-        public void OnMouseExit() {
+        
+        public void OnPointerExit(PointerEventData eventData) {
             this.IsMouseEnter = false;
             this.MoustEnterTime = 0f;
             this.HideUIShowCard.Invoke();

@@ -56,13 +56,14 @@ namespace ET.Server {
             return gameEvent;
         }
 
-        public static GameEvent UseCard(RoomEventTypeComponent room, RoomPlayer player, RoomCard card, RoomCard target)
+        public static GameEvent UseCard(RoomEventTypeComponent room, RoomPlayer player, RoomCard card, RoomCard target, int pos)
         {
             GameEvent gameEvent = new GameEvent(GameEventType.UseCard);
             gameEvent.ToDo = @event => {
+                room.ToDo_LoseHandCard(player, card);
                 room.ToDo_UseCost(player, card.Cost);
                 if (card.CardType == CardType.Unit) {
-                    room.Event_UseUnitCard(player, card, target);
+                    room.Event_UseUnitCard(player, card, target, pos);
                 } else if (card.CardType == CardType.Magic) {
                     room.Event_UseMagicCard(player, card, target);
                 }
@@ -70,13 +71,13 @@ namespace ET.Server {
             return gameEvent;
         }
 
-        public static GameEvent UseUnitCard(RoomEventTypeComponent room, RoomPlayer player, RoomCard card, RoomCard target) {
+        public static GameEvent UseUnitCard(RoomEventTypeComponent room, RoomPlayer player, RoomCard card, RoomCard target, int pos) {
             GameEvent gameEvent = new GameEvent(GameEventType.UseUnitCard);
             gameEvent.ToDo = @event => {
                 if (card.GetArranges().Count > 0) {
                     room.Event_UnitArrange(card, target, player);
                 }
-                room.Event_CallUnit(player, card);
+                room.Event_CallUnit(player, card, pos);
             };
             return gameEvent;
         }
@@ -113,11 +114,10 @@ namespace ET.Server {
             return gameEvent;
         }
 
-        public static GameEvent CallUnit(RoomEventTypeComponent room, RoomCard card, RoomPlayer player) {
+        public static GameEvent CallUnit(RoomEventTypeComponent room, RoomCard card, RoomPlayer player, int pos) {
             GameEvent gameEvent = new GameEvent(GameEventType.CallUnit);
             gameEvent.ToDo = @event => {
-                Log.Warning("召唤单位");
-                room.ToDo_CallUnit(card, player);
+                room.ToDo_CallUnit(card, player, pos);
             };
             return gameEvent;
         }

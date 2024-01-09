@@ -140,6 +140,8 @@ message RoomCardInfo
 	int32 UseCardType = 15;
 	int32 CardType = 16;
 	int32 AttackCount = 17;
+	repeated int32 CardPowers = 18;
+	int32 Order = 19;
 }
 
 message Room2C_GetHandCardFromGroup // IMessage
@@ -344,11 +346,13 @@ message Room2C_EffectCardToCard // IMessage
 message Room2C_CallUnit // IMessage
 {
 	RoomCardInfo Card = 1;
+	repeated long UnitOrder = 2;
 }
 
 message Room2C_EnemyCallUnit // IMessage
 {
 	RoomCardInfo Card = 1;
+	repeated long UnitOrder = 2;
 }
 
 message Room2C_CardGetDamage // IMessage
@@ -369,4 +373,29 @@ message Room2C_GetColor // IMessage
 	int32 Color = 1;
 	int32 Num = 2;
 	bool IsMy = 3;
+}
+
+message Room2C_LoseHandCard // IMessage
+{
+	int64 CardId = 1;
+}
+
+message Room2C_FlashMyHandCarsOrder // IMessage
+{
+	repeated RoomCardInfo Cards = 1;
+}
+
+message Room2C_FlashEnemyHancCardsOrder // IMessage
+{
+	repeated RoomCardInfo Cards = 1;
+}
+
+message Room2C_FlashMyUnitsOrder // IMessage
+{
+	repeated RoomCardInfo Cards = 1;
+}
+
+message Room2C_FlashEnemyUnitsOrder // IMessage
+{
+	repeated RoomCardInfo Cards = 1;
 }

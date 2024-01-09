@@ -9,13 +9,10 @@ namespace ET.Server
     {
         public static async ETTask Match(this MatchWithAiComponent self, long playerId)
         {
-            Log.Warning("创建一个AI机器人");
-            
             // 申请一个房间
             StartSceneConfig startSceneConfig = RandomGenerator.RandomArray(StartSceneConfigCategory.Instance.Maps);
             Match2Map_GetGameRoom match2MapGetRoom = new();
             
-            Log.Warning(playerId);
             match2MapGetRoom.PlayerIds.Add(playerId);
             match2MapGetRoom.PlayerIds.Add(0);
             

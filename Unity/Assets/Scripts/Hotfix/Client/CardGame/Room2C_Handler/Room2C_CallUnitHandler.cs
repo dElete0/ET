@@ -5,8 +5,7 @@ namespace ET.Client
     {
         protected override async ETTask Run(Scene root, Room2C_CallUnit message)
         {
-            await EventSystem.Instance.PublishAsync(root, new CallUnit() {Card = message.Card});
-            await ETTask.CompletedTask;
+            await EventSystem.Instance.PublishAsync(root, new CallUnit() {Card = message.Card, UnitsOrder = message.UnitOrder});
         }
     }
 }

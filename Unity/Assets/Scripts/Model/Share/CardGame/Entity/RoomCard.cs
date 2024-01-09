@@ -42,13 +42,18 @@ namespace ET {
         public bool CantBeAttacTarget;
         public bool CantBeMagicTarget;
 
-        public int AttackCount;
-        public int AttackCountMax = 1;
 
         //属性异能
         public List<Power_Type> AttributePowers = new List<Power_Type>();
         //其他异能
         public List<Power_Struct> OtherPowers = new List<Power_Struct>();
+        
+        //其他计数
+        //刚上场，不能攻击
+        public bool IsCallThisTurn;
+        //攻击次数计数
+        public int AttackCount;
+        public int AttackCountMax = 1;
     }
 
     //部署效果及计数器
@@ -151,6 +156,8 @@ namespace ET {
         HeroImmunity = 107,
         // 嘲讽
         Taunt = 108,
+        // 不能攻击英雄
+        CantAttackHeroAndAgent = 109,
         
         
         //每当你打出一张费用大于3的法术牌，获得1点攻击力
