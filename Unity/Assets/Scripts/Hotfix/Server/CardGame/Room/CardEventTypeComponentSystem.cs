@@ -14,14 +14,6 @@ namespace ET.Server
         {
             self.RoomEvent = args2;
             self.RoomEvent.CardEventTypeComponents.Add(self);
-            //回合开始时，攻击计数清空
-            self.WaitGameEventTypes.Add(TriggerEventFactory.TurnStart(), new GameEvent(GameEventType.TurnStart)
-            {
-                ToDo = (gameEvent) => {
-                    self.GetParent<RoomCard>().AttackCount = self.GetParent<RoomCard>().AttackCountMax;
-                    self.GetParent<RoomCard>().IsCallThisTurn = false;
-                }
-            });
         }
         [EntitySystem]
         private static void Destroy(this ET.Server.CardEventTypeComponent self)
@@ -32,19 +24,35 @@ namespace ET.Server
         public static bool SendTriggeerEvent(this ET.Server.CardEventTypeComponent self, GameEvent eventType)
         {
             //通知所有监听器
-            foreach (var kv in self.WaitGameEventTypes)
+            foreach (var kv in self.AllGameEventTypes)
             {
-                if (eventType.IsDispose)
-                {
-                    //被什么奇怪的效果改了，重新遍历
+                if (SendTriggeerEventHelper(kv, eventType)) {
                     return true;
                 }
-                if (kv.Key.Triggeer.Invoke(eventType))
+            }
+            //单位监听器
+            if (self.UnitGameEventTypes.Count > 0 &&
+                self.GetParent<Room>().GetComponent<CardGameComponent_Cards>().IsUnit(self.GetParent<RoomCard>())) {
+                foreach (var kv in self.UnitGameEventTypes)
                 {
-                    kv.Value.ToDo(eventType);
+                    if (SendTriggeerEventHelper(kv, eventType)) {
+                        return true;
+                    }
                 }
             }
 
+            return false;
+        }
+
+        private static bool SendTriggeerEventHelper(KeyValuePair<TriggerEvent, GameEvent> kv, GameEvent eventType) {
+            if (eventType.IsDispose) {
+                //被什么奇怪的效果改了，重新遍历
+                return true;
+            }
+            if (kv.Key.Triggeer.Invoke(eventType))
+            {
+                kv.Value.ToDo(eventType);
+            }
             return false;
         }
 

@@ -65,6 +65,10 @@ namespace ET.Server {
                 RoomCard card = RoomCardFactory.CreateUnitCard(cards, 300008);
                 playerInfo.Groups.Add(card.Id);
             }
+            {
+                RoomCard card = RoomCardFactory.CreatePlot(cards, 4000001);
+                playerInfo.Groups.Add(card.Id);
+            }
             for (int i = 0; i < 10; i++)
             {
                 RoomCard card = RoomCardFactory.CreateUnitCard(cards, 3000001);

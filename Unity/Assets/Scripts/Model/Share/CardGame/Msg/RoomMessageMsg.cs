@@ -10,5 +10,6 @@ namespace ET {
         //费用不足
         NotEnoughCost = 2,
         CantGetMoreUnit = 3,
+        MustAttackTaunt = 4,
     }
 }

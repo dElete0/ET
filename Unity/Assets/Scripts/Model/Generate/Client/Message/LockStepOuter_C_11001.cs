@@ -1584,88 +1584,22 @@ namespace ET
 
 	}
 
-	[Message(LockStepOuter.Room2C_FlashMyHandCarsOrder)]
+	[Message(LockStepOuter.Room2C_UnitDead)]
 	[MemoryPackable]
-	public partial class Room2C_FlashMyHandCarsOrder: MessageObject, IMessage
+	public partial class Room2C_UnitDead: MessageObject, IMessage
 	{
-		public static Room2C_FlashMyHandCarsOrder Create(bool isFromPool = true) 
+		public static Room2C_UnitDead Create(bool isFromPool = true) 
 		{ 
-			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashMyHandCarsOrder), isFromPool) as Room2C_FlashMyHandCarsOrder; 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_UnitDead), isFromPool) as Room2C_UnitDead; 
 		}
 
 		[MemoryPackOrder(0)]
-		public List<RoomCardInfo> Cards { get; set; } = new();
+		public long CardId { get; set; }
 
 		public override void Dispose() 
 		{
 			if (!this.IsFromPool) return;
-			this.Cards.Clear();
-			
-			ObjectPool.Instance.Recycle(this); 
-		}
-
-	}
-
-	[Message(LockStepOuter.Room2C_FlashEnemyHancCardsOrder)]
-	[MemoryPackable]
-	public partial class Room2C_FlashEnemyHancCardsOrder: MessageObject, IMessage
-	{
-		public static Room2C_FlashEnemyHancCardsOrder Create(bool isFromPool = true) 
-		{ 
-			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashEnemyHancCardsOrder), isFromPool) as Room2C_FlashEnemyHancCardsOrder; 
-		}
-
-		[MemoryPackOrder(0)]
-		public List<RoomCardInfo> Cards { get; set; } = new();
-
-		public override void Dispose() 
-		{
-			if (!this.IsFromPool) return;
-			this.Cards.Clear();
-			
-			ObjectPool.Instance.Recycle(this); 
-		}
-
-	}
-
-	[Message(LockStepOuter.Room2C_FlashMyUnitsOrder)]
-	[MemoryPackable]
-	public partial class Room2C_FlashMyUnitsOrder: MessageObject, IMessage
-	{
-		public static Room2C_FlashMyUnitsOrder Create(bool isFromPool = true) 
-		{ 
-			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashMyUnitsOrder), isFromPool) as Room2C_FlashMyUnitsOrder; 
-		}
-
-		[MemoryPackOrder(0)]
-		public List<RoomCardInfo> Cards { get; set; } = new();
-
-		public override void Dispose() 
-		{
-			if (!this.IsFromPool) return;
-			this.Cards.Clear();
-			
-			ObjectPool.Instance.Recycle(this); 
-		}
-
-	}
-
-	[Message(LockStepOuter.Room2C_FlashEnemyUnitsOrder)]
-	[MemoryPackable]
-	public partial class Room2C_FlashEnemyUnitsOrder: MessageObject, IMessage
-	{
-		public static Room2C_FlashEnemyUnitsOrder Create(bool isFromPool = true) 
-		{ 
-			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashEnemyUnitsOrder), isFromPool) as Room2C_FlashEnemyUnitsOrder; 
-		}
-
-		[MemoryPackOrder(0)]
-		public List<RoomCardInfo> Cards { get; set; } = new();
-
-		public override void Dispose() 
-		{
-			if (!this.IsFromPool) return;
-			this.Cards.Clear();
+			this.CardId = default;
 			
 			ObjectPool.Instance.Recycle(this); 
 		}
@@ -1730,9 +1664,6 @@ namespace ET
 		 public const ushort Room2C_Cost = 11055;
 		 public const ushort Room2C_GetColor = 11056;
 		 public const ushort Room2C_LoseHandCard = 11057;
-		 public const ushort Room2C_FlashMyHandCarsOrder = 11058;
-		 public const ushort Room2C_FlashEnemyHancCardsOrder = 11059;
-		 public const ushort Room2C_FlashMyUnitsOrder = 11060;
-		 public const ushort Room2C_FlashEnemyUnitsOrder = 11061;
+		 public const ushort Room2C_UnitDead = 11058;
 	}
 }

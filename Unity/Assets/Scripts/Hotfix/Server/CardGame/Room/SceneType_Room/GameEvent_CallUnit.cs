@@ -1,6 +1,7 @@
 namespace ET.Server {
     [FriendOfAttribute(typeof(ET.Server.CardGameComponent_Player))]
     [FriendOfAttribute(typeof(ET.RoomCard))]
+    [FriendOfAttribute(typeof(ET.Server.CardEventTypeComponent))]
     public static class GameEvent_CallUnit
     {
         public static void ToDo_CallUnit(this RoomEventTypeComponent roomEventTypeComponent, RoomCard card, RoomPlayer player, int pos)
@@ -8,6 +9,14 @@ namespace ET.Server {
             CardGameComponent_Player playerCards = player.GetComponent<CardGameComponent_Player>();
             playerCards.Units.Insert(pos, card.Id);
             card.IsCallThisTurn = true;
+            //回合开始时，攻击计数清空
+            card.GetComponent<CardEventTypeComponent>().UnitGameEventTypes.Add(TriggerEventFactory.TurnStart(), new GameEvent(GameEventType.TurnStart)
+            {
+                ToDo = (gameEvent) => {
+                    card.AttackCount = card.AttackCountMax;
+                    card.IsCallThisTurn = false;
+                }
+            });
 
             roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.UnitBeCalled(roomEventTypeComponent, card, player));
 

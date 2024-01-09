@@ -114,6 +114,10 @@ namespace ET.Client {
         public int Grey;
     }
 
+    public struct UnitDead {
+        public long CardId;
+    }
+
     public struct GetHandCardFromGroup {
         public RoomCardInfo Card;
     }

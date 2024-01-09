@@ -3,11 +3,13 @@ using UnityEngine.UI;
 
 namespace ET.Client
 {
-    public class UIUnitInfo {
+    [ChildOf(typeof(UIAnimComponent))]
+    public class UIUnitInfo : Entity, IAwake<GameObject>, IUpdate {
         public GameObject CardGo;
+        public Vector3 TargetPos;
+
         public long CardId;
         public int BaseId;
-        public int Order;
         //参数
         public int DCost;
         public int DRed;
@@ -36,5 +38,13 @@ namespace ET.Client
         public Text HP;
 
         public GameObject Taunt;
+        
+        //使用方式等
+        public CardType CardType;
+        public UseCardType UseCardType;
+
+        //动画机是否在移动
+        public bool IsMove;
+        public bool IsDrag;
     }
 }

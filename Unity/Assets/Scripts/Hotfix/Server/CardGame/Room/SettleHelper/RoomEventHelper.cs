@@ -32,6 +32,11 @@ namespace ET.Server {
         {
             eventTypeComponent.BroadAndSettleEvent(GameEventFactory.UseMagicCard(eventTypeComponent, player, card, target));
         }
+        
+        public static void Event_UsePlotCard(this RoomEventTypeComponent eventTypeComponent, RoomPlayer player, RoomCard card, RoomCard target)
+        {
+            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.UsePlotCard(eventTypeComponent, player, card, target));
+        }
 
         public static void Event_UnitArrange(this RoomEventTypeComponent eventTypeComponent, RoomCard card, RoomCard target, RoomPlayer player)
         {
@@ -41,6 +46,11 @@ namespace ET.Server {
         public static void Event_MagicTakesEffect(this RoomEventTypeComponent eventTypeComponent, RoomPlayer player, RoomCard card, RoomCard target)
         {
             eventTypeComponent.BroadAndSettleEvent(GameEventFactory.MagicTakesEffect(eventTypeComponent, card, target, player));
+        }
+        
+        public static void Event_PlotTakesEffect(this RoomEventTypeComponent eventTypeComponent, RoomPlayer player, RoomCard card, RoomCard target)
+        {
+            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.PlotTakesEffect(eventTypeComponent, card, target, player));
         }
 
         public static void Event_CallUnit(this RoomEventTypeComponent eventTypeComponent, RoomPlayer player, RoomCard card, int pos)

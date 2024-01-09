@@ -10,7 +10,9 @@ namespace ET.Client {
             GameObject bundleGameObject = await uiComponent.Room().GetComponent<ResourcesLoaderComponent>().LoadAssetAsync<GameObject>(assetsName);
             GameObject gameObject = UnityEngine.Object.Instantiate(bundleGameObject, uiComponent.UIGlobalComponent.GetLayer((int)uiLayer));
             UI ui = uiComponent.AddChild<UI, string, GameObject>(UIType.UICGGame, gameObject);
-            ui.AddComponent<UICGGameComponent>();
+            UICGGameComponent uicgGameComponent = ui.AddComponent<UICGGameComponent>();
+            uicgGameComponent.AddComponent<UIAnimComponent>();
+            await uicgGameComponent.CreateUIShowCard();
             return ui;
         }
 

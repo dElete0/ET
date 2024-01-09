@@ -19,6 +19,12 @@ namespace ET.Server
             return card;
         }
 
+        public static RoomCard CreatePlot(CardGameComponent_Cards cards, int configId) {
+            RoomCard card = cards.AddChild<RoomCard, int>(configId);
+            card.CardType = CardType.Plot;
+            return card;
+        }
+
         public static RoomCard CreateHero(CardGameComponent_Cards cards, int configId)
         {
             RoomCard card = cards.AddChild<RoomCard, int>(configId);

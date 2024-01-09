@@ -380,22 +380,7 @@ message Room2C_LoseHandCard // IMessage
 	int64 CardId = 1;
 }
 
-message Room2C_FlashMyHandCarsOrder // IMessage
+message Room2C_UnitDead // IMessage
 {
-	repeated RoomCardInfo Cards = 1;
-}
-
-message Room2C_FlashEnemyHancCardsOrder // IMessage
-{
-	repeated RoomCardInfo Cards = 1;
-}
-
-message Room2C_FlashMyUnitsOrder // IMessage
-{
-	repeated RoomCardInfo Cards = 1;
-}
-
-message Room2C_FlashEnemyUnitsOrder // IMessage
-{
-	repeated RoomCardInfo Cards = 1;
+	int64 CardId = 1;
 }

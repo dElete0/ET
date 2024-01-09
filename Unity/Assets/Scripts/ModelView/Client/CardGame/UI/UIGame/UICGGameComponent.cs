@@ -80,5 +80,6 @@ namespace ET.Client
         public const float MyHandCardDes = 5f;
         public const float EnemyHandCardDes = 5f;
         public const float UnitsDes = 20f;
+        public const float FindTarget = 5f;
     }
 }

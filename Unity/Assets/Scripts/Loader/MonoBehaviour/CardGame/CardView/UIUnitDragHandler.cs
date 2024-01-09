@@ -11,12 +11,12 @@ using UnityEngine.UI;
 
 namespace ET {
     public class UIUnitDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler {
-        //执行对目标释放的效果=>里头是发送消息to Server
-        public Action<long> UseCardToServer;
         //仅Client内部调用
         public Func<Vector2, bool> TryToDoInClient;
         //拖拽的动态效果
-        public Action<GameObject> DragShow;
+        public Action<Vector2> DragShow;
+        public GameObject Target;
+        public Action<bool> IsDrag;
         // CardId
         public long CardId;
         public int BaseId;
@@ -25,12 +25,6 @@ namespace ET {
         public static List<UIUnitDragHandler> IsCardBeDrag = new List<UIUnitDragHandler>();
 
         public bool CanBeUsed = true;
-        [FormerlySerializedAs("UseCardType")]
-        public int UIUseCardType;
-        [FormerlySerializedAs("CardType")]
-        public int UICardType;
-        //记录玩家开始拖拽时的位置
-        private Vector3 vector;
 
 
         [Header("表示限制的区域")]
@@ -94,7 +88,7 @@ namespace ET {
                 // 计算偏移量
                 offset = rt.position - globalMousePos;
             }
-            vector = this.transform.position;
+            IsDrag.Invoke(true);
             IsCardBeDrag.Add(this);
         }
 
@@ -105,9 +99,9 @@ namespace ET {
         public void OnDrag(PointerEventData eventData) {
             //if (!this.CanBeUsed) return;
             if (!IsMy) return;
-            if (this.DragShow != null) this.DragShow.Invoke(null);
             // 将屏幕空间上的点转换为位于给定RectTransform平面上的世界空间中的位置
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.pressEventCamera, out Vector3 globalMousePos)) {
+                this.DragShow.Invoke(globalMousePos);
                 this.GlobalMousePos = globalMousePos;
                 rt.position = globalMousePos + offset;
             }
@@ -121,14 +115,9 @@ namespace ET {
         public void OnEndDrag(PointerEventData eventData) {
             //判断是否拖拽到目标上
             if (!IsMy) return;
-            Log.Warning("判断是否拖拽到目标上");
-            GameObject target = null;
+            IsDrag.Invoke(false);
             if (IsCardBeDrag.Contains(this)) IsCardBeDrag.Remove(this);
-
             if (this.TryToDoInClient.Invoke(this.GlobalMousePos)) {
-                this.rectTransform.position = vector;
-            } else{
-                this.rectTransform.position = vector;
             }
         }
     }

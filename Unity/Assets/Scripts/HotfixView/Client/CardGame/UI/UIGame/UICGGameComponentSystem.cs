@@ -6,6 +6,7 @@ namespace ET.Client
 {
     [EntitySystemOf(typeof(UICGGameComponent))]
     [FriendOfAttribute(typeof(ET.Client.UICGGameComponent))]
+    [FriendOfAttribute(typeof(ET.Client.UIUnitInfo))]
     public static partial class UICGGameComponentSystem
     {
         [EntitySystem]
@@ -14,23 +15,23 @@ namespace ET.Client
             self.TurnStart = rc.Get<GameObject>("TurnStart");
             self.TurnOver = rc.Get<GameObject>("TurnOver");
             self.EnemyAccount = rc.Get<GameObject>("EnemyAccount").GetComponentInChildren<Text>();
-            
+
             self.TurnOver.GetComponent<Button>().onClick.AddListener(() => { self.C2Room_TurnOver(); });
-            
+
             // Cost
             self.MyCost = rc.Get<GameObject>("MyCost").GetComponentInChildren<Text>();
             self.EnemyCost = rc.Get<GameObject>("EnemyCost").GetComponentInChildren<Text>();
-            
+
             self.MyCost.text = "0/0";
             self.EnemyCost.text = "0/0";
-            
+
             self.MyRed = rc.Get<GameObject>("MyRed").GetComponentInChildren<Text>();
             self.MyBlue = rc.Get<GameObject>("MyBlue").GetComponentInChildren<Text>();
             self.MyWhite = rc.Get<GameObject>("MyWhite").GetComponentInChildren<Text>();
             self.MyGreen = rc.Get<GameObject>("MyGreen").GetComponentInChildren<Text>();
             self.MyBlack = rc.Get<GameObject>("MyBlack").GetComponentInChildren<Text>();
             self.MyGrey = rc.Get<GameObject>("MyGrey").GetComponentInChildren<Text>();
-            
+
             self.EnemyRed = rc.Get<GameObject>("EnemyRed").GetComponentInChildren<Text>();
             self.EnemyBlue = rc.Get<GameObject>("EnemyBlue").GetComponentInChildren<Text>();
             self.EnemyWhite = rc.Get<GameObject>("EnemyWhite").GetComponentInChildren<Text>();
@@ -45,45 +46,25 @@ namespace ET.Client
             self.MyAgent2 = rc.Get<GameObject>("MyAgent2");
             self.EnemyAgent1 = rc.Get<GameObject>("EnemyAgent1");
             self.EnemyAgent2 = rc.Get<GameObject>("EnemyAgent2");
-            
+
             // CardDeck
             self.MyHandCardsDeck = rc.Get<GameObject>("MyHandCardsDeck");
             self.EnemyHandCardsDeck = rc.Get<GameObject>("EnemyHandCardsDeck");
             self.MyUnits = rc.Get<GameObject>("MyUnits");
             self.EnemyUnits = rc.Get<GameObject>("EnemyUnits");
-            
-            // ShowCard
-            GameObject uiShowCard = rc.Get<GameObject>("UIShowCard");
-            ReferenceCollector uiShowCardRC = uiShowCard.GetComponent<ReferenceCollector>();
-            self.UIShowCardInfo = new UIUnitInfo() {
-                CardGo = uiShowCard, 
-                Attack = uiShowCardRC.Get<GameObject>("Attack").GetComponentInChildren<Text>(),
-                HP = uiShowCardRC.Get<GameObject>("HP").GetComponentInChildren<Text>(),
-                Image = uiShowCardRC.Get<GameObject>("Image").GetComponent<Image>(),
-                Cost = uiShowCardRC.Get<GameObject>("Cost").GetComponentInChildren<Text>(),
-                Info = uiShowCardRC.Get<GameObject>("Info").GetComponent<Text>(),
-                Name = uiShowCardRC.Get<GameObject>("Name").GetComponent<Text>(),
-                // Color
-                Red = uiShowCardRC.Get<GameObject>("Red").GetComponentInChildren<Text>(),
-                Blue = uiShowCardRC.Get<GameObject>("Blue").GetComponentInChildren<Text>(),
-                Green = uiShowCardRC.Get<GameObject>("Green").GetComponentInChildren<Text>(),
-                White = uiShowCardRC.Get<GameObject>("White").GetComponentInChildren<Text>(),
-                Grey = uiShowCardRC.Get<GameObject>("Grey").GetComponentInChildren<Text>(),
-                Black = uiShowCardRC.Get<GameObject>("Black").GetComponentInChildren<Text>(),
-            };
-            
+
+
             // Model
             self.UICard = rc.Get<GameObject>("UICard");
             self.UIUnit = rc.Get<GameObject>("UIUnit");
             self.UIEnemyHandCard = rc.Get<GameObject>("UIEnemyHandCard");
-            
+
             // SetActive
             self.TurnStart.SetActive(false);
             self.UICard.SetActive(false);
             self.UIUnit.SetActive(false);
             self.UIEnemyHandCard.SetActive(false);
-            uiShowCard.SetActive(false);
-            
+
             // MyColor
             self.MyRed.transform.parent.gameObject.SetActive(false);
             self.MyBlue.transform.parent.gameObject.SetActive(false);
@@ -91,7 +72,7 @@ namespace ET.Client
             self.MyGreen.transform.parent.gameObject.SetActive(false);
             self.MyBlack.transform.parent.gameObject.SetActive(false);
             self.MyGrey.transform.parent.gameObject.SetActive(false);
-            
+
             // EnemyColor
             self.EnemyRed.transform.parent.gameObject.SetActive(false);
             self.EnemyBlue.transform.parent.gameObject.SetActive(false);
@@ -102,7 +83,8 @@ namespace ET.Client
         }
 
         [EntitySystem]
-        private static void Update(this UICGGameComponent self) {
+        private static void Update(this UICGGameComponent self)
+        {
             // 回合开始逻辑
             self.TurnStart();
             // 手牌位置逻辑
@@ -112,33 +94,64 @@ namespace ET.Client
             self.EnemyUnitsPos();
         }
 
-        private static void TurnStart(this UICGGameComponent self) {
-            if (self.IsShowTurnStart) {
+        private static void TurnStart(this UICGGameComponent self)
+        {
+            if (self.IsShowTurnStart)
+            {
                 self.IsShowTurnStart = false;
                 self.IsWaitCloseTurnStart = true;
                 self.ShowTurnStartTime = TimeInfo.Instance.ClientNow();
             }
 
-            if (self.IsWaitCloseTurnStart && 
-                TimeInfo.Instance.ClientNow() - self.ShowTurnStartTime > UICGGameComponent.ShowTunStartTimeD) {
+            if (self.IsWaitCloseTurnStart &&
+                TimeInfo.Instance.ClientNow() - self.ShowTurnStartTime > UICGGameComponent.ShowTunStartTimeD)
+            {
                 self.IsWaitCloseTurnStart = false;
                 self.TurnStart.SetActive(false);
             }
         }
 
-        public static async ETTask ShowUIShowCard(this UICGGameComponent self, bool left, int baseId) {
+        public static async ETTask CreateUIShowCard(this UICGGameComponent self) {
+            // ShowCard
+            ReferenceCollector rc = self.GetParent<UI>().GameObject.GetComponent<ReferenceCollector>();
+            GameObject uiShowCard = rc.Get<GameObject>("UIShowCard");
+            ReferenceCollector uiShowCardRC = uiShowCard.GetComponent<ReferenceCollector>();
+            UIUnitInfo unitInfo = self.GetComponent<UIAnimComponent>().AddChild<UIUnitInfo, GameObject>(uiShowCard);
+            unitInfo.Attack = uiShowCardRC.Get<GameObject>("Attack").GetComponentInChildren<Text>();
+            unitInfo.HP = uiShowCardRC.Get<GameObject>("HP").GetComponentInChildren<Text>();
+            unitInfo.Image = uiShowCardRC.Get<GameObject>("Image").GetComponent<Image>();
+            unitInfo.Cost = uiShowCardRC.Get<GameObject>("Cost").GetComponentInChildren<Text>();
+            unitInfo.Info = uiShowCardRC.Get<GameObject>("Info").GetComponent<Text>();
+            unitInfo.Name = uiShowCardRC.Get<GameObject>("Name").GetComponent<Text>();
+            // Color
+            unitInfo.Red = uiShowCardRC.Get<GameObject>("Red").GetComponentInChildren<Text>();
+            unitInfo.Blue = uiShowCardRC.Get<GameObject>("Blue").GetComponentInChildren<Text>();
+            unitInfo.Green = uiShowCardRC.Get<GameObject>("Green").GetComponentInChildren<Text>();
+            unitInfo.White = uiShowCardRC.Get<GameObject>("White").GetComponentInChildren<Text>();
+            unitInfo.Grey = uiShowCardRC.Get<GameObject>("Grey").GetComponentInChildren<Text>();
+            unitInfo.Black = uiShowCardRC.Get<GameObject>("Black").GetComponentInChildren<Text>();
+            self.UIShowCardInfo = unitInfo;
+            uiShowCard.SetActive(false);
+            await ETTask.CompletedTask;
+        }
+
+        public static async ETTask ShowUIShowCard(this UICGGameComponent self, bool left, int baseId)
+        {
             self.UIShowCardInfo.CardGo.SetActive(true);
             var position = self.UIShowCardInfo.CardGo.transform.localPosition;
-            if (left) {
+            if (left)
+            {
                 self.UIShowCardInfo.CardGo.transform.localPosition = new Vector3(
                     -Mathf.Abs(position.x),
                     position.y, 0);
-            } else {
+            }
+            else
+            {
                 self.UIShowCardInfo.CardGo.transform.localPosition = new Vector3(
                     Mathf.Abs(position.x),
                     position.y, 0);
             }
-            
+
             CardConfig config = CardConfigCategory.Instance.Get(baseId);
             self.UIShowCardInfo.Attack.text = config.Attack.ToString();
             self.UIShowCardInfo.HP.text = config.HP.ToString();
@@ -148,10 +161,13 @@ namespace ET.Client
             //Sprite
             string spritePath = $"Assets/Bundles/CardImage/{baseId}.png";
             UIComponent uiComponent = self.GetParent<UIComponent>();
-            try {
+            try
+            {
                 Sprite sprite = await uiComponent.Room().GetComponent<ResourcesLoaderComponent>().LoadAssetAsync<Sprite>(spritePath);
                 self.UIShowCardInfo.Image.sprite = sprite;
-            }  catch  {
+            }
+            catch
+            {
                 Log.Warning($"{spritePath}还未引入匹配图片");
             }
             //Color
@@ -169,54 +185,66 @@ namespace ET.Client
             self.UIShowCardInfo.Black.transform.parent.gameObject.SetActive(config.Black > 0);
         }
 
-        public static void HideUIShowCard(this UICGGameComponent self) {
+        public static void HideUIShowCard(this UICGGameComponent self)
+        {
             self.UIShowCardInfo.CardGo.SetActive(false);
         }
 
-        private static void C2Room_TurnOver(this UICGGameComponent self) {
+        private static void C2Room_TurnOver(this UICGGameComponent self)
+        {
             UICGGameHelper.C2Room_TurnOver(self.Root()).Coroutine();
         }
 
-        private static void HandCardsPos(this UICGGameComponent self) {
+        public static void HandCardsPos(this UICGGameComponent self)
+        {
             if (UIHandCardDragHandler.IsCardBeDrag.Count > 0) return;
-            if (self.MyHandCards != null) {
-                int i = 0;
-                foreach (var card in self.MyHandCards) {
-                    card.CardGo.transform.position = 
-                            (i * UICGGameComponent.MyHandCardDes  - 
-                                UICGGameComponent.MyHandCardDes / 2 * self.MyHandCards.Count) * Vector3.right + 
+            if (self.MyHandCards != null)
+            {
+                for (int i = 0; i < self.MyHandCards.Count; i++) {
+                    self.MyHandCards[i].TargetPos =
+                            (i * UICGGameComponent.MyHandCardDes -
+                                UICGGameComponent.MyHandCardDes / 2 * self.MyHandCards.Count) * Vector3.right +
                             self.MyHandCardsDeck.transform.position;
+                    self.MyHandCards[i].CardGo.transform.SetSiblingIndex(i);
+                }
+            }
+        }
+
+        public static void EnemyHandCardsPos(this UICGGameComponent self)
+        {
+            if (self.EnemyHandCards != null)
+            {
+                int i = 0;
+                foreach (var card in self.EnemyHandCards)
+                {
                     card.CardGo.transform.SetSiblingIndex(i);
+                    card.TargetPos = (i * UICGGameComponent.EnemyHandCardDes - UICGGameComponent.EnemyHandCardDes / 2 * self.EnemyHandCards.Count) * Vector3.right + self.EnemyHandCardsDeck.transform.position;
                     i++;
                 }
             }
         }
 
-        private static void EnemyHandCardsPos(this UICGGameComponent self) {
-            if (self.EnemyHandCards != null) {
+        private static void MyUnitsPos(this UICGGameComponent self)
+        {
+            if (self.MyFightUnits != null)
+            {
                 int i = 0;
-                foreach (var card in self.EnemyHandCards) {
-                    card.CardGo.transform.SetSiblingIndex(i);
-                    card.CardGo.transform.position = (i * UICGGameComponent.EnemyHandCardDes  - UICGGameComponent.EnemyHandCardDes / 2 * self.EnemyHandCards.Count) * Vector3.right + self.EnemyHandCardsDeck.transform.position;
-                    i++;
-                }
-            }
-        }
-
-        private static void MyUnitsPos(this UICGGameComponent self) {
-            if (self.MyFightUnits != null) {
-                int i = 0;
-                if (self.MyHandCardPos == -1) {
-                    foreach (var card in self.MyFightUnits) {
-                        card.CardGo.transform.position =
+                if (self.MyHandCardPos == -1)
+                {
+                    foreach (var card in self.MyFightUnits)
+                    {
+                        card.TargetPos =
                                 (i * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * (self.MyFightUnits.Count - 1)) * Vector3.right +
                                 self.MyUnits.transform.position;
                         i++;
                     }
-                } else {
-                    foreach (var card in self.MyFightUnits) {
+                }
+                else
+                {
+                    foreach (var card in self.MyFightUnits)
+                    {
                         if (i == self.MyHandCardPos) i++;
-                        card.CardGo.transform.position =
+                        card.TargetPos =
                                 (i * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * self.MyFightUnits.Count) * Vector3.right +
                                 self.MyUnits.transform.position;
                         i++;
@@ -224,12 +252,15 @@ namespace ET.Client
                 }
             }
         }
-        
-        private static void EnemyUnitsPos(this UICGGameComponent self) {
-            if (self.EnemyFightUnits != null) {
+
+        private static void EnemyUnitsPos(this UICGGameComponent self)
+        {
+            if (self.EnemyFightUnits != null)
+            {
                 int i = 0;
-                foreach (var card in self.EnemyFightUnits) {
-                    card.CardGo.transform.position =
+                foreach (var card in self.EnemyFightUnits)
+                {
+                    card.TargetPos =
                             (i * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * (self.EnemyFightUnits.Count - 1)) * Vector3.right +
                             self.EnemyUnits.transform.position;
                     i++;
@@ -237,7 +268,8 @@ namespace ET.Client
             }
         }
 
-        public static GameObject GetAttackTarget(this UICGGameComponent self, Vector2 vector2) {
+        public static GameObject GetAttackTarget(this UICGGameComponent self, Vector2 vector2)
+        {
             GameObject target = null;
             target = self.GetEnemyHero(vector2);
             if (target != null) return target;
@@ -248,7 +280,8 @@ namespace ET.Client
             return null;
         }
 
-        public static GameObject GetActorTarget(this UICGGameComponent self, Vector2 vector2) {
+        public static GameObject GetActorTarget(this UICGGameComponent self, Vector2 vector2)
+        {
             GameObject target = null;
             target = self.GetEnemyHero(vector2);
             if (target != null) return target;
@@ -265,70 +298,88 @@ namespace ET.Client
             return null;
         }
 
-        private static GameObject GetEnemyHero(this UICGGameComponent self, Vector2 vector2) {
-            if (Mathf.Abs(vector2.x - self.EnemyHero.transform.position.x) < 10 &&
-                Mathf.Abs(vector2.y - self.EnemyHero.transform.position.y) < 10) {
+        private static GameObject GetEnemyHero(this UICGGameComponent self, Vector2 vector2)
+        {
+            if (Mathf.Abs(vector2.x - self.EnemyHero.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.EnemyHero.transform.position.y) < UICGGameComponent.FindTarget)
+            {
                 return self.EnemyHero;
             }
             return null;
         }
-        
-        private static GameObject GetMyHero(this UICGGameComponent self, Vector2 vector2) {
-            if (Mathf.Abs(vector2.x - self.MyHero.transform.position.x) < 10 &&
-                Mathf.Abs(vector2.y - self.MyHero.transform.position.y) < 10) {
+
+        private static GameObject GetMyHero(this UICGGameComponent self, Vector2 vector2)
+        {
+            if (Mathf.Abs(vector2.x - self.MyHero.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.MyHero.transform.position.y) < UICGGameComponent.FindTarget)
+            {
                 return self.MyHero;
             }
             return null;
         }
 
-        private static GameObject GetEnemyAgent(this UICGGameComponent self, Vector2 vector2) {
-            if (Mathf.Abs(vector2.x - self.EnemyAgent1.transform.position.x) < 10 &&
-                Mathf.Abs(vector2.y - self.EnemyAgent1.transform.position.y) < 10) {
+        private static GameObject GetEnemyAgent(this UICGGameComponent self, Vector2 vector2)
+        {
+            if (Mathf.Abs(vector2.x - self.EnemyAgent1.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.EnemyAgent1.transform.position.y) < UICGGameComponent.FindTarget)
+            {
                 return self.EnemyAgent1;
             }
-            if (Mathf.Abs(vector2.x - self.EnemyAgent2.transform.position.x) < 10 &&
-                Mathf.Abs(vector2.y - self.EnemyAgent2.transform.position.y) < 10) {
+            if (Mathf.Abs(vector2.x - self.EnemyAgent2.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.EnemyAgent2.transform.position.y) < UICGGameComponent.FindTarget)
+            {
                 return self.EnemyAgent2;
             }
 
             return null;
         }
-        
-        private static GameObject GetMyAgent(this UICGGameComponent self, Vector2 vector2) {
-            if (Mathf.Abs(vector2.x - self.MyAgent1.transform.position.x) < 10 &&
-                Mathf.Abs(vector2.y - self.MyAgent1.transform.position.y) < 10) {
+
+        private static GameObject GetMyAgent(this UICGGameComponent self, Vector2 vector2)
+        {
+            if (Mathf.Abs(vector2.x - self.MyAgent1.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.MyAgent1.transform.position.y) < UICGGameComponent.FindTarget)
+            {
                 return self.MyAgent1;
             }
-            if (Mathf.Abs(vector2.x - self.MyAgent2.transform.position.x) < 10 &&
-                Mathf.Abs(vector2.y - self.MyAgent2.transform.position.y) < 10) {
+            if (Mathf.Abs(vector2.x - self.MyAgent2.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.MyAgent2.transform.position.y) < UICGGameComponent.FindTarget)
+            {
                 return self.MyAgent2;
             }
 
             return null;
         }
 
-        private static GameObject GetEnemyUnit(this UICGGameComponent self, Vector2 vector2) {
-            
-            foreach (var unit in self.EnemyFightUnits) {
-                if (Mathf.Abs(vector2.x - unit.CardGo.transform.position.x) < 10 &&
-                    Mathf.Abs(vector2.y - unit.CardGo.transform.position.y) < 10) {
-                    return self.EnemyHero;
+        private static GameObject GetEnemyUnit(this UICGGameComponent self, Vector2 vector2)
+        {
+
+            foreach (var unit in self.EnemyFightUnits)
+            {
+                Log.Warning(unit.CardGo.transform.position.ToString());
+                Log.Warning(vector2.ToString());
+                if (Mathf.Abs(vector2.x - unit.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
+                    Mathf.Abs(vector2.y - unit.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
+                {
+                    return unit.CardGo;
                 }
             }
 
             return null;
         }
-        
-        private static GameObject GetMyUnit(this UICGGameComponent self, Vector2 vector2) {
-            
-            foreach (var unit in self.MyFightUnits) {
-                if (Mathf.Abs(vector2.x - unit.CardGo.transform.position.x) < 10 &&
-                    Mathf.Abs(vector2.y - unit.CardGo.transform.position.y) < 10) {
-                    return self.EnemyHero;
+
+        private static GameObject GetMyUnit(this UICGGameComponent self, Vector2 vector2)
+        {
+
+            foreach (var unit in self.MyFightUnits)
+            {
+                if (Mathf.Abs(vector2.x - unit.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
+                    Mathf.Abs(vector2.y - unit.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
+                {
+                    return unit.CardGo;
                 }
             }
 
             return null;
         }
-    } 
+    }
 }

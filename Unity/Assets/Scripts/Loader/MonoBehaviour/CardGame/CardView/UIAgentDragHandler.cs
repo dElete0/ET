@@ -24,10 +24,6 @@ namespace ET {
         public static bool IsCardBeDrag;
 
         public bool CanBeUsed = true;
-        [FormerlySerializedAs("UseCardType")]
-        public UIUseCardType UIUseCardType;
-        [FormerlySerializedAs("CardType")]
-        public UICardType UICardType;
         //记录玩家开始拖拽时的位置
         private Vector3 vector;
 

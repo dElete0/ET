@@ -103,7 +103,7 @@ namespace ET.Server
                 //必须先攻击嘲讽
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail()
                 {
-                    FailId = (int)Room2C_OperateFailType.CantOperateNow
+                    FailId = (int)Room2C_OperateFailType.MustAttackTaunt
                 });
                 return;
             }

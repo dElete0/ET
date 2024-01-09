@@ -66,6 +66,8 @@ namespace ET.Server {
                     room.Event_UseUnitCard(player, card, target, pos);
                 } else if (card.CardType == CardType.Magic) {
                     room.Event_UseMagicCard(player, card, target);
+                } else if (card.CardType == CardType.Plot) {
+                    room.Event_UsePlotCard(player, card, target);
                 }
             };
             return gameEvent;
@@ -83,9 +85,17 @@ namespace ET.Server {
         }
         
         public static GameEvent UseMagicCard(RoomEventTypeComponent room, RoomPlayer player, RoomCard card, RoomCard target) {
-            GameEvent gameEvent = new GameEvent(GameEventType.UseUnitCard);
+            GameEvent gameEvent = new GameEvent(GameEventType.UseMagicCard);
             gameEvent.ToDo = @event => {
                 room.Event_MagicTakesEffect(player, card, target);
+            };
+            return gameEvent;
+        }
+        
+        public static GameEvent UsePlotCard(RoomEventTypeComponent room, RoomPlayer player, RoomCard card, RoomCard target) {
+            GameEvent gameEvent = new GameEvent(GameEventType.UsePlotCard);
+            gameEvent.ToDo = @event => {
+                room.Event_PlotTakesEffect(player, card, target);
             };
             return gameEvent;
         }
@@ -99,9 +109,17 @@ namespace ET.Server {
         }
         
         public static GameEvent MagicTakesEffect(RoomEventTypeComponent room, RoomCard card, RoomCard target, RoomPlayer player) {
-            GameEvent gameEvent = new GameEvent(GameEventType.UnitArrange);
+            GameEvent gameEvent = new GameEvent(GameEventType.MagicTakesEffect);
             gameEvent.ToDo = @event => {
                 room.ToDo_MagicTakesEffect(card, target, player);
+            };
+            return gameEvent;
+        }
+        
+        public static GameEvent PlotTakesEffect(RoomEventTypeComponent room, RoomCard card, RoomCard target, RoomPlayer player) {
+            GameEvent gameEvent = new GameEvent(GameEventType.PlotTakesEffect);
+            gameEvent.ToDo = @event => {
+                room.ToDo_PlotTakesEffect(card, target, player);
             };
             return gameEvent;
         }
@@ -145,7 +163,7 @@ namespace ET.Server {
                 } else if (target.CardType == CardType.Unit) {
                     room.ToDo_UnitDamage(card, target, num);
                 } else if (target.CardType == CardType.Agent) {
-                    room.ToDo_UnitDamage(card, target, num);
+                    room.ToDo_AgentDamage(card, target, num);
                 }
             };
             return gameEvent;

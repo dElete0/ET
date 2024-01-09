@@ -52,5 +52,8 @@ namespace ET.Server {
         AttackOver = 120,
         
         GetBaseColor = 121,
+        UsePlotCard = 122,
+        MagicTakesEffect = 123,
+        PlotTakesEffect = 124,
     }
 }
