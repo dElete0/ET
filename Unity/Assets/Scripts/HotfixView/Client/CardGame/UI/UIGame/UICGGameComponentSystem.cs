@@ -198,8 +198,24 @@ namespace ET.Client
         public static void HandCardsPos(this UICGGameComponent self)
         {
             if (UIHandCardDragHandler.IsCardBeDrag.Count > 0) return;
-            if (self.MyHandCards != null)
-            {
+            if (self.SelectCardPos > -1) {
+                for (int i = 0; i < self.MyHandCards.Count; i++) {
+                    self.MyHandCards[i].TargetPos =
+                            (i * UICGGameComponent.MyHandCardDes -
+                                UICGGameComponent.MyHandCardDes / 2 * self.MyHandCards.Count) * Vector3.right +
+                            self.MyHandCardsDeck.transform.position;
+                    if (i < self.SelectCardPos) {
+                        self.MyHandCards[i].TargetPos -= UICGGameComponent.MyHandCardDes * 1.9f * Vector3.right;
+                    } else if (i > self.SelectCardPos) {
+                        self.MyHandCards[i].TargetPos += UICGGameComponent.MyHandCardDes * 1.9f * Vector3.right;
+                        //self.MyHandCards[i].CardGo.transform.SetSiblingIndex(i - 1);
+                    } else {
+                        self.MyHandCards[i].TargetPos += UICGGameComponent.MyHandCardDes * 1.9f * Vector3.up;
+                        //self.MyHandCards[i].CardGo.transform.SetSiblingIndex(self.MyHandCards.Count);
+                    }
+                    self.MyHandCards[i].CardGo.transform.SetSiblingIndex(i);
+                }
+            } else {
                 for (int i = 0; i < self.MyHandCards.Count; i++) {
                     self.MyHandCards[i].TargetPos =
                             (i * UICGGameComponent.MyHandCardDes -

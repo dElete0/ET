@@ -64,6 +64,9 @@ namespace ET.Server
                 case Power_Type.GetHandCardFromGroup:
                     room.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(room, player, power.Count1));
                     break;
+                case Power_Type.DamageHint:
+                    room.BroadAndSettleEvent(GameEventFactory.Damage(room, card, target, power.Count1));
+                    break;
             }
         }
     }

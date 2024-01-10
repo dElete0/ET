@@ -184,5 +184,7 @@ namespace ET {
         LetAgentAdd = 1011,
         // 抽牌
         GetHandCardFromGroup = 1012,
+        //造成伤害
+        DamageHint = 1013,
     }
 }

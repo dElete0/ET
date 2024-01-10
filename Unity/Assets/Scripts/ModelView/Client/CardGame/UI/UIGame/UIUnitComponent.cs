@@ -7,9 +7,11 @@ namespace ET.Client
     public class UIUnitInfo : Entity, IAwake<GameObject>, IUpdate {
         public GameObject CardGo;
         public Vector3 TargetPos;
+        public float TargetScale = 1f;
 
         public long CardId;
         public int BaseId;
+        public UIUnitInfo TargetInfo;
         //参数
         public int DCost;
         public int DRed;
@@ -20,6 +22,8 @@ namespace ET.Client
         public int DWhite;
         public int DAttack;
         public int DHP;
+        public bool AttackCountEnough = true;
+        public bool IsTaunt;
         
         // UI
         public Text Name, Info;
@@ -44,7 +48,7 @@ namespace ET.Client
         public UseCardType UseCardType;
 
         //动画机是否在移动
-        public bool IsMove;
-        public bool IsDrag;
+        public bool IsMove, IsScaleChange;
+        public bool IsDrag, IsBeSelect;
     }
 }

@@ -206,7 +206,7 @@ namespace ET.Client
                 if (unitInfo.CardId == targetId)
                     target = unitInfo;
             } 
-            actor.AttackTo(target.CardGo.transform.position);
+            actor.AttackTo(target);
         }
 
         public static async ETTask Room2C_CallUnit(Room room, RoomCardInfo cardInfo, bool isMy)
@@ -319,6 +319,11 @@ namespace ET.Client
             unitInfo.Attack.text = cardInfo.Attack.ToString();
             unitInfo.HP.text = cardInfo.HP.ToString();
             unitInfo.Taunt.SetActive(cardInfo.CardPowers.Contains((int)Power_Type.Taunt));
+            
+            //参数
+            unitInfo.DAttack = cardInfo.Attack;
+            unitInfo.DHP = cardInfo.HP;
+            unitInfo.DCost = cardInfo.Cost;
 
             //Sprite
             string spritePath = $"Assets/Bundles/CardImage/{cardInfo.BaseId}.png";
@@ -326,54 +331,46 @@ namespace ET.Client
             unitInfo.Image.sprite = sprite;
 
             UIUnitDragHandler dragHandler = unit.GetComponent<UIUnitDragHandler>();
-            dragHandler.CardId = cardInfo.CardId;
-            dragHandler.BaseId = cardInfo.BaseId;
             dragHandler.IsMy = isMy;
             dragHandler.IsDrag = (b) => {
                 unitInfo.IsDrag = b;
             };
+            dragHandler.CanBeUsed = () => {
+                if (unitInfo.DAttack < 1) {
+                    Log.Warning("????");
+                    return false;
+                }
+
+                if (!unitInfo.AttackCountEnough) {
+                    Log.Warning("????");
+                    return false;
+                }
+                Log.Warning("????");
+
+                return true;
+            };
             dragHandler.DragShow = v => {
                 GameObject target = uicgGameComponent.GetAttackTarget(v);
                 if (target != null) {
-                    dragHandler.Target = target;
+                    unitInfo.TargetInfo = uicgGameComponent.GetComponent<UIAnimComponent>().GetUnitInfoByGo(target);
                     target.transform.localScale = new Vector3(1.05f, 1.05f);
-                } else if (dragHandler.Target != null) {
-                    dragHandler.Target.transform.localScale = Vector3.one;
+                } else if (unitInfo.TargetInfo != null) {
+                    unitInfo.TargetInfo.CardGo.transform.localScale = Vector3.one;
+                    unitInfo.TargetInfo = null;
                 }
             };
             dragHandler.TryToDoInClient = (vector2) =>
             {
-                if (unitInfo.Attack.text == "0")
-                {
-                    Log.Warning("攻击为0，不能攻击");
-                    return false;
-                }
-
-                GameObject target = uicgGameComponent.GetAttackTarget(vector2);
-                if (target != null)
-                {
-                    long targetID = 0;
-                    UIUnitDragHandler unitTargetHandler = target.GetComponent<UIUnitDragHandler>();
-                    UIHeroDragHandler heroTargetHandler = target.GetComponent<UIHeroDragHandler>();
-                    UIAgentDragHandler agentDragHandler = target.GetComponent<UIAgentDragHandler>();
-                    if (unitTargetHandler != null)
-                        targetID = unitTargetHandler.CardId;
-                    if (heroTargetHandler != null)
-                        targetID = heroTargetHandler.CardId;
-                    if (agentDragHandler != null)
-                        targetID = agentDragHandler.CardId;
-                    if (targetID != 0)
-                    {
-                        room.Root().GetComponent<ClientSenderCompnent>().Send(new C2Room_Attack() { Actor = cardInfo.CardId, Target = targetID });
-                        return true;
-                    }
+                if (unitInfo.TargetInfo != null) {
+                    room.Root().GetComponent<ClientSenderCompnent>().Send(new C2Room_Attack() { Actor = cardInfo.CardId, Target = unitInfo.TargetInfo.CardId });
+                    return true;
                 }
                 return false;
             };
             dragHandler.ShowUIShowCard = () =>
             {
                 bool left = dragHandler.gameObject.transform.position.x < 30;
-                uicgGameComponent.ShowUIShowCard(left, dragHandler.BaseId).Coroutine();
+                uicgGameComponent.ShowUIShowCard(left, unitInfo.BaseId).Coroutine();
             };
             dragHandler.HideUIShowCard = uicgGameComponent.HideUIShowCard;
 
@@ -424,6 +421,8 @@ namespace ET.Client
             unitInfo.HP.text = cardInfo.HP.ToString();
             unitInfo.Cost.text = cardInfo.Cost.ToString();
             unitInfo.DCost = cardInfo.Cost;
+            unitInfo.DAttack = cardInfo.Attack;
+            unitInfo.DHP = cardInfo.HP;
             unitInfo.DRed = cardInfo.Red;
             unitInfo.DBlue = cardInfo.Blue;
             unitInfo.DGreen = cardInfo.Green;
@@ -453,15 +452,43 @@ namespace ET.Client
                     if(unitInfo.CardGo.transform.position.y - unitInfo.TargetPos.y > 20f) {
                         return true;
                     }
-                } else if (unitInfo.CardType == CardType.Magic && unitInfo.UseCardType == UseCardType.ToUnit) {
+                } else if (unitInfo.CardType == CardType.Magic && unitInfo.UseCardType == UseCardType.ToActor) {
                     return true;
                 }
 
                 return false;
             };
+            dragHandler.BeSelect = b => {
+                if (!b) {
+                    unitInfo.IsBeSelect = false;
+                    unitInfo.TargetScale = 1f;
+                    for (int i = 0; i < ui.MyHandCards.Count; i++) {
+                        if (ui.MyHandCards[i].CardId == unitInfo.CardId) {
+                            if (i == ui.SelectCardPos) {
+                                ui.SelectCardPos = -1;
+                                return;
+                            }
+                        }
+                    }
+                } else {
+                    unitInfo.IsBeSelect = true;
+                    unitInfo.TargetScale = 1.3f;
+                    if (ui.SelectCardPos != -1)
+                        return;
+                    for (int i = 0; i < ui.MyHandCards.Count; i++) {
+                        if (ui.MyHandCards[i].CardId == unitInfo.CardId) {
+                            ui.SelectCardPos = i;
+                            return;
+                        }
+                    }
+                }
+            };
             dragHandler.IsBeDrag = b => {
                 unitInfo.IsDrag = b;
             };
+            dragHandler.IsUnitInDrag = () => unitInfo.CardType == CardType.Unit;
+            dragHandler.GetHeroVector = () => ui.MyHero.transform.position;
+            dragHandler.GetTargetPos = () => unitInfo.TargetPos;
             dragHandler.CanBeUsed = () =>
             {
                 //费用不足，无法使用
@@ -471,18 +498,31 @@ namespace ET.Client
                 }
                 return true;
             };
+            dragHandler.IsToTargetInDrag = v => {
+                if (unitInfo.UseCardType == UseCardType.NoTarget) {
+                    unitInfo.TargetInfo = null;
+                    return false;
+                } else {
+                    GameObject target = ui.GetAttackTarget(v);
+                    if (target != null) {
+                        unitInfo.TargetInfo = ui.GetComponent<UIAnimComponent>().GetUnitInfoByGo(target);
+                        target.transform.localScale = new Vector3(1.05f, 1.05f);
+                    } else if (unitInfo.TargetInfo != null) {
+                        unitInfo.TargetInfo.CardGo.transform.localScale = Vector3.one;
+                        unitInfo.TargetInfo = null;
+                    }
+
+                    return true;
+                }
+            };
             dragHandler.CardPos = (vector3) => {
                 if (unitInfo.CardType != CardType.Unit) return;
                 if (vector3.x > 9999f) {
                     ui.MyHandCardPos = -1;
-                }
-                else
-                {
+                } else {
                     int i = 0;
-                    foreach (var unit in ui.MyFightUnits)
-                    {
-                        if (unit.CardGo.transform.position.x > vector3.x)
-                        {
+                    foreach (var unit in ui.MyFightUnits) {
+                        if (unit.CardGo.transform.position.x > vector3.x) {
                             continue;
                         }
                         i++;
@@ -490,24 +530,14 @@ namespace ET.Client
                     ui.MyHandCardPos = i;
                 }
             };
-            dragHandler.TryToDoInClient = (vector2) =>
-            {
-                if (unitInfo.UseCardType == UseCardType.ToUnit ||
-                    unitInfo.UseCardType == UseCardType.ToHero) {
-                    GameObject target = ui.GetActorTarget(vector2);
-
-                    long targetID = 0;
-                    UIUnitDragHandler unitTargetHandler = target.GetComponent<UIUnitDragHandler>();
-                    UIHeroDragHandler heroTargetHandler = target.GetComponent<UIHeroDragHandler>();
-                    UIAgentDragHandler agentDragHandler = target.GetComponent<UIAgentDragHandler>();
-                    if (unitTargetHandler != null)
-                        targetID = unitTargetHandler.CardId;
-                    if (heroTargetHandler != null)
-                        targetID = heroTargetHandler.CardId;
-                    if (agentDragHandler != null)
-                        targetID = agentDragHandler.CardId;
-                    if (targetID != 0) {
-                        room.Root().GetComponent<ClientSenderCompnent>().Send(new C2Room_UseCard() { Card = cardInfo.CardId, Target = targetID, Pos = ui.MyHandCardPos });
+            dragHandler.TryToDoInClient = (vector2) => {
+                ui.SelectCardPos = -1;
+                if ((unitInfo.CardType == CardType.Magic || unitInfo.CardType == CardType.Plot) && 
+                    (unitInfo.UseCardType == UseCardType.ToUnit || 
+                        unitInfo.UseCardType == UseCardType.ToHero ||
+                        unitInfo.UseCardType == UseCardType.ToActor)) {
+                    if (unitInfo.TargetInfo != null) {
+                        room.Root().GetComponent<ClientSenderCompnent>().Send(new C2Room_UseCard() { Card = cardInfo.CardId, Target = unitInfo.TargetInfo.CardId, Pos = ui.MyHandCardPos });
                         return true;
                     }
                 } else if (unitInfo.CardType == CardType.Unit &&

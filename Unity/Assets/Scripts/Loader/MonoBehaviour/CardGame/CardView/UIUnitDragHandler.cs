@@ -15,17 +15,11 @@ namespace ET {
         public Func<Vector2, bool> TryToDoInClient;
         //拖拽的动态效果
         public Action<Vector2> DragShow;
-        public GameObject Target;
         public Action<bool> IsDrag;
+        public Func<bool> CanBeUsed;
         // CardId
-        public long CardId;
-        public int BaseId;
         public bool IsMy;
-
         public static List<UIUnitDragHandler> IsCardBeDrag = new List<UIUnitDragHandler>();
-
-        public bool CanBeUsed = true;
-
 
         [Header("表示限制的区域")]
         public RectTransform LimitContainer;
@@ -84,7 +78,9 @@ namespace ET {
         /// <param name="eventData"></param>
         public void OnBeginDrag(PointerEventData eventData) {
             if (!IsMy) return;
-            if (!this.CanBeUsed) return;
+            Log.Warning("????");
+            if (!this.CanBeUsed.Invoke()) return;
+            Log.Warning("????");
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.enterEventCamera, out Vector3 globalMousePos)) {
                 // 计算偏移量
                 offset = rt.position - globalMousePos;
@@ -99,7 +95,9 @@ namespace ET {
         /// <param name="eventData"></param>
         public void OnDrag(PointerEventData eventData) {
             if (!IsMy) return;
-            if (!this.CanBeUsed) return;
+            Log.Warning("????");
+            if (!this.CanBeUsed.Invoke()) return;
+            Log.Warning("????");
             // 将屏幕空间上的点转换为位于给定RectTransform平面上的世界空间中的位置
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.pressEventCamera, out Vector3 globalMousePos)) {
                 this.DragShow.Invoke(globalMousePos);
@@ -117,7 +115,7 @@ namespace ET {
         public void OnEndDrag(PointerEventData eventData) {
             //判断是否拖拽到目标上
             if (!IsMy) return;
-            if (!this.CanBeUsed) return;
+            if (!this.CanBeUsed.Invoke()) return;
             UIArrowHandler.IsSetTarget = false;
             IsDrag.Invoke(false);
             if (IsCardBeDrag.Contains(this)) IsCardBeDrag.Remove(this);

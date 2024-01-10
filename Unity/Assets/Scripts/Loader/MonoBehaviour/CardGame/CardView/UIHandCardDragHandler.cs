@@ -14,29 +14,34 @@ namespace ET {
         //执行对目标释放的效果=>里头是发送消息to Server(仅Client内部调用)
         public Func<Vector3, bool> TryToDoInClient;
         //拖拽的动态效果
-        public Action<GameObject> DragShow;
+        public Func<Vector3, bool> IsToTargetInDrag;
         public Action<Vector3> CardPos;
         public Action<bool> IsBeDrag;
+        public Action<bool> IsBeSelect;
         public Func<bool> IsDragEnable;
+        public Action<bool> BeSelect;
         public bool IsMy;
+        private float UI_Alpha = 1f;
         //鼠标位置
         Vector3 offset = Vector3.zero;
-        RectTransform rt;
         public Vector3 GlobalMousePos;
-
-        public static GameObject ShowThis;
-        [Header("场景中Canvas")]
-        public Canvas canvas;
+        
         public static List<UIHandCardDragHandler> IsCardBeDrag = new List<UIHandCardDragHandler>();
 
         public Func<bool> CanBeUsed;
+        public Func<bool> IsUnitInDrag;
+        public Func<Vector3> GetTargetPos;
+        public Func<Vector3> GetHeroVector;
 
         //需要移动物品的位置组件
-        private RectTransform rectTransform;
+        private RectTransform rt;
+        private CanvasGroup CanvasGroup;
 
         //UI事件管理器
         private UnityEngine.EventSystems.EventSystem _EventSystem;
         private GraphicRaycaster gra;
+        
+        private const float HideDes = 100f;
         
         private void Awake() {
             rt = GetComponent<RectTransform>();
@@ -45,15 +50,27 @@ namespace ET {
         }
 
         private void Start() {
-            this.canvas = this.transform.parent.parent.parent.parent.GetComponent<Canvas>();
         }
-        
+
+        private void Update() {
+            if (CanvasGroup == null)
+            {
+                return;
+            }
+ 
+            if (UI_Alpha != CanvasGroup.alpha) {
+                CanvasGroup.alpha = UI_Alpha;
+            }
+        }
+
         public void OnPointerEnter(PointerEventData eventData) {
-            ShowThis = this.gameObject;
+            BeSelect.Invoke(true);
+            this.gameObject.transform.localScale = Vector3.one * 1.3f;
         }
         
         public void OnPointerExit(PointerEventData eventData) {
-            ShowThis = null;
+            BeSelect.Invoke(false);
+            this.gameObject.transform.localScale = Vector3.one;
         }
 
         /// <summary>
@@ -79,13 +96,23 @@ namespace ET {
         public void OnDrag(PointerEventData eventData) {
             if (!IsMy) return;
             if (!this.CanBeUsed()) return;
-            if (this.DragShow != null) this.DragShow.Invoke(null);
             // 将屏幕空间上的点转换为位于给定RectTransform平面上的世界空间中的位置
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.pressEventCamera, out Vector3 globalMousePos)) {
                 this.GlobalMousePos = globalMousePos;
-                rt.position = globalMousePos + offset;
+                if (this.IsUnitInDrag.Invoke()) {
+                    rt.position = globalMousePos + offset;
+                    CardPos.Invoke(globalMousePos);
+                } else {
+                    if (this.IsToTargetInDrag.Invoke(globalMousePos)) {
+                        float dis = (GetTargetPos.Invoke() - this.GlobalMousePos).magnitude;
+                        this.UI_Alpha = dis > HideDes ? 0 : 1 - dis / HideDes;
+                        UIArrowHandler.IsSetTarget = true;
+                        UIArrowHandler.SetTarget(GetHeroVector.Invoke(), this.GlobalMousePos);
+                    } else {
+                        rt.position = globalMousePos + offset;
+                    }
+                }
             }
-            CardPos.Invoke(globalMousePos);
         }
 
         /// <summary>
@@ -93,9 +120,11 @@ namespace ET {
         /// </summary>
         /// <param name="eventData"></param>
         public void OnEndDrag(PointerEventData eventData) {
-            //判断是否拖拽到目标上
-            GameObject target = null;
-            bool isUsed;
+            if (UIArrowHandler.IsSetTarget) {
+                this.UI_Alpha = 1f;
+                UIArrowHandler.IsSetTarget = false;
+                this.rt.position = GetTargetPos.Invoke();
+            }
             if (IsCardBeDrag.Contains(this)) IsCardBeDrag.Remove(this);
             this.IsBeDrag.Invoke(false);
             if (IsDragEnable.Invoke()) {

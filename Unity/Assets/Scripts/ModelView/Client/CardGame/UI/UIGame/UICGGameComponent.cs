@@ -75,6 +75,8 @@ namespace ET.Client
         
         //玩家拖拽手牌的目标落点
         public int MyHandCardPos = -1;
+        //玩家选择的手牌
+        public int SelectCardPos = -1;
         
         //常数
         public const float MyHandCardDes = 5f;

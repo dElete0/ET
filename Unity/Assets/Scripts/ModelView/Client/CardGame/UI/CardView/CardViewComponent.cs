@@ -9,7 +9,6 @@ namespace ET.Client
     {
         public RectTransform rectTrans;
         public CanvasGroup canvasGroup;
-        public UIDragHandler DragHandler;
         public GameObject cardObject;
 
         // public EventTrigger EventTrigger;

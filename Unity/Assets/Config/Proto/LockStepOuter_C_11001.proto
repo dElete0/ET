@@ -384,3 +384,9 @@ message Room2C_UnitDead // IMessage
 {
 	int64 CardId = 1;
 }
+
+message Room2C_AttackCountEnough // IMessage
+{
+	int64 CardId = 1;
+	bool AttackCountEnough = 2;
+}
