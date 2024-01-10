@@ -10,7 +10,7 @@ namespace ET.Server {
             }
             
             // Todo 客户端执行受伤动作
-            Room room = target.GetParent<Room>();
+            Room room = roomEventTypeComponent.GetParent<Room>();
             Room2C_CardGetDamage cardGetDamage = new() { Card = target.RoomCard2UnitInfo(), hurt = count};
             RoomMessageHelper.BroadCast(room, cardGetDamage);
         }
@@ -19,12 +19,12 @@ namespace ET.Server {
             target.HP -= count;
             
             // Todo 客户端执行受伤动作
-            Room room = target.GetParent<Room>();
+            Room room = roomEventTypeComponent.GetParent<Room>();
             Room2C_CardGetDamage cardGetDamage = new() { Card = target.RoomCard2UnitInfo(), hurt = count};
             RoomMessageHelper.BroadCast(room, cardGetDamage);
             
             if (target.HP < 0) {
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.Dead(roomEventTypeComponent, card));
+                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.Dead(roomEventTypeComponent, target));
             }
         }
 
@@ -35,7 +35,7 @@ namespace ET.Server {
             }
             
             // Todo 客户端执行受伤动作
-            Room room = target.GetParent<Room>();
+            Room room = roomEventTypeComponent.GetParent<Room>();
             Room2C_CardGetDamage cardGetDamage = new() { Card = target.RoomCard2UnitInfo(), hurt = count};
             RoomMessageHelper.BroadCast(room, cardGetDamage);
         }

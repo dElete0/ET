@@ -355,8 +355,6 @@ namespace ET.Client
 
             foreach (var unit in self.EnemyFightUnits)
             {
-                Log.Warning(unit.CardGo.transform.position.ToString());
-                Log.Warning(vector2.ToString());
                 if (Mathf.Abs(vector2.x - unit.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
                     Mathf.Abs(vector2.y - unit.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
                 {

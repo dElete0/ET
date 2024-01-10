@@ -196,6 +196,19 @@ namespace ET.Client
             UIUnitInfo uiUnit = await uicgGameComponent.CreateUIHandCard(cardInfo, room, handCard);
         }
 
+        public static async ETTask Room2C_RoomCardAttack(Room room, long actorId, long targetId) {
+            UI ui = await UIHelper.Get(room, UIType.UICGGame);
+            UIAnimComponent animComponent = ui.GetComponent<UICGGameComponent>().GetComponent<UIAnimComponent>();
+            UIUnitInfo actor = null, target = null;
+            foreach (UIUnitInfo unitInfo in animComponent.Children.Values) {
+                if (unitInfo.CardId == actorId)
+                    actor = unitInfo;
+                if (unitInfo.CardId == targetId)
+                    target = unitInfo;
+            } 
+            actor.AttackTo(target.CardGo.transform.position);
+        }
+
         public static async ETTask Room2C_CallUnit(Room room, RoomCardInfo cardInfo, bool isMy)
         {
             UI ui = await UIHelper.Get(room, UIType.UICGGame);
@@ -224,7 +237,6 @@ namespace ET.Client
             UIUnitInfo info = null;
             foreach (var cardUnitInfo in uicgGameComponent.HeroAndAgent)
             {
-                Log.Warning(cardUnitInfo.CardId);
                 if (cardInfo.CardId == cardUnitInfo.CardId)
                 {
                     info = cardUnitInfo;
@@ -232,7 +244,6 @@ namespace ET.Client
             }
             foreach (var cardUnitInfo in uicgGameComponent.MyFightUnits)
             {
-                Log.Warning(cardUnitInfo.CardId);
                 if (cardInfo.CardId == cardUnitInfo.CardId)
                 {
                     info = cardUnitInfo;
@@ -240,13 +251,12 @@ namespace ET.Client
             }
             foreach (var cardUnitInfo in uicgGameComponent.EnemyFightUnits)
             {
-                Log.Warning(cardUnitInfo.CardId);
                 if (cardInfo.CardId == cardUnitInfo.CardId)
                 {
                     info = cardUnitInfo;
                 }
             }
-            info.HP.text = cardInfo.HP.ToString();
+            info.AppendCallback(() => info.HP.text = cardInfo.HP.ToString());
         }
 
         public static void Room2C_UseHandCards(this UICGGameComponent ui, long CardId)
@@ -682,6 +692,15 @@ namespace ET.Client
             UI ui = await UIHelper.Get(room, UIType.UICGGame);
             UICGGameComponent uicgGameComponent = ui.GetComponent<UICGGameComponent>();
             foreach (var unit in uicgGameComponent.MyFightUnits) {
+                if (unit.CardId == cardId) {
+                    uicgGameComponent.MyFightUnits.Remove(unit);
+                    uicgGameComponent.GetComponent<UIAnimComponent>().RemoveChild(unit.Id);
+                    uicgGameComponent.UnitPool.Add(unit.CardGo);
+                    unit.CardGo.SetActive(false);
+                    return;
+                }
+            }
+            foreach (var unit in uicgGameComponent.EnemyFightUnits) {
                 if (unit.CardId == cardId) {
                     uicgGameComponent.MyFightUnits.Remove(unit);
                     uicgGameComponent.GetComponent<UIAnimComponent>().RemoveChild(unit.Id);

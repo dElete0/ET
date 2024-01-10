@@ -84,6 +84,7 @@ namespace ET {
         /// <param name="eventData"></param>
         public void OnBeginDrag(PointerEventData eventData) {
             if (!IsMy) return;
+            if (!this.CanBeUsed) return;
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.enterEventCamera, out Vector3 globalMousePos)) {
                 // 计算偏移量
                 offset = rt.position - globalMousePos;
@@ -97,13 +98,14 @@ namespace ET {
         /// </summary>
         /// <param name="eventData"></param>
         public void OnDrag(PointerEventData eventData) {
-            //if (!this.CanBeUsed) return;
             if (!IsMy) return;
+            if (!this.CanBeUsed) return;
             // 将屏幕空间上的点转换为位于给定RectTransform平面上的世界空间中的位置
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.pressEventCamera, out Vector3 globalMousePos)) {
                 this.DragShow.Invoke(globalMousePos);
                 this.GlobalMousePos = globalMousePos;
-                rt.position = globalMousePos + offset;
+                UIArrowHandler.IsSetTarget = true;
+                UIArrowHandler.SetTarget(this.rt.position, globalMousePos);
             }
         }
         
@@ -115,6 +117,8 @@ namespace ET {
         public void OnEndDrag(PointerEventData eventData) {
             //判断是否拖拽到目标上
             if (!IsMy) return;
+            if (!this.CanBeUsed) return;
+            UIArrowHandler.IsSetTarget = false;
             IsDrag.Invoke(false);
             if (IsCardBeDrag.Contains(this)) IsCardBeDrag.Remove(this);
             if (this.TryToDoInClient.Invoke(this.GlobalMousePos)) {

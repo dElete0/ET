@@ -1,4 +1,6 @@
+using System;
 using DG.Tweening;
+using UnityEngine;
 
 namespace ET.Client {
     [EntitySystemOf(typeof(UIUnitInfo))]
@@ -23,6 +25,20 @@ namespace ET.Client {
                         .Append(self.CardGo.transform.DOMove(self.TargetPos, 0.2f))
                         .AppendCallback(() => { self.IsMove = false; });
             }
+        }
+
+        public static void AttackTo(this UIUnitInfo self, Vector3 vector) {
+            Vector3 backTarget = 0.15f * (self.CardGo.transform.position - vector) + self.CardGo.transform.position;
+            self.GetParent<UIAnimComponent>().GetSequence()
+                    .AppendCallback(() => self.IsMove = true)
+                    .Append(self.CardGo.transform.DOMove(backTarget, 0.15f))
+                    .Append(self.CardGo.transform.DOMove(vector, 0.3f))
+                    .Append(self.CardGo.transform.DOMove(self.TargetPos, 0.13f))
+                    .AppendCallback(() => self.IsMove = false);
+        }
+
+        public static void AppendCallback(this UIUnitInfo self, Action a) {
+            self.GetParent<UIAnimComponent>().GetSequence().AppendCallback(a.Invoke);
         }
     }
 }

@@ -2423,6 +2423,7 @@ GameObject:
   - component: {fileID: 4163240287372524368}
   - component: {fileID: 1418880890990636457}
   - component: {fileID: 6041592149674420475}
+  - component: {fileID: 6908853866871366594}
   m_Layer: 5
   m_Name: UICard
   m_TagString: Untagged
@@ -2570,10 +2571,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cfaa11cfbfe49cf9bd46c8edc6c0856, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CardId: 0
-  CanBeUsed: 0
-  UIUseCardType: 0
-  UICardType: 0
+  IsMy: 0
+  GlobalMousePos: {x: 0, y: 0, z: 0}
+  canvas: {fileID: 0}
+--- !u!210 &6908853866871366594
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8376743970285329446}
+  m_Enabled: 1
+  m_SortingLayerID: 319031819
+  m_SortingLayer: 0
+  m_SortingOrder: 0
 --- !u!1 &8421673123137265972
 GameObject:
   m_ObjectHideFlags: 0
@@ -2764,7 +2775,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1

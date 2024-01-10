@@ -11,8 +11,10 @@ namespace ET.Client {
             self.Sequence = DOTween.Sequence();
         }
 
-        public static void Append(this ET.Client.UIAnimComponent self, Tween t) {
-            self.Sequence.Append(t);
+        public static Sequence GetSequence(this ET.Client.UIAnimComponent self) {
+            if (!self.Sequence.active)
+                self.Sequence = DOTween.Sequence();
+            return self.Sequence;
         }
     }
 }
