@@ -40,10 +40,12 @@ namespace ET.Client
         public GameObject EnemyHero;
         public GameObject EnemyAgent1, EnemyAgent2;
         
+        public GameObject MyGroup, EnemyGroup, GetHandCardShowPos;
+        
         // 模板
         public GameObject UICard, UIUnit, UIEnemyHandCard;
         public UIUnitInfo UIShowCardInfo;
-        
+
         //Deck
         public GameObject MyHandCardsDeck;
         public GameObject MyUnits;
@@ -75,6 +77,8 @@ namespace ET.Client
         
         //玩家拖拽手牌的目标落点
         public int MyHandCardPos = -1;
+        //玩家拖拽成功即将上场的手牌
+        public UIUnitInfo MyHandCardUesd;
         //玩家选择的手牌
         public int SelectCardPos = -1;
         
@@ -83,5 +87,8 @@ namespace ET.Client
         public const float EnemyHandCardDes = 5f;
         public const float UnitsDes = 20f;
         public const float FindTarget = 5f;
+        
+        //动画执行期间的逻辑
+        public bool IsGetHandCardAnim;
     }
 }

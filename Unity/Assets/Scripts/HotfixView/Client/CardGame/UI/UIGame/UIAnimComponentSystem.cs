@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using UnityEngine;
 
@@ -8,16 +9,34 @@ namespace ET.Client {
     public static partial class UIAnimComponentSystem
     {
         [EntitySystem]
-        private static void Awake(this ET.Client.UIAnimComponent self)
+        private static void Awake(this ET.Client.UIAnimComponent self) {
+        }
+        [EntitySystem]
+        private static void Update(this ET.Client.UIAnimComponent self)
         {
-            self.Sequence = DOTween.Sequence();
+            if (self.IsLastSequenceOver && self.Actions.Count > 0) {
+                self.IsLastSequenceOver = false;
+                self.Sequence = DOTween.Sequence();
+                foreach (var action in self.Actions) {
+                    action.Invoke(self.Sequence);
+                }
+                self.Actions.Clear();
+
+                self.Sequence.AppendCallback(() => self.IsLastSequenceOver = true);
+            }
         }
 
-        public static Sequence GetSequence(this ET.Client.UIAnimComponent self)
+        public static void AppendCallback(this ET.Client.UIAnimComponent self, TweenCallback tweenCallback)
         {
-            if (!self.Sequence.active)
-                self.Sequence = DOTween.Sequence();
-            return self.Sequence;
+            self.Actions.Add((sequence) => sequence.AppendCallback(tweenCallback));
+        }
+        public static void Append(this ET.Client.UIAnimComponent self, Tween tween)
+        {
+            self.Actions.Add((sequence) => sequence.Append(tween));
+        }
+
+        public static void AppendInterval(this UIAnimComponent self, float time) {
+            self.Actions.Add((sequence) => sequence.AppendInterval(time));
         }
 
         public static UIUnitInfo GetUnitInfoByGo(this UIAnimComponent self, GameObject go)

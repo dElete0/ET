@@ -95,9 +95,7 @@ namespace ET {
         /// <param name="eventData"></param>
         public void OnDrag(PointerEventData eventData) {
             if (!IsMy) return;
-            Log.Warning("????");
             if (!this.CanBeUsed.Invoke()) return;
-            Log.Warning("????");
             // 将屏幕空间上的点转换为位于给定RectTransform平面上的世界空间中的位置
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.pressEventCamera, out Vector3 globalMousePos)) {
                 this.DragShow.Invoke(globalMousePos);

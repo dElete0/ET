@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -53,6 +54,10 @@ namespace ET.Client
             self.MyUnits = rc.Get<GameObject>("MyUnits");
             self.EnemyUnits = rc.Get<GameObject>("EnemyUnits");
 
+            // Group
+            self.MyGroup = rc.Get<GameObject>("MyGroup");
+            self.EnemyGroup = rc.Get<GameObject>("EnemyGroup");
+            self.GetHandCardShowPos = rc.Get<GameObject>("GetHandCardShowPos");
 
             // Model
             self.UICard = rc.Get<GameObject>("UICard");
@@ -198,30 +203,45 @@ namespace ET.Client
         public static void HandCardsPos(this UICGGameComponent self)
         {
             if (UIHandCardDragHandler.IsCardBeDrag.Count > 0) return;
-            if (self.SelectCardPos > -1) {
+            if (self.MyHandCardUesd != null) {
+                bool isBehand = false;
                 for (int i = 0; i < self.MyHandCards.Count; i++) {
+                    if (self.MyHandCardUesd.CardId == self.MyHandCards[i].CardId) {
+                        isBehand = true;
+                        continue;
+                    }
                     self.MyHandCards[i].TargetPos =
-                            (i * UICGGameComponent.MyHandCardDes -
+                            ((i - (isBehand ? 1 : 0)) * UICGGameComponent.MyHandCardDes -
                                 UICGGameComponent.MyHandCardDes / 2 * self.MyHandCards.Count) * Vector3.right +
                             self.MyHandCardsDeck.transform.position;
-                    if (i < self.SelectCardPos) {
-                        self.MyHandCards[i].TargetPos -= UICGGameComponent.MyHandCardDes * 1.9f * Vector3.right;
-                    } else if (i > self.SelectCardPos) {
-                        self.MyHandCards[i].TargetPos += UICGGameComponent.MyHandCardDes * 1.9f * Vector3.right;
-                        //self.MyHandCards[i].CardGo.transform.SetSiblingIndex(i - 1);
-                    } else {
-                        self.MyHandCards[i].TargetPos += UICGGameComponent.MyHandCardDes * 1.9f * Vector3.up;
-                        //self.MyHandCards[i].CardGo.transform.SetSiblingIndex(self.MyHandCards.Count);
-                    }
                     self.MyHandCards[i].CardGo.transform.SetSiblingIndex(i);
                 }
             } else {
-                for (int i = 0; i < self.MyHandCards.Count; i++) {
-                    self.MyHandCards[i].TargetPos =
-                            (i * UICGGameComponent.MyHandCardDes -
-                                UICGGameComponent.MyHandCardDes / 2 * self.MyHandCards.Count) * Vector3.right +
-                            self.MyHandCardsDeck.transform.position;
-                    self.MyHandCards[i].CardGo.transform.SetSiblingIndex(i);
+                if (self.SelectCardPos > -1) {
+                    for (int i = 0; i < self.MyHandCards.Count; i++) {
+                        self.MyHandCards[i].TargetPos =
+                                (i * UICGGameComponent.MyHandCardDes -
+                                    UICGGameComponent.MyHandCardDes / 2 * self.MyHandCards.Count) * Vector3.right +
+                                self.MyHandCardsDeck.transform.position;
+                        if (i < self.SelectCardPos) {
+                            self.MyHandCards[i].TargetPos -= UICGGameComponent.MyHandCardDes * 1.9f * Vector3.right;
+                        } else if (i > self.SelectCardPos) {
+                            self.MyHandCards[i].TargetPos += UICGGameComponent.MyHandCardDes * 1.9f * Vector3.right;
+                            //self.MyHandCards[i].CardGo.transform.SetSiblingIndex(i - 1);
+                        } else {
+                            self.MyHandCards[i].TargetPos += UICGGameComponent.MyHandCardDes * 1.9f * Vector3.up;
+                            //self.MyHandCards[i].CardGo.transform.SetSiblingIndex(self.MyHandCards.Count);
+                        }
+                        self.MyHandCards[i].CardGo.transform.SetSiblingIndex(i);
+                    }
+                } else {
+                    for (int i = 0; i < self.MyHandCards.Count; i++) {
+                        self.MyHandCards[i].TargetPos =
+                                (i * UICGGameComponent.MyHandCardDes -
+                                    UICGGameComponent.MyHandCardDes / 2 * self.MyHandCards.Count) * Vector3.right +
+                                self.MyHandCardsDeck.transform.position;
+                        self.MyHandCards[i].CardGo.transform.SetSiblingIndex(i);
+                    }
                 }
             }
         }
@@ -244,26 +264,31 @@ namespace ET.Client
         {
             if (self.MyFightUnits != null)
             {
-                int i = 0;
                 if (self.MyHandCardPos == -1)
                 {
-                    foreach (var card in self.MyFightUnits)
-                    {
-                        card.TargetPos =
+                    for (int i = 0; i < self.MyFightUnits.Count; i++) {
+                        self.MyFightUnits[i].TargetPos =
                                 (i * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * (self.MyFightUnits.Count - 1)) * Vector3.right +
                                 self.MyUnits.transform.position;
-                        i++;
                     }
-                }
-                else
-                {
-                    foreach (var card in self.MyFightUnits)
-                    {
-                        if (i == self.MyHandCardPos) i++;
-                        card.TargetPos =
-                                (i * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * self.MyFightUnits.Count) * Vector3.right +
+                } else {
+                    bool isBehand = false;
+                    if (self.MyFightUnits.Count == self.MyHandCardPos && self.MyHandCardUesd != null) {
+                        self.MyHandCardUesd.TargetPos = (self.MyFightUnits.Count * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * self.MyFightUnits.Count) * Vector3.right +
                                 self.MyUnits.transform.position;
-                        i++;
+                    }
+                    for (int i = 0; i < self.MyFightUnits.Count; i++) {
+                        if (i == self.MyHandCardPos) {
+                            isBehand = true;
+                            Log.Warning(i);
+                            if (self.MyHandCardUesd != null) {
+                                self.MyHandCardUesd.TargetPos = (i * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * self.MyFightUnits.Count) * Vector3.right +
+                                        self.MyUnits.transform.position;
+                            }
+                        }
+                        self.MyFightUnits[i].TargetPos =
+                                ((i + (isBehand ? 1 : 0)) * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * self.MyFightUnits.Count) * Vector3.right +
+                                self.MyUnits.transform.position;
                     }
                 }
             }

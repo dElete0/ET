@@ -5,6 +5,7 @@ using UnityEngine;
 namespace ET.Client {
     [EntitySystemOf(typeof(UIUnitInfo))]
     [FriendOfAttribute(typeof(ET.Client.UIUnitInfo))]
+    [FriendOfAttribute(typeof(ET.Client.UICGGameComponent))]
     public static partial class UIUnitInfoSystem
     {
         [EntitySystem]
@@ -12,6 +13,7 @@ namespace ET.Client {
         {
             self.CardGo = args2;
             self.TargetPos = args2.transform.position;
+            self.CardGo.transform.rotation = new Quaternion(0, 0, 0, 0);
         }
         [EntitySystem]
         private static void Update(this ET.Client.UIUnitInfo self)
@@ -21,13 +23,15 @@ namespace ET.Client {
             if (self.IsScaleChange) return;
             bool isPos = self.TargetPos != self.CardGo.transform.position;
             bool isScale = self.TargetScale != self.CardGo.transform.localScale.x;
-            if (isPos) {
+            if (isPos)
+            {
                 Sequence sequence = DOTween.Sequence();
                 self.IsMove = true;
                 sequence.Append(self.CardGo.transform.DOMove(self.TargetPos, 0.2f));
                 sequence.AppendCallback(() => { self.IsMove = false; });
             }
-            if (isScale) {
+            if (isScale)
+            {
                 Sequence sequence = DOTween.Sequence();
                 self.IsScaleChange = true;
                 sequence.Append(self.CardGo.transform.DOScale(self.TargetScale * Vector3.one, 0.2f));
@@ -35,23 +39,21 @@ namespace ET.Client {
             }
         }
 
-        public static void AttackTo(this UIUnitInfo self, UIUnitInfo target) {
+        public static void AttackTo(this UIUnitInfo self, UIUnitInfo target)
+        {
             var targetPos = target.CardGo.transform.position;
             var pos = self.CardGo.transform.position;
             Vector3 backTarget = 0.15f * (pos - targetPos) + pos;
-            Sequence sequence = self.GetParent<UIAnimComponent>().GetSequence();
-            sequence.AppendCallback(() => self.IsMove = true);
-            sequence.Append(self.CardGo.transform.DOMove(backTarget, 0.15f));
-            sequence.Append(self.CardGo.transform.DOMove(targetPos, 0.3f));
-            sequence.AppendCallback(() => {
-                        target.CardGo.transform.DOShakeRotation(1f, new Vector3(10, 10, 10), 10, 180);
-                    });
-            sequence.Append(self.CardGo.transform.DOMove(self.TargetPos, 0.13f));
-            sequence.AppendCallback(() => self.IsMove = false);
-        }
-
-        public static void AppendCallback(this UIUnitInfo self, Action a) {
-            self.GetParent<UIAnimComponent>().GetSequence().AppendCallback(a.Invoke);
+            UIAnimComponent uiAnim = self.GetParent<UIAnimComponent>();
+            uiAnim.AppendCallback(() => self.IsMove = true);
+            uiAnim.Append(self.CardGo.transform.DOMove(backTarget, 0.15f));
+            uiAnim.Append(self.CardGo.transform.DOMove(targetPos, 0.3f));
+            uiAnim.AppendCallback(() => {
+                target.Sequence = DOTween.Sequence().Append(
+                    target.CardGo.transform.DOShakeRotation(1f, new Vector3(10, 10, 10), 10, 180));
+            });
+            uiAnim.Append(self.CardGo.transform.DOMove(self.TargetPos, 0.13f));
+            uiAnim.AppendCallback(() => self.IsMove = false);
         }
     }
 }

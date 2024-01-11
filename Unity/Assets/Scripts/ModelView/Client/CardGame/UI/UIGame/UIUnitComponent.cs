@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,9 +6,11 @@ namespace ET.Client
 {
     [ChildOf(typeof(UIAnimComponent))]
     public class UIUnitInfo : Entity, IAwake<GameObject>, IUpdate {
+        //显示效果
         public GameObject CardGo;
         public Vector3 TargetPos;
         public float TargetScale = 1f;
+        public Sequence Sequence;
 
         public long CardId;
         public int BaseId;
