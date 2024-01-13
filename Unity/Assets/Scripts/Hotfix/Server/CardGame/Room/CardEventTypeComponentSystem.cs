@@ -21,21 +21,23 @@ namespace ET.Server
             self.RoomEvent.CardEventTypeComponents.Remove(self);
         }
 
-        public static bool SendTriggeerEvent(this ET.Server.CardEventTypeComponent self, GameEvent eventType)
+        public static bool SendTriggeerEvent(this ET.Server.CardEventTypeComponent self, GameEvent eventType, EventInfo eventInfo)
         {
-            //通知所有监听器
+            //通知任意位置触发的监听器
             foreach (var kv in self.AllGameEventTypes)
             {
-                if (SendTriggeerEventHelper(kv, eventType)) {
+                if (SendTriggeerEventHelper(kv, eventType, eventInfo)) {
                     return true;
                 }
             }
-            //单位监听器
-            if (self.UnitGameEventTypes.Count > 0 &&
-                self.GetParent<Room>().GetComponent<CardGameComponent_Cards>().IsUnit(self.GetParent<RoomCard>())) {
+            //场上角色监听器
+            if (self.UnitGameEventTypes.Count > 0 && 
+                (self.GetParent<RoomCard>().CardType == CardType.Agent ||
+                    self.GetParent<RoomCard>().CardType == CardType.Hero ||
+                    self.GetParent<Room>().GetComponent<CardGameComponent_Cards>().IsUnit(self.GetParent<RoomCard>()))) {
                 foreach (var kv in self.UnitGameEventTypes)
                 {
-                    if (SendTriggeerEventHelper(kv, eventType)) {
+                    if (SendTriggeerEventHelper(kv, eventType, eventInfo)) {
                         return true;
                     }
                 }
@@ -44,28 +46,31 @@ namespace ET.Server
             return false;
         }
 
-        private static bool SendTriggeerEventHelper(KeyValuePair<TriggerEvent, GameEvent> kv, GameEvent eventType) {
+        private static bool SendTriggeerEventHelper(KeyValuePair<TriggerEvent, GameEvent> kv, GameEvent eventType, EventInfo eventInfo) {
             if (eventType.IsDispose) {
                 //被什么奇怪的效果改了，重新遍历
                 return true;
             }
             if (kv.Key.Triggeer.Invoke(eventType))
             {
-                kv.Value.ToDo(eventType);
+                kv.Value.ToDo(eventInfo);
             }
             return false;
         }
 
-        public static void PowerToDo(this Power_Struct power, RoomEventTypeComponent room, RoomCard card, RoomCard target, RoomPlayer player)
+        public static void PowerToDo(this Power_Struct power, RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo)
         {
-            switch (power.PowerType)
-            {
-                //抽卡效果
+            switch (power.PowerType) {
                 case Power_Type.GetHandCardFromGroup:
-                    room.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(room, player, power.Count1));
+                    //抽卡效果
+                    roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, power.RoomPlayer1, power.Count1), eventInfo);
                     break;
-                case Power_Type.DamageHint:
-                    room.BroadAndSettleEvent(GameEventFactory.Damage(room, card, target, power.Count1));
+                case Power_Type.DamageHurt:
+                    //直伤
+                    roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.Damage(roomEventTypeComponent, power.Card1, power.Card2, power.Count1), eventInfo);
+                    break;
+                case Power_Type.Desecrate:
+                    roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.Desecrate(roomEventTypeComponent, power.Card1, power.Count1), eventInfo);
                     break;
             }
         }

@@ -30,5 +30,44 @@ namespace ET.Server
                 return num == 4 ? agent2.Colors.Item1 : agent2.Colors.Item2;
             }
         }
+
+        public static bool Contains(this long[] self, long id) {
+            foreach (var cardId in self) {
+                if (cardId == id)
+                    return true;
+            }
+
+            return false;
+        }
+        
+        public static void Remove(this long[] self, long id) {
+            for(int i = 0; i < self.Length; i++) {
+                if (self[i] == id) {
+                    self[i] = 0;
+                    return;
+                }
+            }
+        }
+        
+        public static int Count(this long[] self) {
+            int count = 0;
+            for(int i = 0; i < self.Length; i++) {
+                if (self[i] != 0) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public static bool TryAdd(this long[] self, long id) {
+            for (int i = 0; i < self.Length; i++) {
+                if (self[i] == 0) {
+                    self[i] = id;
+                    return true;
+                }
+            }
+            return false;
+        }
+        
     }
 }

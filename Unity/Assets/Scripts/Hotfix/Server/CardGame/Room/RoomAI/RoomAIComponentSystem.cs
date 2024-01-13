@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ET.Server
 {
@@ -30,17 +31,25 @@ namespace ET.Server
 
         private static async ETTask ToDo(this RoomAIComponent self) {
             RoomPlayer player = self.GetParent<RoomPlayer>();
-            CardGameComponent_Player cards = player.GetComponent<CardGameComponent_Player>();
+            CardGameComponent_Player myCards = player.GetComponent<CardGameComponent_Player>();
+            CardGameComponent_Player enemyCards = player.GetEnemy().GetComponent<CardGameComponent_Player>();
             CardGameComponent_Cards allCards = player.GetParent<Room>().GetComponent<CardGameComponent_Cards>();
-            foreach (var handCardId in cards.HandCards)
+            long targetId = 0;
+            foreach (var handCardId in myCards.HandCards)
             {
                 RoomCard handCard = allCards.GetChild<RoomCard>(handCardId);
-                if (handCard.CardType == CardType.Unit && handCard.Cost <= cards.Cost) {
-                    await C2Room_UseCardHandler.AI2Room_UseCard(self, new C2Room_UseCard() {Card = handCardId} );
+                if (handCard.CardType == CardType.Unit && handCard.Cost <= myCards.Cost) {
+                    if (handCard.UseCardType == UseCardType.ToActor) {
+                        if (enemyCards.Units.Count > 0) {
+                            targetId = enemyCards.Units[0];
+                        } else {
+                            targetId = enemyCards.Hero;
+                        }
+                    }
+                    await C2Room_UseCardHandler.AI2Room_UseCard(self, new C2Room_UseCard() {Card = handCardId, Target = targetId} );
                 }
                 break;
             }
-
 
             Log.Warning("AI自己结束自己回合");
             await C2Room_TurnOverHandler.AI2Room_TurnOver(self, new C2Room_TurnOver() { });

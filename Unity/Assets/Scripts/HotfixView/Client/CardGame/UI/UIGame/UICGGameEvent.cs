@@ -13,6 +13,7 @@ namespace ET.Client {
             UICGGameComponent uicgGameComponent = ui.AddComponent<UICGGameComponent>();
             uicgGameComponent.AddComponent<UIAnimComponent>();
             await uicgGameComponent.CreateUIShowCard();
+            await uicgGameComponent.CreateUIUnitShowInfo();
             return ui;
         }
 

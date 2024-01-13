@@ -54,15 +54,17 @@ namespace ET {
         //攻击次数计数
         public int AttackCount;
         public int AttackCountMax = 1;
+        //死亡标记
+        public bool IsDeadState;
     }
 
     //部署效果及计数器
-    public struct Power_Struct {
+    public class Power_Struct {
         public Power_Type PowerType;
         public TriggerPowerType TriggerPowerType;
         public int Count1, Count2, Count3;
-        public long Card1, Card2, Card3;
-        public long RoomPlayer1, RoomPlayer2;
+        public RoomCard Card1, Card2, Card3;
+        public RoomPlayer RoomPlayer1, RoomPlayer2;
     }
 
     // 触发方式
@@ -185,6 +187,10 @@ namespace ET {
         // 抽牌
         GetHandCardFromGroup = 1012,
         //造成伤害
-        DamageHint = 1013,
+        DamageHurt = 1013,
+        //亵渎
+        Desecrate = 1014,
+        //属性光环
+        AttributeAura = 1015,
     }
 }

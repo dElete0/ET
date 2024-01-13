@@ -37,15 +37,15 @@ namespace ET.Server {
             // 抽卡
             if (room.GetComponent<CGServerUpdater>().NowPlayer == player1.Id)
             {
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player1, 3));
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player2, 4));
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.TurnStart(roomEventTypeComponent, player1));
+                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player1, 3), new EventInfo());
+                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player2, 4), new EventInfo());
+                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.TurnStart(roomEventTypeComponent, player1), new EventInfo());
             }
             else
             {
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player1, 4));
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player2, 3));
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.TurnStart(roomEventTypeComponent, player2));
+                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player1, 4), new EventInfo());
+                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player2, 3), new EventInfo());
+                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.TurnStart(roomEventTypeComponent, player2), new EventInfo());
             }
 
             room.GetComponent<CGServerUpdater>().GameState = GameState.Run;
@@ -61,30 +61,31 @@ namespace ET.Server {
             //牌库
             CardGameComponent_Cards cards = player.GetParent<Room>().GetComponent<CardGameComponent_Cards>();
             CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
-            {
-                RoomCard card = RoomCardFactory.CreateUnitCard(cards, 300008);
-                playerInfo.Groups.Add(card.Id);
-            }
-            {
-                RoomCard card = RoomCardFactory.CreateUnitCard(cards, 3000010);
-                playerInfo.Groups.Add(card.Id);
-            }
-            {
-                RoomCard card = RoomCardFactory.CreatePlot(cards, 4000001);
-                playerInfo.Groups.Add(card.Id);
-            }
-            {
-                RoomCard card = RoomCardFactory.CreateMagic(cards, 5000015);
-                playerInfo.Groups.Add(card.Id);
-            }
-            for (int i = 0; i < 10; i++)
-            {
-                RoomCard card = RoomCardFactory.CreateUnitCard(cards, 3000001);
-                playerInfo.Groups.Add(card.Id);
-            }
-
-            for (int i = 0; i < 10; i++) {
-                RoomCard card = RoomCardFactory.CreateMagic(cards, 5000015);
+            List<int> baseIds = new List<int>() {
+                300008, 
+                3000010,
+                3000006,
+                3000010,
+                3000010,
+                5000059,
+                3000010,
+                3000010,
+                3000001,
+                3000001,
+                3000010,
+                3000010,
+                3000010,
+                4000001,
+                4000001,
+                5000015,
+                3000001,
+                5000015,
+                5000015,
+                5000015,
+                5000015,
+            };
+            foreach (var id in baseIds) {
+                RoomCard card = RoomCardFactory.CreateGroupCard(cards, id);
                 playerInfo.Groups.Add(card.Id);
             }
             RoomMessageHelper.ServerSendMessageToClient(player, new Room2C_MyGroupCount() { Count = playerInfo.Groups.Count });

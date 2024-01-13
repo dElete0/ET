@@ -35,6 +35,7 @@ namespace ET.Server
             RoomCard card = cardGameComponentCards.GetChild<RoomCard>(message.Card);
             RoomCard target = message.Target == 0 ? null : cardGameComponentCards.GetChild<RoomCard>(message.Target);
             CardGameComponent_Player playerInfo = roomPlayer.GetComponent<CardGameComponent_Player>();
+            CardGameComponent_Player enemyInfo = roomPlayer.GetEnemy().GetComponent<CardGameComponent_Player>();
 
             if (playerInfo.Units.Count >= CardGameComponent_Player.UnitMax) {
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.CantGetMoreUnit });
@@ -45,9 +46,22 @@ namespace ET.Server
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.NotEnoughCost });
                 return;
             }
+
+            if (card.UseCardType != UseCardType.NoTarget && target == null) {
+                int playerCount = playerInfo.Units.Count;
+                int enemyCount = enemyInfo.Units.Count;
+                if (card.UseCardType == UseCardType.ToUnit && playerCount + enemyCount < 1) {
+                    
+                } else if (card.UseCardType == UseCardType.ToMyUnit && playerCount < 1) {
+                    
+                } else if (card.UseCardType == UseCardType.ToEnemyUnit && enemyCount < 1) {
+                    
+                }
+                return;
+            }
             RoomEventTypeComponent roomEventTypeComponent = roomPlayer.GetParent<Room>().GetComponent<RoomEventTypeComponent>();
             roomEventTypeComponent.CountClear();
-            roomEventTypeComponent.Event_UseCard(roomPlayer, card, target, message.Pos);
+            roomEventTypeComponent.Event_UseCard(new EventInfo(), roomPlayer, card, target, message.Pos);
         }
     }
 }

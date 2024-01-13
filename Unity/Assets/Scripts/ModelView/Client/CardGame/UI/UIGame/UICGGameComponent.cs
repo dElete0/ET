@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,12 +40,16 @@ namespace ET.Client
 
         public GameObject EnemyHero;
         public GameObject EnemyAgent1, EnemyAgent2;
+
+        public Text MyTalkUI, EnemyTalkUI;
+        public Sequence MyTalkSequence, EnemyTalkSequence;
         
         public GameObject MyGroup, EnemyGroup, GetHandCardShowPos;
         
         // 模板
         public GameObject UICard, UIUnit, UIEnemyHandCard;
-        public UIUnitInfo UIShowCardInfo;
+        public UIUnitInfo UIShowCardInfo, UIUnitShowInfo;
+        public GameObject HurtUI;
 
         //Deck
         public GameObject MyHandCardsDeck;
@@ -52,6 +57,8 @@ namespace ET.Client
 
         public GameObject EnemyHandCardsDeck;
         public GameObject EnemyUnits;
+
+        public GameObject HurtUIs;
 
         public List<UIUnitInfo> MyHandCards = new List<UIUnitInfo>();
         public List<UIUnitInfo> EnemyHandCards = new List<UIUnitInfo>();
@@ -74,6 +81,7 @@ namespace ET.Client
         public List<GameObject> UnitPool = new List<GameObject>();
         public List<GameObject> MyHandCardPool = new List<GameObject>();
         public List<GameObject> EnemyHandCardPool = new List<GameObject>();
+        public List<GameObject> HurtUIPool = new List<GameObject>();
         
         //玩家拖拽手牌的目标落点
         public int MyHandCardPos = -1;
@@ -90,5 +98,11 @@ namespace ET.Client
         
         //动画执行期间的逻辑
         public bool IsGetHandCardAnim;
+    }
+
+    public enum TalkType {
+        CantHaveMoreUnit = 0,
+        CantDoNow = 1,
+        CostNotEnough = 2
     }
 }

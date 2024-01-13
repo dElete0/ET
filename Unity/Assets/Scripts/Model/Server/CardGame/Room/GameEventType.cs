@@ -17,10 +17,13 @@ namespace ET.Server {
     public class GameEvent {
         public bool IsDispose;//是否失效
         public GameEventType GameEventType;
-        public Action<GameEvent> ToDo;
+        public Action<EventInfo> ToDo;
         public int Count1, Count2, Count3;
-        public long Id1, Id2;
-        public GameEvent(GameEventType type) { this.GameEventType = type; }
+        public long Id1, Id2, Id3;
+
+        public GameEvent(GameEventType type) {
+            this.GameEventType = type;
+        }
     }
 
     public enum GameEventType {
@@ -55,5 +58,11 @@ namespace ET.Server {
         UsePlotCard = 122,
         MagicTakesEffect = 123,
         PlotTakesEffect = 124,
+        DeadOver = 125,
+        Desecrate = 126,
+        DamageAllUnit = 127,
+        DamageAllActor = 128,
+        DamageAllEnemyUnit = 129,
+        DamageAllMyUnit = 130,
     }
 }

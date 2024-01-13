@@ -17,31 +17,31 @@ namespace ET.Server
 
             self.WaitGameEventTypes.Add(TriggerEventFactory.MyTurnStart(self.GetParent<RoomPlayer>()), new GameEvent(GameEventType.GetHandCard)
             {
-                ToDo = (gameEvent) =>
+                ToDo = (info) =>
                 {
                     //Log.Warning("回合开始时抽卡");
-                    args2.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(args2, self.GetParent<RoomPlayer>(), 1));
+                    args2.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(args2, self.GetParent<RoomPlayer>(), 1), info);
                 },
             });
             self.WaitGameEventTypes.Add(TriggerEventFactory.MyTurnStart(self.GetParent<RoomPlayer>()), new GameEvent(GameEventType.GetCostTotal)
             {
-                ToDo = (gameEvent) =>
+                ToDo = (info) =>
                 {
                     //Log.Warning("回合开始时增加费用上限");
-                    args2.BroadAndSettleEvent(GameEventFactory.GetCostTotal(args2, self.GetParent<RoomPlayer>(), 1));
+                    args2.BroadAndSettleEvent(GameEventFactory.GetCostTotal(args2, self.GetParent<RoomPlayer>(), 1), info);
                 },
             });
             self.WaitGameEventTypes.Add(TriggerEventFactory.MyTurnStart(self.GetParent<RoomPlayer>()), new GameEvent(GameEventType.ResetCost)
             {
-                ToDo = (gameEvent) =>
+                ToDo = (info) =>
                 {
                     //Log.Warning("回合开始时费用复原");
-                    args2.BroadAndSettleEvent(GameEventFactory.ResetCost(args2, self.GetParent<RoomPlayer>()));
+                    args2.BroadAndSettleEvent(GameEventFactory.ResetCost(args2, self.GetParent<RoomPlayer>()), info);
                 },
             });
             self.WaitGameEventTypes.Add(TriggerEventFactory.MyTurnStart(self.GetParent<RoomPlayer>()), new GameEvent(GameEventType.GetBaseColor) {
-                ToDo = (gameEvent) => {
-                    args2.BroadAndSettleEvent(GameEventFactory.GetBaseColor(args2, self.GetParent<RoomPlayer>()));
+                ToDo = (info) => {
+                    args2.BroadAndSettleEvent(GameEventFactory.GetBaseColor(args2, self.GetParent<RoomPlayer>()), info);
                 }
             });
 
@@ -52,7 +52,7 @@ namespace ET.Server
             self.GetParent<Room>().GetComponent<RoomEventTypeComponent>().PlayerEventTypeComponents.Remove(self);
         }
 
-        public static bool SendTriggeerEvent(this PlayerEventTypeComponent self, GameEvent eventType)
+        public static bool SendTriggeerEvent(this PlayerEventTypeComponent self, GameEvent eventType, EventInfo eventInfo)
         {
             //通知所有监听器
             foreach (var kv in self.WaitGameEventTypes)
@@ -60,7 +60,7 @@ namespace ET.Server
                 if (eventType.IsDispose) return true;
                 if (kv.Key.Triggeer.Invoke(eventType))
                 {
-                    kv.Value.ToDo(eventType);
+                    kv.Value.ToDo(eventInfo);
                 }
             }
 

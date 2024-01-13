@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
 
@@ -10,43 +11,45 @@ namespace ET.Client
     {
         protected override async ETTask Run(Scene scene, UnitDead args)
         {
-            await UnitDead(scene.GetComponent<Room>(), args.CardId);
+            await UnitDead(scene.GetComponent<Room>(), args.CardIds);
         }
 
-        private static async ETTask UnitDead(Entity room, long cardId)
+        private static async ETTask UnitDead(Entity room, List<long> cardIds)
         {
             UI ui = await UIHelper.Get(room, UIType.UICGGame);
             UICGGameComponent uicgGameComponent = ui.GetComponent<UICGGameComponent>();
+            Log.Warning("执行单位死亡动画");
             foreach (var unit in uicgGameComponent.MyFightUnits)
             {
-                if (unit.CardId == cardId)
+                if (cardIds.Contains(unit.CardId))
                 {
-                    uicgGameComponent.MyFightUnits.Remove(unit);
                     uicgGameComponent.GetComponent<UIAnimComponent>().RemoveChild(unit.Id);
-                    uicgGameComponent.UnitPool.Add(unit.CardGo);
                     uicgGameComponent.GetComponent<UIAnimComponent>().AppendCallback(() => {
-                        unit.Sequence.Kill();
-                        unit.CardGo.transform.rotation = new Quaternion(10, 10, 10, 10);
-                        unit.Sequence = DOTween.Sequence().InsertCallback(0.7f, () =>
-                                unit.CardGo.SetActive(false));
+                        if (unit.Sequence != null) unit.Sequence.Kill();
+                        unit.CardGo.transform.eulerAngles = new Vector3(10, 10, 10);
+                        unit.Sequence = DOTween.Sequence().InsertCallback(1.5f, () => {
+                            Log.Warning($"单位被移除:{unit.CardId}");
+                            uicgGameComponent.MyFightUnits.Remove(unit);
+                            uicgGameComponent.UnitPool.Add(unit.CardGo);
+                            unit.CardGo.SetActive(false);
+                        });
                     });
-                    return;
                 }
             }
             foreach (var unit in uicgGameComponent.EnemyFightUnits)
             {
-                if (unit.CardId == cardId)
+                if (cardIds.Contains(unit.CardId))
                 {
-                    uicgGameComponent.MyFightUnits.Remove(unit);
                     uicgGameComponent.GetComponent<UIAnimComponent>().RemoveChild(unit.Id);
-                    uicgGameComponent.UnitPool.Add(unit.CardGo);
                     uicgGameComponent.GetComponent<UIAnimComponent>().AppendCallback(() => {
-                        unit.Sequence.Kill();
-                        unit.CardGo.transform.rotation = new Quaternion(10, 10, 10, 10);
-                        unit.Sequence = DOTween.Sequence().InsertCallback(0.7f, () =>
-                                unit.CardGo.SetActive(false));
+                        if (unit.Sequence != null) unit.Sequence.Kill();
+                        unit.CardGo.transform.eulerAngles = new Vector3(10, 10, 10);
+                        unit.Sequence = DOTween.Sequence().InsertCallback(1.5f, () => {
+                            uicgGameComponent.EnemyFightUnits.Remove(unit);
+                            uicgGameComponent.UnitPool.Add(unit.CardGo);
+                            unit.CardGo.SetActive(false);
+                        });
                     });
-                    return;
                 }
             }
         }

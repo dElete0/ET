@@ -35,6 +35,7 @@ namespace ET {
         public Func<bool> CanBeUsed;
         public Func<bool> IsGetHandCardAnim;
         public Func<bool> IsUnitInDrag;
+        public Action SetUIUnitShow;
         public Func<Vector3> GetTargetPos;
         public Func<Vector3> GetHeroVector;
 
@@ -42,15 +43,11 @@ namespace ET {
         private RectTransform rt;
         private CanvasGroup CanvasGroup;
 
-        //UI事件管理器
-        private UnityEngine.EventSystems.EventSystem _EventSystem;
-        private Camera _Camera;
-        
-        private const float HideDes = 100f;
+        private const float HideDes = 30f;
         
         private void Awake() {
             rt = GetComponent<RectTransform>();
-            _EventSystem = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+            CanvasGroup = GetComponent<CanvasGroup>();
         }
 
         private void Start() {
@@ -66,13 +63,13 @@ namespace ET {
                     this.OnFindTarget();
                 }
             }
-            if (CanvasGroup != null && UI_Alpha != CanvasGroup.alpha)
-            {
+            if (UI_Alpha != CanvasGroup.alpha) {
                 CanvasGroup.alpha = UI_Alpha;
             }
         }
 
         public void OnPointerEnter(PointerEventData eventData) {
+            if (IsCardBeDrag.Count > 0) return;
             if (IsGetHandCardAnim.Invoke()) return;
             BeSelect.Invoke(true);
             this.gameObject.transform.localScale = Vector3.one * 1.3f;
@@ -97,6 +94,9 @@ namespace ET {
                 //rt.position = globalMousePos + offset;
             }
             IsCardBeDrag.Add(this);
+            if (this.IsUnitInDrag.Invoke()) {
+                SetUIUnitShow.Invoke();
+            }
         }
 
         /// <summary>
@@ -110,15 +110,21 @@ namespace ET {
             if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rt, eventData.position, eventData.pressEventCamera, out Vector3 globalMousePos)) {
                 this.GlobalMousePos = globalMousePos;
                 if (this.IsUnitInDrag.Invoke()) {
+                    //单位牌
                     rt.position = globalMousePos + offset;
                     CardPos.Invoke(globalMousePos);
+                    float dis = (GetTargetPos.Invoke() - this.GlobalMousePos).magnitude;
+                    this.UI_Alpha = dis > HideDes ? 0 : 1 - dis / HideDes;
+                    UIUnitShowHandler.Follow(this.UI_Alpha, this.transform);
                 } else {
                     if (this.IsToTargetInDrag.Invoke(globalMousePos)) {
+                        //具有目标的法术牌
                         float dis = (GetTargetPos.Invoke() - this.GlobalMousePos).magnitude;
                         this.UI_Alpha = dis > HideDes ? 0 : 1 - dis / HideDes;
                         UIArrowHandler.IsSetTarget = true;
                         UIArrowHandler.SetTarget(GetHeroVector.Invoke(), this.GlobalMousePos);
                     } else {
+                        //无目标的法术牌
                         rt.position = globalMousePos + offset;
                     }
                 }
@@ -130,9 +136,7 @@ namespace ET {
         /// </summary>
         /// <param name="eventData"></param>
         public void OnEndDrag(PointerEventData eventData) {
-            _Camera = eventData.pressEventCamera;
             if (UIArrowHandler.IsSetTarget) {
-                this.UI_Alpha = 1f;
                 UIArrowHandler.IsSetTarget = false;
                 this.rt.position = GetTargetPos.Invoke();
             }
@@ -145,9 +149,13 @@ namespace ET {
                     UIArrowHandler.Begin = this.transform;
                     UIArrowHandler.IsFindTarget = true;
                 } else {
+                    UIUnitShowHandler.NotFollow();
+                    this.UI_Alpha = 1f;
                     CardPos.Invoke(new Vector3(10000,0,0));
                 }
             } else {
+                UIUnitShowHandler.NotFollow();
+                this.UI_Alpha = 1f;
                 CardPos.Invoke(new Vector3(10000,0,0));
             }
         }
@@ -159,6 +167,7 @@ namespace ET {
         private void OnSetTarget() {
             IsFindTarget = false;
             UIArrowHandler.IsFindTarget = false;
+            UIUnitShowHandler.NotFollow();
             if (SetUnitTargetToDo.Invoke()) {
                 CardPos.Invoke(new Vector3(10000,0,0));
             } else {
@@ -167,6 +176,8 @@ namespace ET {
         }
         
         private void CanelTarget() {
+            UIUnitShowHandler.NotFollow();
+            this.UI_Alpha = 1f;
             UIArrowHandler.IsFindTarget = false;
             this.CancelTarget.Invoke();
             CardPos.Invoke(new Vector3(10000,0,0));

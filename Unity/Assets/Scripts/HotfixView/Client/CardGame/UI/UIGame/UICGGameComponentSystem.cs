@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -47,12 +48,17 @@ namespace ET.Client
             self.MyAgent2 = rc.Get<GameObject>("MyAgent2");
             self.EnemyAgent1 = rc.Get<GameObject>("EnemyAgent1");
             self.EnemyAgent2 = rc.Get<GameObject>("EnemyAgent2");
+            self.MyTalkUI = rc.Get<GameObject>("MyTalkUI").GetComponentInChildren<Text>();
+            self.EnemyTalkUI = rc.Get<GameObject>("EnemyTalkUI").GetComponentInChildren<Text>();
+            self.MyTalkUI.transform.parent.gameObject.SetActive(false);
+            self.EnemyTalkUI.transform.parent.gameObject.SetActive(false);
 
             // CardDeck
             self.MyHandCardsDeck = rc.Get<GameObject>("MyHandCardsDeck");
             self.EnemyHandCardsDeck = rc.Get<GameObject>("EnemyHandCardsDeck");
             self.MyUnits = rc.Get<GameObject>("MyUnits");
             self.EnemyUnits = rc.Get<GameObject>("EnemyUnits");
+            self.HurtUIs = rc.Get<GameObject>("HurtUIs");
 
             // Group
             self.MyGroup = rc.Get<GameObject>("MyGroup");
@@ -62,12 +68,14 @@ namespace ET.Client
             // Model
             self.UICard = rc.Get<GameObject>("UICard");
             self.UIUnit = rc.Get<GameObject>("UIUnit");
+            self.HurtUI = rc.Get<GameObject>("HurtUI");
             self.UIEnemyHandCard = rc.Get<GameObject>("UIEnemyHandCard");
 
             // SetActive
             self.TurnStart.SetActive(false);
             self.UICard.SetActive(false);
             self.UIUnit.SetActive(false);
+            self.HurtUI.SetActive(false);
             self.UIEnemyHandCard.SetActive(false);
 
             // MyColor
@@ -115,6 +123,37 @@ namespace ET.Client
                 self.TurnStart.SetActive(false);
             }
         }
+        
+        public static void DoTalkUI(this UICGGameComponent self, bool isMy, TalkType talkType) {
+            Text talkUI = isMy? self.MyTalkUI : self.EnemyTalkUI;
+            Sequence talkSequence = isMy? self.MyTalkSequence : self.EnemyTalkSequence;
+            string talk = "";
+            float waitTime = 0f;
+            switch (talkType) {
+                case TalkType.CantDoNow:
+                    talk = "这不是我的回合";
+                    waitTime = 2f;
+                    break;
+                case TalkType.CostNotEnough:
+                    talk = "我的战备资源不足";
+                    waitTime = 2f;
+                    break;
+                case TalkType.CantHaveMoreUnit:
+                    talk = "我无法拥有更多单位";
+                    waitTime = 2f;
+                    break;
+                default:
+                    return;
+            }
+            talkUI.transform.parent.gameObject.SetActive(true);
+            talkUI.text = talk;
+            if (talkSequence != null) {
+                talkSequence.Kill();
+            }
+            self.EnemyTalkSequence = DOTween.Sequence()
+                    .AppendInterval(waitTime)
+                    .AppendCallback(() => talkUI.transform.parent.gameObject.SetActive(false));
+        }
 
         public static async ETTask CreateUIShowCard(this UICGGameComponent self) {
             // ShowCard
@@ -138,6 +177,31 @@ namespace ET.Client
             self.UIShowCardInfo = unitInfo;
             uiShowCard.SetActive(false);
             await ETTask.CompletedTask;
+        }
+        
+        public static async ETTask CreateUIUnitShowInfo(this UICGGameComponent self) {
+            // ShowCard
+            ReferenceCollector rc = self.GetParent<UI>().GameObject.GetComponent<ReferenceCollector>();
+            GameObject uiShowCard = rc.Get<GameObject>("UIUnitShow");
+            ReferenceCollector uiShowCardRC = uiShowCard.GetComponent<ReferenceCollector>();
+            UIUnitInfo unitInfo = self.GetComponent<UIAnimComponent>().AddChild<UIUnitInfo, GameObject>(uiShowCard);
+            unitInfo.Attack = uiShowCardRC.Get<GameObject>("Attack").GetComponentInChildren<Text>();
+            unitInfo.HP = uiShowCardRC.Get<GameObject>("HP").GetComponentInChildren<Text>();
+            unitInfo.Image = uiShowCardRC.Get<GameObject>("Image").GetComponent<Image>();
+            unitInfo.TargetPos = new Vector3(-999999, -999999);
+            unitInfo.CardGo.transform.position = new Vector3(-999999, -999999);
+            UIUnitShowHandler.IsBeDrag = (b) => {
+                unitInfo.IsDrag = b;
+            };
+            self.UIUnitShowInfo = unitInfo;
+            await ETTask.CompletedTask;
+        }
+
+        public static void ShowUIUnitShowInfo(this UICGGameComponent self, UIUnitInfo card) {
+            UIUnitInfo unitShow = self.UIUnitShowInfo;
+            unitShow.Attack.text = card.DAttack.ToString();
+            unitShow.HP.text = card.DHP.ToString();
+            unitShow.Image.sprite = card.Image.sprite;
         }
 
         public static async ETTask ShowUIShowCard(this UICGGameComponent self, bool left, int baseId)
@@ -280,7 +344,6 @@ namespace ET.Client
                     for (int i = 0; i < self.MyFightUnits.Count; i++) {
                         if (i == self.MyHandCardPos) {
                             isBehand = true;
-                            Log.Warning(i);
                             if (self.MyHandCardUesd != null) {
                                 self.MyHandCardUesd.TargetPos = (i * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * self.MyFightUnits.Count) * Vector3.right +
                                         self.MyUnits.transform.position;

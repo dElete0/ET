@@ -1594,12 +1594,38 @@ namespace ET
 		}
 
 		[MemoryPackOrder(0)]
+		public List<long> CardIds { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardIds.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_AttackCountEnough)]
+	[MemoryPackable]
+	public partial class Room2C_AttackCountEnough: MessageObject, IMessage
+	{
+		public static Room2C_AttackCountEnough Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_AttackCountEnough), isFromPool) as Room2C_AttackCountEnough; 
+		}
+
+		[MemoryPackOrder(0)]
 		public long CardId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public bool AttackCountEnough { get; set; }
 
 		public override void Dispose() 
 		{
 			if (!this.IsFromPool) return;
 			this.CardId = default;
+			this.AttackCountEnough = default;
 			
 			ObjectPool.Instance.Recycle(this); 
 		}
@@ -1665,5 +1691,6 @@ namespace ET
 		 public const ushort Room2C_GetColor = 11056;
 		 public const ushort Room2C_LoseHandCard = 11057;
 		 public const ushort Room2C_UnitDead = 11058;
+		 public const ushort Room2C_AttackCountEnough = 11059;
 	}
 }

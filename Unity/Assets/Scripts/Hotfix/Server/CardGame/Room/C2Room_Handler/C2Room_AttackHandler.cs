@@ -26,9 +26,9 @@ namespace ET.Server
             RoomPlayer roomPlayer = room.GetComponent<RoomServerComponent>().GetChild<RoomPlayer>(message.PlayerId);
             
 
-            //非当前操作者回合
             if (serverUpdater.NowPlayer != roomPlayer.Id)
             {
+                Log.Warning("非当前操作者回合");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail()
                 {
                     FailId = (int)Room2C_OperateFailType.CantOperateNow
@@ -41,6 +41,7 @@ namespace ET.Server
 
             if (card == null)
             {
+                Log.Warning("攻击牌为空");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail()
                 {
                     FailId = (int)Room2C_OperateFailType.CantOperateNow
@@ -52,9 +53,9 @@ namespace ET.Server
             RoomPlayer enemy = roomPlayer.GetEnemy();
             CardGameComponent_Player enemyInfo = enemy.GetComponent<CardGameComponent_Player>();
 
-            //攻击次数不足
             if (card.AttackCount < 1)
             {
+                Log.Warning("攻击次数不足");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail()
                 {
                     FailId = (int)Room2C_OperateFailType.CantOperateNow
@@ -63,7 +64,7 @@ namespace ET.Server
             }
             if (card.Attack < 1)
             {
-                //攻击为0
+                Log.Warning("攻击为0");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail()
                 {
                     FailId = (int)Room2C_OperateFailType.CantOperateNow
@@ -75,7 +76,7 @@ namespace ET.Server
                     card.AttributePowers.Contains(Power_Type.Charge) ||
                     card.AttributePowers.Contains(Power_Type.Rush)))
             {
-                //刚上场
+                Log.Warning("刚上场");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer,
                     new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.CantOperateNow });
                 return;
@@ -85,7 +86,7 @@ namespace ET.Server
                 card.AttributePowers.Contains(Power_Type.Rush) &&
                 (target.CardType == CardType.Agent || target.CardType == CardType.Hero))
             {
-                //突袭不能攻击英雄和干员
+                Log.Warning("突袭不能攻击英雄和干员");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer,
                     new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.CantOperateNow });
                 return;
@@ -100,7 +101,7 @@ namespace ET.Server
                 }
             }
             if (isEnemyHaveTaunt && !target.AttributePowers.Contains(Power_Type.Taunt)) {
-                //必须先攻击嘲讽
+                Log.Warning("必须先攻击嘲讽");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail()
                 {
                     FailId = (int)Room2C_OperateFailType.MustAttackTaunt
@@ -108,7 +109,7 @@ namespace ET.Server
                 return;
             }
             roomEventTypeComponent.CountClear();
-            roomEventTypeComponent.Event_AttackTo(card, target);
+            roomEventTypeComponent.Event_AttackTo(new EventInfo(), card, target);
         }
     }
 }

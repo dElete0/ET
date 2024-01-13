@@ -382,7 +382,7 @@ message Room2C_LoseHandCard // IMessage
 
 message Room2C_UnitDead // IMessage
 {
-	int64 CardId = 1;
+	repeated int64 CardIds = 1;
 }
 
 message Room2C_AttackCountEnough // IMessage

@@ -11,31 +11,6 @@ namespace ET.Client
     [FriendOfAttribute(typeof(ET.Client.UIUnitInfo))]
     public static partial class UICGGameHelper
     {
-
-        public static void RemoveMyUnit(this UICGGameComponent ui, long CardId)
-        {
-            ui.RemoveUnit(CardId, true);
-        }
-        public static void RemoveEnemyUnit(this UICGGameComponent ui, long CardId)
-        {
-            ui.RemoveUnit(CardId, false);
-        }
-
-        private static void RemoveUnit(this UICGGameComponent ui, long CardId, bool IsMy)
-        {
-            var units = IsMy ? ui.MyFightUnits : ui.EnemyFightUnits;
-            foreach (var unit in units)
-            {
-                if (unit.CardId == CardId)
-                {
-                    unit.CardGo.SetActive(false);
-                    ui.UnitPool.Add(unit.CardGo);
-                    ui.MyFightUnits.Remove(unit);
-                    return;
-                }
-            }
-        }
-
         public static async ETTask Room2C_LoseHandCard(Room room, long cardId)
         {
             UI ui = await UIHelper.Get(room, UIType.UICGGame);
@@ -210,8 +185,9 @@ namespace ET.Client
             actor.AttackTo(target);
         }
 
-        public static async ETTask Room2C_CallUnit(Room room, RoomCardInfo cardInfo, bool isMy)
+        public static async ETTask Room2C_CallUnit(this Room room, RoomCardInfo cardInfo, bool isMy)
         {
+            Log.Warning($"执行单位上场逻辑:{cardInfo.CardId}");
             UI ui = await UIHelper.Get(room, UIType.UICGGame);
             UICGGameComponent uicgGameComponent = ui.GetComponent<UICGGameComponent>();
             GameObject unit = null;
@@ -223,6 +199,7 @@ namespace ET.Client
             else
             {
                 unit = uicgGameComponent.UnitPool[0];
+                unit.transform.SetParent(isMy ? uicgGameComponent.MyUnits.transform : uicgGameComponent.EnemyUnits.transform);
                 uicgGameComponent.UnitPool.RemoveAt(0);
             }
             unit.GetComponent<UIUnitDragHandler>().IsMy = isMy;
@@ -231,27 +208,14 @@ namespace ET.Client
             UIUnitInfo uiUnit = await cardInfo.GetUIUnit(uicgGameComponent, room, unit, isMy);
         }
 
-        public static void Room2C_UseHandCards(this UICGGameComponent ui, long CardId)
+        public static async ETTask OrderUnits(this Room room, List<long> unitsOrder, bool IsMy)
         {
-            foreach (var card in ui.MyHandCards)
-            {
-                if (card.CardId == CardId)
-                {
-                    card.CardGo.SetActive(false);
-                    ui.UnitPool.Add(card.CardGo);
-                    ui.MyFightUnits.Remove(card);
-                    return;
-                }
-            }
-        }
-
-        public static async ETTask OrderUnits(this Room room, List<long> unitsOrder)
-        {
+            Log.Warning($"客户端收到排序消息:{unitsOrder.Count}");
             UI ui = await UIHelper.Get(room, UIType.UICGGame);
             UICGGameComponent uicgGameComponent = ui.GetComponent<UICGGameComponent>();
             List<UIUnitInfo> newUnits = new List<UIUnitInfo>();
-            foreach (var unit in unitsOrder)
-            {
+            foreach (var unit in unitsOrder) {
+                Log.Warning(unit);
                 newUnits.Add(uicgGameComponent.GetMyUnit(unit));
             }
             uicgGameComponent.MyFightUnits = newUnits;
@@ -268,6 +232,31 @@ namespace ET.Client
             }
             return null;
         }
+        
+        public static async ETTask ShowCardGetDamage(this UIUnitInfo unitInfo, Room room, int damage)
+        {
+            UI ui = await UIHelper.Get(room, UIType.UICGGame);
+            UICGGameComponent uicgGameComponent = ui.GetComponent<UICGGameComponent>();
+            GameObject hurtUI = null;
+            if (uicgGameComponent.HurtUIPool.Count < 1)
+            {
+                hurtUI = UnityEngine.Object.Instantiate(uicgGameComponent.HurtUI, uicgGameComponent.HurtUIs.transform, true);
+            }
+            else
+            {
+                hurtUI = uicgGameComponent.HurtUIPool[0];
+                uicgGameComponent.HurtUIPool.RemoveAt(0);
+            }
+            hurtUI.SetActive(true);
+            hurtUI.transform.position = unitInfo.CardGo.transform.position;
+            hurtUI.GetComponentInChildren<Text>().text = $"-{damage}";
+            DOTween.Sequence()
+                    .AppendInterval(0.6f)
+                    .AppendCallback(() => {
+                        hurtUI.SetActive(false);
+                        uicgGameComponent.HurtUIPool.Add(hurtUI);
+                    });
+        }
 
         public static async ETTask<UIUnitInfo> GetUIUnit(this RoomCardInfo cardInfo, UICGGameComponent uicgGameComponent, Room room, GameObject unit, bool isMy)
         {
@@ -282,7 +271,11 @@ namespace ET.Client
             unitInfo.Taunt = rc.Get<GameObject>("Taunt");
             if (isMy)
             {
+                Log.Warning($"单位被添加:{unitInfo.CardId}");
                 uicgGameComponent.MyFightUnits.Add(unitInfo);
+                foreach (var fightUnit in uicgGameComponent.MyFightUnits) {
+                    Log.Warning($"目前有的单位:{fightUnit.CardId}");
+                }
             }
             else
             {
@@ -306,6 +299,7 @@ namespace ET.Client
             dragHandler.IsMy = isMy;
             dragHandler.IsDrag = (b) => {
                 unitInfo.IsDrag = b;
+                unitInfo.TargetScale = b ? 1.07f : 1f;
             };
             dragHandler.CanBeUsed = () => {
                 if (unitInfo.DAttack < 1) {
@@ -328,10 +322,10 @@ namespace ET.Client
                     unitInfo.TargetInfo = null;
                 }
             };
-            dragHandler.TryToDoInClient = (vector2) =>
+            dragHandler.TryToDoInClient = () =>
             {
                 if (unitInfo.TargetInfo != null) {
-                    room.Root().GetComponent<ClientSenderCompnent>().Send(new C2Room_Attack() { Actor = cardInfo.CardId, Target = unitInfo.TargetInfo.CardId });
+                    room.Root().GetComponent<ClientSenderCompnent>().Send(new C2Room_Attack() { Actor = unitInfo.CardId, Target = unitInfo.TargetInfo.CardId });
                     return true;
                 }
                 return false;
@@ -388,10 +382,10 @@ namespace ET.Client
                 unitInfo.CardGo.SetActive(true);
             });
             animComponent.AppendCallback(() => {
-                unitInfo.CardGo.transform.DORotate(new Vector3(0, 0, 0), 0.6f);
+                unitInfo.CardGo.transform.DORotate(new Vector3(0, 0, 0), UIAnimComponent.GetCardTime);
             });
-            animComponent.Append(unitInfo.CardGo.transform.DOMove(ui.GetHandCardShowPos.transform.position, 0.6f));
-            animComponent.AppendInterval(0.7f);
+            animComponent.Append(unitInfo.CardGo.transform.DOMove(ui.GetHandCardShowPos.transform.position, UIAnimComponent.GetCardTime));
+            animComponent.AppendInterval(UIAnimComponent.ShowHandCardTime);
             animComponent.AppendCallback(() => {
                 ui.IsGetHandCardAnim = false;
                 unitInfo.IsMove = false;
@@ -475,6 +469,9 @@ namespace ET.Client
             dragHandler.IsBeDrag = b => {
                 unitInfo.IsDrag = b;
             };
+            dragHandler.SetUIUnitShow = () => {
+                ui.ShowUIUnitShowInfo(unitInfo);
+            };
             dragHandler.IsUnitInDrag = () => unitInfo.CardType == CardType.Unit;
             dragHandler.GetHeroVector = () => ui.MyHero.transform.position;
             dragHandler.GetTargetPos = () => unitInfo.TargetPos;
@@ -486,8 +483,13 @@ namespace ET.Client
                     return false;
                 }
                 //费用不足，无法使用
-                if (unitInfo.DCost > ui.DMyCost)
-                {
+                if (unitInfo.DCost > ui.DMyCost) {
+                    ui.DoTalkUI(true, TalkType.CostNotEnough);
+                    return false;
+                }
+                //场上单位已满
+                if (unitInfo.CardType == CardType.Unit && ui.MyFightUnits.Count > 7) {
+                    ui.DoTalkUI(true, TalkType.CantHaveMoreUnit);
                     return false;
                 }
                 return true;
@@ -649,65 +651,76 @@ namespace ET.Client
             GameObject agent1 = isMy ? uicgGameComponent.MyAgent1 : uicgGameComponent.EnemyAgent1;
             GameObject agent2 = isMy ? uicgGameComponent.MyAgent2 : uicgGameComponent.EnemyAgent2;
             //Agent1
-            ReferenceCollector rc1 = agent1.GetComponent<ReferenceCollector>();
-            UIUnitInfo unitInfo1 = uicgGameComponent.GetComponent<UIAnimComponent>().AddChild<UIUnitInfo, GameObject>(agent1);
-            unitInfo1.CardGo = agent1;
-            unitInfo1.Attack = rc1.Get<GameObject>("Attack").GetComponentInChildren<Text>();
-            unitInfo1.HP = rc1.Get<GameObject>("HP").GetComponentInChildren<Text>();
-            unitInfo1.Image = rc1.Get<GameObject>("Image").GetComponent<Image>();
-            uicgGameComponent.HeroAndAgent.Add(unitInfo1);
-            unitInfo1.Attack.text = agentCard1.Attack.ToString();
-            unitInfo1.HP.text = agentCard1.HP.ToString();
-            string spritePath1 = $"Assets/Bundles/CardImage/{agentCard1.BaseId}.png";
-            try
-            {
-                Sprite sprite = await (room as Room).GetComponent<ResourcesLoaderComponent>().LoadAssetAsync<Sprite>(spritePath1);
-                unitInfo1.Image.sprite = sprite;
-            }
-            catch
-            {
-                Log.Warning($"{spritePath1}还未引入匹配图片");
-            }
-            UIAgentDragHandler dragHandler1 = agent1.GetComponent<UIAgentDragHandler>();
-            dragHandler1.CardId = agentCard1.CardId;
-            dragHandler1.IsMy = isMy;
-            dragHandler1.BaseId = agentCard1.BaseId;
-            dragHandler1.ShowUIShowCard = () =>
-            {
-                bool left = dragHandler1.gameObject.transform.position.x < 30;
-                uicgGameComponent.ShowUIShowCard(left, dragHandler1.BaseId).Coroutine();
-            };
-            dragHandler1.HideUIShowCard = uicgGameComponent.HideUIShowCard;
+            await SetAgentUnitInfo(room, uicgGameComponent, agent1, agentCard1, isMy);
             //Agent2
-            ReferenceCollector rc2 = agent2.GetComponent<ReferenceCollector>();
-            UIUnitInfo unitInfo2 = uicgGameComponent.GetComponent<UIAnimComponent>().AddChild<UIUnitInfo, GameObject>(agent2);
-            unitInfo2.Attack = rc2.Get<GameObject>("Attack").GetComponentInChildren<Text>();
-            unitInfo2.HP = rc2.Get<GameObject>("HP").GetComponentInChildren<Text>();
-            unitInfo2.Image = rc2.Get<GameObject>("Image").GetComponent<Image>();
-            uicgGameComponent.HeroAndAgent.Add(unitInfo2);
-            unitInfo2.Attack.text = agentCard2.Attack.ToString();
-            unitInfo2.HP.text = agentCard2.HP.ToString();
-            string spritePath2 = $"Assets/Bundles/CardImage/{agentCard2.BaseId}.png";
+            await SetAgentUnitInfo(room, uicgGameComponent, agent2, agentCard2, isMy);
+            await ETTask.CompletedTask;
+        }
+
+        private static async ETTask SetAgentUnitInfo(Entity room, UICGGameComponent uicgGameComponent, GameObject agent, RoomCardInfo agentCard, bool isMy) {
+            ReferenceCollector rc = agent.GetComponent<ReferenceCollector>();
+            UIUnitInfo unitInfo = uicgGameComponent.GetComponent<UIAnimComponent>().AddChild<UIUnitInfo, GameObject>(agent);
+            unitInfo.Attack = rc.Get<GameObject>("Attack").GetComponentInChildren<Text>();
+            unitInfo.HP = rc.Get<GameObject>("HP").GetComponentInChildren<Text>();
+            unitInfo.Image = rc.Get<GameObject>("Image").GetComponent<Image>();
+            uicgGameComponent.HeroAndAgent.Add(unitInfo);
+            unitInfo.Attack.text = agentCard.Attack.ToString();
+            unitInfo.DAttack = agentCard.Attack;
+            unitInfo.DHP = agentCard.HP;
+            unitInfo.HP.text = agentCard.HP.ToString();
+            unitInfo.CardId = agentCard.CardId;
+            unitInfo.BaseId = agentCard.BaseId;
+            string spritePath2 = $"Assets/Bundles/CardImage/{agentCard.BaseId}.png";
             try
             {
                 Sprite sprite = await (room as Room).GetComponent<ResourcesLoaderComponent>().LoadAssetAsync<Sprite>(spritePath2);
-                unitInfo2.Image.sprite = sprite;
+                unitInfo.Image.sprite = sprite;
             }
             catch
             {
                 Log.Warning($"{spritePath2}还未引入匹配图片");
             }
-            UIAgentDragHandler dragHandler2 = agent2.GetComponent<UIAgentDragHandler>();
-            dragHandler2.CardId = agentCard2.CardId;
-            dragHandler2.IsMy = isMy;
-            dragHandler2.BaseId = agentCard2.BaseId;
-            dragHandler2.ShowUIShowCard = () =>
-            {
-                bool left = dragHandler2.gameObject.transform.position.x < 30;
-                uicgGameComponent.ShowUIShowCard(left, dragHandler2.BaseId).Coroutine();
+            UIAgentDragHandler dragHandler = agent.GetComponent<UIAgentDragHandler>();
+            dragHandler.IsMy = isMy;
+            dragHandler.IsDrag = (b) => {
+                unitInfo.IsDrag = b;
+                unitInfo.TargetScale = b ? 1.07f : 1f;
             };
-            dragHandler2.HideUIShowCard = uicgGameComponent.HideUIShowCard;
-            await ETTask.CompletedTask;
+            dragHandler.CanBeUsed = () => {
+                if (unitInfo.DAttack < 1) {
+                    return false;
+                }
+
+                if (!unitInfo.AttackCountEnough) {
+                    return false;
+                }
+
+                return true;
+            };
+            dragHandler.DragShow = v => {
+                GameObject target = uicgGameComponent.GetAttackTarget(v);
+                if (target != null) {
+                    unitInfo.TargetInfo = uicgGameComponent.GetComponent<UIAnimComponent>().GetUnitInfoByGo(target);
+                    target.transform.localScale = new Vector3(1.05f, 1.05f);
+                } else if (unitInfo.TargetInfo != null) {
+                    unitInfo.TargetInfo.CardGo.transform.localScale = Vector3.one;
+                    unitInfo.TargetInfo = null;
+                }
+            };
+            dragHandler.TryToDoInClient = () =>
+            {
+                if (unitInfo.TargetInfo != null) {
+                    room.Root().GetComponent<ClientSenderCompnent>().Send(new C2Room_Attack() { Actor = unitInfo.CardId, Target = unitInfo.TargetInfo.CardId });
+                    return true;
+                }
+                return false;
+            };
+            dragHandler.ShowUIShowCard = () =>
+            {
+                bool left = dragHandler.gameObject.transform.position.x < 30;
+                uicgGameComponent.ShowUIShowCard(left, unitInfo.BaseId).Coroutine();
+            };
+            dragHandler.HideUIShowCard = uicgGameComponent.HideUIShowCard;
         }
 
         public static async ETTask TurnStart(Entity room, TurnStart turnStart)

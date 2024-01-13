@@ -17,6 +17,7 @@ namespace ET.Server {
             foreach (RoomPlayer player in roomServerComponent.Children.Values)
             {
                 CardGameComponent_Player playerCards = player.GetComponent<CardGameComponent_Player>();
+                //Log.Warning($"移除:{card.Id}");
                 if (playerCards.HandCards.Contains(card.Id)) 
                     playerCards.HandCards.Remove(card.Id);
                 if (playerCards.Units.Contains(card.Id))

@@ -24,7 +24,7 @@ namespace ET.Server
             if (serverUpdater.NowPlayer == roomPlayer.Id)
             {
                 Log.Warning("回合结束：" + roomPlayer.Id);
-                roomEventTypeComponent.Event_TurnOver(roomPlayer);
+                roomEventTypeComponent.Event_TurnOver(new EventInfo(), roomPlayer);
             }
             await ETTask.CompletedTask;
         }

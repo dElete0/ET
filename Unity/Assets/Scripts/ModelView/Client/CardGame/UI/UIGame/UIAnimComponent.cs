@@ -12,5 +12,10 @@ namespace ET.Client
         public Sequence Sequence;
         //等待执行的动作
         public List<Action<Sequence>> Actions = new List<Action<Sequence>>();
+
+        //抽牌时间
+        public const float GetCardTime = 0.3f;
+        //抽牌展示时间
+        public const float ShowHandCardTime = 0.7f;
     }
 }

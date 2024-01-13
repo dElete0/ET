@@ -115,7 +115,7 @@ namespace ET.Client {
     }
 
     public struct UnitDead {
-        public long CardId;
+        public List<long> CardIds;
     }
 
     public struct GetHandCardFromGroup {
@@ -134,14 +134,15 @@ namespace ET.Client {
         public RoomCardInfo Card;
         public List<long> UnitsOrder;
     }
+    
+    public struct EnemyCallUnit {
+        public RoomCardInfo Card;
+        public List<long> UnitsOrder;
+    }
 
     public struct CardGetDamage {
         public RoomCardInfo Card;
         public int Hurt;
-    }
-    
-    public struct EnemyCallUnit {
-        public RoomCardInfo Card;
     }
 
     public struct RoomCardAttack {
