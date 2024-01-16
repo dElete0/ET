@@ -1,11 +1,13 @@
 using System.Collections.Generic;
+using ET.Server;
 
 namespace ET {
     [ChildOf(typeof(CardGameComponent_Cards))]
     //游戏内的卡牌
-    public class RoomCard : Entity, IAwake<int> {
+    public class RoomCard : Entity, IAwake<int, long> {
         public int ConfigId { get; set; } //配置表id
         public CardType CardType;
+        public string Name;
 
         public long PlayerId;
 
@@ -42,11 +44,12 @@ namespace ET {
         public bool CantBeAttacTarget;
         public bool CantBeMagicTarget;
 
-
         //属性异能
         public List<Power_Type> AttributePowers = new List<Power_Type>();
         //其他异能
         public List<Power_Struct> OtherPowers = new List<Power_Struct>();
+        //身上的光环效果
+        public List<Power_Struct> AuraOnThisPowers = new List<Power_Struct>();
         
         //其他计数
         //刚上场，不能攻击
@@ -59,12 +62,11 @@ namespace ET {
     }
 
     //部署效果及计数器
-    public class Power_Struct {
+    public struct Power_Struct {
         public Power_Type PowerType;
         public TriggerPowerType TriggerPowerType;
         public int Count1, Count2, Count3;
-        public RoomCard Card1, Card2, Card3;
-        public RoomPlayer RoomPlayer1, RoomPlayer2;
+        public GameEvent TriggerEvent;
     }
 
     // 触发方式
@@ -76,7 +78,7 @@ namespace ET {
         //亡语
         Dead = 2,
         //光环
-        Effect = 3,
+        Aura = 3,
         //游戏开始时触发
         GameStart = 4,
         //抽到时释放
@@ -93,12 +95,12 @@ namespace ET {
         ToUnit = 2,
         ToHero = 3,
         ToAgent = 4,
-        ToMyHero = 5,
-        ToMyUnit = 6,
-        ToMyAgent = 7,
-        ToEnemyHero = 8,
-        ToEnemyUnit = 9,
-        ToEnemyAgent = 10,
+        ToMyUnit = 5,
+        ToMyAgent = 6,
+        ToEnemyUnit = 7,
+        ToEnemyAgent = 8,
+        ToMyActor = 9,
+        ToEnemyActor = 10,
     }
 
     public enum CardColor {
@@ -141,6 +143,11 @@ namespace ET {
         Weapon = 8,
         Building = 9,
         Agent = 10,
+    }
+
+    public enum CallType {
+        Nomal = 0,
+        RedDragon = 1,
     }
 
     //卡牌效果种类
@@ -192,5 +199,19 @@ namespace ET {
         Desecrate = 1014,
         //属性光环
         AttributeAura = 1015,
+        //对所有单位造成伤害
+        DamageAllUnit = 1016,
+        //对目标单位沉默
+        SilentTarget = 1017,
+        //侵蚀
+        Erosion = 1018,
+        //召唤红龙
+        CallRedDragon = 1019,
+        //消灭目标单位
+        KillTargetUnit = 1020,
+        //消灭所有单位
+        KillAllUnit = 1021,
+        //发现并复制牌库中的n张卡
+        FindAndCloneCard = 1022,
     }
 }

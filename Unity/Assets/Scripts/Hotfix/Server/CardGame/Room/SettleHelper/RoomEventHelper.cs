@@ -43,6 +43,11 @@ namespace ET.Server {
             eventTypeComponent.BroadAndSettleEvent(GameEventFactory.UnitArrange(eventTypeComponent, card, target, player), eventInfo);
         }
 
+        public static void Event_AuraEffect(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomCard card, RoomPlayer player)
+        {
+            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.AuraEffect(eventTypeComponent, card, player), eventInfo);
+        }
+
         public static void Event_MagicTakesEffect(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomPlayer player, RoomCard card, RoomCard target)
         {
             eventTypeComponent.BroadAndSettleEvent(GameEventFactory.MagicTakesEffect(eventTypeComponent, card, target, player), eventInfo);

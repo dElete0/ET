@@ -32,6 +32,7 @@ namespace ET.Server
         public int White;
         public int Grey;
 
-        public const int UnitMax = 8;
+        //本场召唤的红龙数量
+        public int RedGragonNum;
     }
 }

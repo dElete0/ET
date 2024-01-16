@@ -37,7 +37,7 @@ namespace ET.Server
             CardGameComponent_Player playerInfo = roomPlayer.GetComponent<CardGameComponent_Player>();
             CardGameComponent_Player enemyInfo = roomPlayer.GetEnemy().GetComponent<CardGameComponent_Player>();
 
-            if (playerInfo.Units.Count >= CardGameComponent_Player.UnitMax) {
+            if (playerInfo.Units.Count >= CardGameMsg.UnitMax) {
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.CantGetMoreUnit });
                 return;
             }

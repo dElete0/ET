@@ -210,6 +210,32 @@ namespace ET
 
 	}
 
+	[Message(LockStepOuter.C2Room_SelectCard)]
+	[MemoryPackable]
+	public partial class C2Room_SelectCard: MessageObject, IRoomMessage
+	{
+		public static C2Room_SelectCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(C2Room_SelectCard), isFromPool) as C2Room_SelectCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public long PlayerId { get; set; }
+
+		[MemoryPackOrder(1)]
+		public long CardId { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.PlayerId = default;
+			this.CardId = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	[Message(LockStepOuter.CardGameUnitInfo)]
 	[MemoryPackable]
 	public partial class CardGameUnitInfo: MessageObject
@@ -1029,33 +1055,6 @@ namespace ET
 
 	}
 
-// 发现
-	[Message(LockStepOuter.C2Room_SelectCard)]
-	[MemoryPackable]
-	public partial class C2Room_SelectCard: MessageObject, IRoomMessage
-	{
-		public static C2Room_SelectCard Create(bool isFromPool = true) 
-		{ 
-			return ObjectPool.Instance.Fetch(typeof(C2Room_SelectCard), isFromPool) as C2Room_SelectCard; 
-		}
-
-		[MemoryPackOrder(0)]
-		public long PlayerId { get; set; }
-
-		[MemoryPackOrder(1)]
-		public long Card { get; set; }
-
-		public override void Dispose() 
-		{
-			if (!this.IsFromPool) return;
-			this.PlayerId = default;
-			this.Card = default;
-			
-			ObjectPool.Instance.Recycle(this); 
-		}
-
-	}
-
 	[Message(LockStepOuter.Room2C_UseCard)]
 	[MemoryPackable]
 	public partial class Room2C_UseCard: MessageObject, IMessage
@@ -1632,6 +1631,216 @@ namespace ET
 
 	}
 
+	[Message(LockStepOuter.Room2C_CardsGetDamage)]
+	[MemoryPackable]
+	public partial class Room2C_CardsGetDamage: MessageObject, IMessage
+	{
+		public static Room2C_CardsGetDamage Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_CardsGetDamage), isFromPool) as Room2C_CardsGetDamage; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Card { get; set; } = new();
+
+		[MemoryPackOrder(1)]
+		public List<int> hurt { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card.Clear();
+			this.hurt.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_CallUnits)]
+	[MemoryPackable]
+	public partial class Room2C_CallUnits: MessageObject, IMessage
+	{
+		public static Room2C_CallUnits Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_CallUnits), isFromPool) as Room2C_CallUnits; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Units { get; set; } = new();
+
+		[MemoryPackOrder(1)]
+		public List<long> Order { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Units.Clear();
+			this.Order.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyCallUnits)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyCallUnits: MessageObject, IMessage
+	{
+		public static Room2C_EnemyCallUnits Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyCallUnits), isFromPool) as Room2C_EnemyCallUnits; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Units { get; set; } = new();
+
+		[MemoryPackOrder(1)]
+		public List<long> Order { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Units.Clear();
+			this.Order.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_FlashMyUnit)]
+	[MemoryPackable]
+	public partial class Room2C_FlashMyUnit: MessageObject, IMessage
+	{
+		public static Room2C_FlashMyUnit Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashMyUnit), isFromPool) as Room2C_FlashMyUnit; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Units { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Units.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_FlashEnemyUnit)]
+	[MemoryPackable]
+	public partial class Room2C_FlashEnemyUnit: MessageObject, IMessage
+	{
+		public static Room2C_FlashEnemyUnit Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashEnemyUnit), isFromPool) as Room2C_FlashEnemyUnit; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Units { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Units.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_FlashUnit)]
+	[MemoryPackable]
+	public partial class Room2C_FlashUnit: MessageObject, IMessage
+	{
+		public static Room2C_FlashUnit Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashUnit), isFromPool) as Room2C_FlashUnit; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Units { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Units = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_FindCardsToShow)]
+	[MemoryPackable]
+	public partial class Room2C_FindCardsToShow: MessageObject, IMessage
+	{
+		public static Room2C_FindCardsToShow Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_FindCardsToShow), isFromPool) as Room2C_FindCardsToShow; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_GetHandCards)]
+	[MemoryPackable]
+	public partial class Room2C_GetHandCards: MessageObject, IMessage
+	{
+		public static Room2C_GetHandCards Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_GetHandCards), isFromPool) as Room2C_GetHandCards; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_EnemyGetHandCards)]
+	[MemoryPackable]
+	public partial class Room2C_EnemyGetHandCards: MessageObject, IMessage
+	{
+		public static Room2C_EnemyGetHandCards Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_EnemyGetHandCards), isFromPool) as Room2C_EnemyGetHandCards; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	public static class LockStepOuter
 	{
 		 public const ushort C2G_Match = 11002;
@@ -1642,36 +1851,36 @@ namespace ET
 		 public const ushort Match2G_NotifyMatchSuccess = 11007;
 		 public const ushort C2Room_ChangeSceneFinish = 11008;
 		 public const ushort C2Room_ChangeGameSceneFinish = 11009;
-		 public const ushort CardGameUnitInfo = 11010;
-		 public const ushort LockStepUnitInfo = 11011;
-		 public const ushort Room2C_Start = 11012;
-		 public const ushort Room2C_CGStart = 11013;
-		 public const ushort FrameMessage = 11014;
-		 public const ushort OneFrameInputs = 11015;
-		 public const ushort Room2C_AdjustUpdateTime = 11016;
-		 public const ushort C2Room_CheckHash = 11017;
-		 public const ushort Room2C_CheckHashFail = 11018;
-		 public const ushort G2C_Reconnect = 11019;
-		 public const ushort RoomCardInfo = 11020;
-		 public const ushort Room2C_GetHandCardFromGroup = 11021;
-		 public const ushort Room2C_EnemyGetHandCardFromGroup = 11022;
-		 public const ushort Room2C_GetCard = 11023;
-		 public const ushort Room2C_EnemyGetCard = 11024;
-		 public const ushort Room2C_MyGroupCount = 11025;
-		 public const ushort Room2C_EnemyGroupCount = 11026;
-		 public const ushort C2Room_TurnOver = 11027;
-		 public const ushort Room2C_TurnStart = 11028;
-		 public const ushort Room2C_NewHero = 11029;
-		 public const ushort Room2C_NewAgent = 11030;
-		 public const ushort Room2C_EnemyNewHero = 11031;
-		 public const ushort Room2C_EnemyNewAgent = 11032;
-		 public const ushort Room2C_GroupCount = 11033;
-		 public const ushort Room2C_CardBoom = 11034;
-		 public const ushort Room2C_EnemyCardBoom = 11035;
-		 public const ushort C2Room_Attack = 11036;
-		 public const ushort Room2C_Attack = 11037;
-		 public const ushort C2Room_UseCard = 11038;
-		 public const ushort C2Room_SelectCard = 11039;
+		 public const ushort C2Room_SelectCard = 11010;
+		 public const ushort CardGameUnitInfo = 11011;
+		 public const ushort LockStepUnitInfo = 11012;
+		 public const ushort Room2C_Start = 11013;
+		 public const ushort Room2C_CGStart = 11014;
+		 public const ushort FrameMessage = 11015;
+		 public const ushort OneFrameInputs = 11016;
+		 public const ushort Room2C_AdjustUpdateTime = 11017;
+		 public const ushort C2Room_CheckHash = 11018;
+		 public const ushort Room2C_CheckHashFail = 11019;
+		 public const ushort G2C_Reconnect = 11020;
+		 public const ushort RoomCardInfo = 11021;
+		 public const ushort Room2C_GetHandCardFromGroup = 11022;
+		 public const ushort Room2C_EnemyGetHandCardFromGroup = 11023;
+		 public const ushort Room2C_GetCard = 11024;
+		 public const ushort Room2C_EnemyGetCard = 11025;
+		 public const ushort Room2C_MyGroupCount = 11026;
+		 public const ushort Room2C_EnemyGroupCount = 11027;
+		 public const ushort C2Room_TurnOver = 11028;
+		 public const ushort Room2C_TurnStart = 11029;
+		 public const ushort Room2C_NewHero = 11030;
+		 public const ushort Room2C_NewAgent = 11031;
+		 public const ushort Room2C_EnemyNewHero = 11032;
+		 public const ushort Room2C_EnemyNewAgent = 11033;
+		 public const ushort Room2C_GroupCount = 11034;
+		 public const ushort Room2C_CardBoom = 11035;
+		 public const ushort Room2C_EnemyCardBoom = 11036;
+		 public const ushort C2Room_Attack = 11037;
+		 public const ushort Room2C_Attack = 11038;
+		 public const ushort C2Room_UseCard = 11039;
 		 public const ushort Room2C_UseCard = 11040;
 		 public const ushort Room2C_OperateFail = 11041;
 		 public const ushort C2Room_Effect = 11042;
@@ -1692,5 +1901,14 @@ namespace ET
 		 public const ushort Room2C_LoseHandCard = 11057;
 		 public const ushort Room2C_UnitDead = 11058;
 		 public const ushort Room2C_AttackCountEnough = 11059;
+		 public const ushort Room2C_CardsGetDamage = 11060;
+		 public const ushort Room2C_CallUnits = 11061;
+		 public const ushort Room2C_EnemyCallUnits = 11062;
+		 public const ushort Room2C_FlashMyUnit = 11063;
+		 public const ushort Room2C_FlashEnemyUnit = 11064;
+		 public const ushort Room2C_FlashUnit = 11065;
+		 public const ushort Room2C_FindCardsToShow = 11066;
+		 public const ushort Room2C_GetHandCards = 11067;
+		 public const ushort Room2C_EnemyGetHandCards = 11068;
 	}
 }

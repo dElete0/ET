@@ -11,6 +11,9 @@ namespace ET.Client
         public Vector3 TargetPos;
         public float TargetScale = 1f;
         public Sequence Sequence;
+        
+        //所在房间
+        public Room Room;
 
         public long CardId;
         public int BaseId;

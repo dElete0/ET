@@ -8,8 +8,9 @@ namespace ET {
     public static partial class RoomCardSystem
     {
         [EntitySystem]
-        private static void Awake(this ET.RoomCard self, int configId) {
+        private static void Awake(this ET.RoomCard self, int configId, long playerId) {
             self.ConfigId = configId;
+            self.PlayerId = playerId;
             self.SetRoomCardByBase();
             CardEventTypeComponent cardEventTypeComponent = 
                     self.AddComponent<CardEventTypeComponent, RoomEventTypeComponent>(
@@ -61,6 +62,7 @@ namespace ET {
         }
 
         public static void SetRoomCardByBase(this RoomCard self) {
+            self.Name = self.Config().Name;
             self.SetCost(self.Config().Cost);
             self.SetAttack(self.Config().Attack);
             self.SetHP(self.Config().HP);
@@ -134,6 +136,16 @@ namespace ET {
             return powerStructs;
         }
 
+        public static List<Power_Struct> GetAura(this RoomCard self) {
+            List<Power_Struct> powerStructs = new List<Power_Struct>();
+            foreach (var power in self.OtherPowers) {
+                if (power.TriggerPowerType == TriggerPowerType.Aura) {
+                    powerStructs.Add(power);
+                }
+            }
+            return powerStructs;
+        }
+
         public static List<Power_Struct> GetRelease(this RoomCard self) {
             List<Power_Struct> powerStructs = new List<Power_Struct>();
             foreach (var power in self.OtherPowers) {
@@ -143,6 +155,12 @@ namespace ET {
             }
 
             return powerStructs;
+        }
+
+        public static RoomPlayer GetOwner(this RoomCard self) {
+            RoomServerComponent roomServerComponent = self.GetParent<Room>().GetComponent<RoomServerComponent>();
+            RoomPlayer player = roomServerComponent.GetChild<RoomPlayer>(self.PlayerId);
+            return player;
         }
 
         public static List<Power_Struct> GetBasePowers(this RoomCard self) {

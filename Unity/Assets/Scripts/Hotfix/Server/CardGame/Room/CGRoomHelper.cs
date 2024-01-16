@@ -64,9 +64,16 @@ namespace ET.Server {
             List<int> baseIds = new List<int>() {
                 300008, 
                 3000010,
+                5000063,
+                5000032,
+                5000064,
+                5000018,
+                5000003,
+                5000032,
                 3000006,
-                3000010,
-                3000010,
+                3000011,
+                5000060,
+                3000012,
                 5000059,
                 3000010,
                 3000010,
@@ -85,21 +92,21 @@ namespace ET.Server {
                 5000015,
             };
             foreach (var id in baseIds) {
-                RoomCard card = RoomCardFactory.CreateGroupCard(cards, id);
+                RoomCard card = RoomCardFactory.CreateGroupCard(cards, id, player.Id);
                 playerInfo.Groups.Add(card.Id);
             }
             RoomMessageHelper.ServerSendMessageToClient(player, new Room2C_MyGroupCount() { Count = playerInfo.Groups.Count });
             RoomMessageHelper.BroadCastWithOutPlayer(player, new Room2C_EnemyGroupCount() { Count = playerInfo.Groups.Count });
 
             //英雄
-            RoomCard hero = RoomCardFactory.CreateHero(cards, 10001);
+            RoomCard hero = RoomCardFactory.CreateHero(cards, 10001, player.Id);
             playerInfo.Hero = hero.Id;
             RoomMessageHelper.ServerSendMessageToClient(player, new Room2C_NewHero() { Hero = hero.RoomCard2HeroInfo() });
             RoomMessageHelper.BroadCastWithOutPlayer(player, new Room2C_EnemyNewHero() { Hero = hero.RoomCard2HeroInfo() });
 
             //干员
-            RoomCard agent1 = RoomCardFactory.CreateAgent(cards, 200001);
-            RoomCard agent2 = RoomCardFactory.CreateAgent(cards, 200002);
+            RoomCard agent1 = RoomCardFactory.CreateAgent(cards, 200001, player.Id);
+            RoomCard agent2 = RoomCardFactory.CreateAgent(cards, 200002, player.Id);
             playerInfo.Agent1 = agent1.Id;
             playerInfo.Agent2 = agent2.Id;
             RoomMessageHelper.ServerSendMessageToClient(player, new Room2C_NewAgent() { Agent1 = agent1.RoomCard2AgentInfo(), Agent2 = agent2.RoomCard2AgentInfo() });
@@ -188,6 +195,16 @@ namespace ET.Server {
                 White = roomCard.White,
                 Black = roomCard.Black,
             };
+        }
+
+        public static List<RoomCardInfo> RoomCardList2UnitInfoList(this CardGameComponent_Player playerCards, CardGameComponent_Cards cards) {
+            List<RoomCardInfo> cardInfos = new List<RoomCardInfo>();
+            foreach (var unitId in playerCards.Units)
+            {
+                RoomCard unit = cards.GetChild<RoomCard>(unitId);
+                cardInfos.Add(unit.RoomCard2AgentInfo());
+            }
+            return cardInfos;
         }
 
         public static RoomCardInfo RoomCard2UnitInfo(this RoomCard roomCard) {

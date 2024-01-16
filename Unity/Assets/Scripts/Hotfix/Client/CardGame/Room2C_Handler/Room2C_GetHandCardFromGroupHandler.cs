@@ -6,7 +6,6 @@ namespace ET.Client
         protected override async ETTask Run(Scene root, Room2C_GetHandCardFromGroup message)
         {
             await EventSystem.Instance.PublishAsync(root, new GetHandCardFromGroup() {Card = message.CardInfo});
-            await ETTask.CompletedTask;
         }
     }
 }

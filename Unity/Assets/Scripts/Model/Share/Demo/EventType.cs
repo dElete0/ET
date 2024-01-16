@@ -57,10 +57,26 @@ namespace ET.Client {
         public RoomCardInfo Hero;
     }
 
+    public struct FindCardsToShow {
+        public List<RoomCardInfo> Cards;
+    }
+
     public struct GetColor {
         public CardColor Color;
         public int Num;
         public bool IsMy;
+    }
+
+    public struct FlashMyUnits {
+        public List<RoomCardInfo> Cards;
+    }
+
+    public struct FlashEnemyUnits {
+        public List<RoomCardInfo> Cards;
+    }
+
+    public struct FlashUnit {
+        public RoomCardInfo Card;
     }
 
     public struct GroupCountType {
@@ -122,6 +138,14 @@ namespace ET.Client {
         public RoomCardInfo Card;
     }
 
+    public struct GetHandCards {
+        public List<RoomCardInfo> Cards;
+    }
+
+    public struct EnemyGetHandCards {
+        public List<RoomCardInfo> Cards;
+    }
+
     public struct LoseHandCard {
         public long CardId;
     }
@@ -139,10 +163,25 @@ namespace ET.Client {
         public RoomCardInfo Card;
         public List<long> UnitsOrder;
     }
+    
+    public struct CallUnits {
+        public List<RoomCardInfo> Card;
+        public List<long> UnitsOrder;
+    }
+    
+    public struct EnemyCallUnits {
+        public List<RoomCardInfo> Card;
+        public List<long> UnitsOrder;
+    }
 
     public struct CardGetDamage {
         public RoomCardInfo Card;
         public int Hurt;
+    }
+
+    public struct CardsGetDamage {
+        public List<RoomCardInfo> Card;
+        public List<int> Hurt;
     }
 
     public struct RoomCardAttack {

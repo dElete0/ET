@@ -53,24 +53,64 @@ namespace ET.Server
             }
             if (kv.Key.Triggeer.Invoke(eventType))
             {
-                kv.Value.ToDo(eventInfo);
+                kv.Value.ToDo(eventType, eventInfo);
             }
             return false;
         }
 
-        public static void PowerToDo(this Power_Struct power, RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo)
+        public static async ETTask PowerToDo(this Power_Struct power, RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, RoomCard target, RoomPlayer player)
         {
             switch (power.PowerType) {
                 case Power_Type.GetHandCardFromGroup:
                     //抽卡效果
-                    roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, power.RoomPlayer1, power.Count1), eventInfo);
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player, power.Count1), eventInfo);
                     break;
                 case Power_Type.DamageHurt:
                     //直伤
-                    roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.Damage(roomEventTypeComponent, power.Card1, power.Card2, power.Count1), eventInfo);
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.Damage(roomEventTypeComponent, actor, target, power.Count1), eventInfo);
                     break;
                 case Power_Type.Desecrate:
-                    roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.Desecrate(roomEventTypeComponent, power.Card1, power.Count1), eventInfo);
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.Desecrate(roomEventTypeComponent, actor, power.Count1), eventInfo);
+                    break;
+                case Power_Type.DamageAllUnit:
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.DamageAllUnit(roomEventTypeComponent, actor, player, power.Count1), eventInfo);
+                    break;
+                case Power_Type.CallTargetUnit:
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.CallTargetUnit(roomEventTypeComponent, player, target, power.Count1, power.Count2), eventInfo);
+                    break;
+                case Power_Type.SilentTarget:
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.SilentTarget(roomEventTypeComponent, actor, target), eventInfo);
+                    break;
+                case Power_Type.AttributeAura:
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.AttributeAuraEffect(roomEventTypeComponent, actor, power), eventInfo);
+                    break;
+                case Power_Type.CallRedDragon:
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.CallRedDragon(roomEventTypeComponent, player, actor, power.Count1), eventInfo);
+                    break;
+                case Power_Type.KillTargetUnit:
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.KillTargetUnit(roomEventTypeComponent, actor, target), eventInfo);
+                    break;
+                case Power_Type.KillAllUnit:
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.KillAllUnit(roomEventTypeComponent, actor), eventInfo);
+                    break;
+                case Power_Type.FindAndCloneCard:
+                    await roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.FindAndCloneCard(roomEventTypeComponent, actor, power.Count1, power.Count2), eventInfo);
+                    break;
+            }
+        }
+
+        public static void PowerToLose(this Power_Struct power, RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, RoomCard target, RoomPlayer player) {
+            switch (power.PowerType) {
+                case Power_Type.AttributeAura:
+                    roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.AttributeAuraUnEffect(roomEventTypeComponent, actor, power), eventInfo);
+                    break;
+            }
+        }
+
+        public static void AuraPowerToTarget(this Power_Struct power, RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, RoomCard target, RoomPlayer player) {
+            switch (power.PowerType) {
+                case Power_Type.AttributeAura:
+                    roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.AttributeAuraEffectToTarget(roomEventTypeComponent, actor, power.TriggerEvent, power.Count1), eventInfo);
                     break;
             }
         }

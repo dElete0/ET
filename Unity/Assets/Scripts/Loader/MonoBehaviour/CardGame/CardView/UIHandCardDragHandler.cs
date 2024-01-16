@@ -136,6 +136,7 @@ namespace ET {
         /// </summary>
         /// <param name="eventData"></param>
         public void OnEndDrag(PointerEventData eventData) {
+            this.UI_Alpha = 1f;
             if (UIArrowHandler.IsSetTarget) {
                 UIArrowHandler.IsSetTarget = false;
                 this.rt.position = GetTargetPos.Invoke();
@@ -146,16 +147,15 @@ namespace ET {
                 if (this.TryToDoInClient.Invoke()) {
                     //如果是需要二次选择目标的卡牌
                     IsFindTarget = true;
+                    this.UI_Alpha = 0f;
                     UIArrowHandler.Begin = this.transform;
                     UIArrowHandler.IsFindTarget = true;
                 } else {
                     UIUnitShowHandler.NotFollow();
-                    this.UI_Alpha = 1f;
                     CardPos.Invoke(new Vector3(10000,0,0));
                 }
             } else {
                 UIUnitShowHandler.NotFollow();
-                this.UI_Alpha = 1f;
                 CardPos.Invoke(new Vector3(10000,0,0));
             }
         }
@@ -168,6 +168,7 @@ namespace ET {
             IsFindTarget = false;
             UIArrowHandler.IsFindTarget = false;
             UIUnitShowHandler.NotFollow();
+            this.UI_Alpha = 1f;
             if (SetUnitTargetToDo.Invoke()) {
                 CardPos.Invoke(new Vector3(10000,0,0));
             } else {

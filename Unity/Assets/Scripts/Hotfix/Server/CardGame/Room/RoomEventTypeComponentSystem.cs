@@ -17,7 +17,7 @@ namespace ET.Server
             self.Count = 0;
         }
 
-        public static void BroadAndSettleEvent(this ET.Server.RoomEventTypeComponent self, GameEvent eventType, EventInfo eventInfo) {
+        public static async ETTask BroadAndSettleEvent(this ET.Server.RoomEventTypeComponent self, GameEvent eventType, EventInfo eventInfo) {
             eventInfo.Count++;
             Log.Warning("服务器处理: " + eventType.ToStr());
             if (self.Count < Msg_Room.EventToDoCountMax) {
@@ -43,7 +43,7 @@ namespace ET.Server
             //事件执行
             if (eventType.ToDo != null) {
                 try {
-                    eventType.ToDo.Invoke(eventInfo);
+                    eventType.ToDo.Invoke(null, eventInfo);
                 } catch (Exception e) {
                     Log.Error(e.ToString());
                 }
@@ -53,7 +53,17 @@ namespace ET.Server
             if (eventInfo.Count < 1) {
                 //其他事件都执行了，执行死亡标记等事件
                 if (eventInfo.DeadList.Count > 0) {
-                    self.BroadAndSettleEvent(GameEventFactory.Dead(self, eventInfo.DeadList), eventInfo);
+                    await self.BroadAndSettleEvent(GameEventFactory.Dead(self, eventInfo.DeadList), eventInfo);
+                    eventInfo.DeadList.Clear();
+                }
+            
+                //继续执行新的逻辑
+                Log.Warning(eventInfo.PowerStructs.Count);
+                if (eventInfo.PowerStructs.Count > 0) {
+                    foreach (var power in eventInfo.PowerStructs) {
+                        Log.Warning(eventInfo.PowerStructs.Count);
+                        await power.Item1.PowerToDo(self, eventInfo, power.Item2, power.Item3, power.Item4);
+                    }
                 }
             }
         }

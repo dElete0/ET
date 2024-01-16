@@ -31,6 +31,13 @@ namespace ET.Server
             }
         }
 
+        public static List<long> GetAllUnits(this CardGameComponent_Player self) {
+            List<long> units = new List<long>(self.Units);
+            var enemyCards = self.GetParent<RoomPlayer>().GetEnemy().GetComponent<CardGameComponent_Player>();
+            units.AddRange(enemyCards.Units);
+            return units;
+        }
+
         public static bool Contains(this long[] self, long id) {
             foreach (var cardId in self) {
                 if (cardId == id)

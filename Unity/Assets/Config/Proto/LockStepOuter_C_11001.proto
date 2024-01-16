@@ -54,6 +54,12 @@ message C2Room_ChangeGameSceneFinish // IRoomMessage
 	int64 PlayerId = 1;
 }
 
+message C2Room_SelectCard // IRoomMessage
+{
+	int64 PlayerId = 1;
+	int64 CardId = 2;
+}
+
 message CardGameUnitInfo
 {
 	int64 PlayerId = 1;
@@ -250,13 +256,6 @@ message C2Room_UseCard // IRoomMessage
 	int32 Pos = 4;
 }
 
-// 发现
-message C2Room_SelectCard // IRoomMessage
-{
-	int64 PlayerId = 1;
-	int64 Card = 2;
-}
-
 message Room2C_UseCard // IMessage
 {
 	RoomCardInfo Card = 1;
@@ -389,4 +388,52 @@ message Room2C_AttackCountEnough // IMessage
 {
 	int64 CardId = 1;
 	bool AttackCountEnough = 2;
+}
+
+message Room2C_CardsGetDamage // IMessage
+{
+	repeated RoomCardInfo Card = 1;
+ 	repeated int32 hurt = 2;
+}
+
+message Room2C_CallUnits // IMessage
+{
+	repeated RoomCardInfo Units = 1;
+	repeated int64 Order = 2;
+}
+
+message Room2C_EnemyCallUnits // IMessage
+{
+	repeated RoomCardInfo Units = 1;
+	repeated int64 Order = 2;
+}
+
+message Room2C_FlashMyUnit // IMessage
+{
+	repeated RoomCardInfo Units = 1;
+}
+
+message Room2C_FlashEnemyUnit // IMessage
+{
+	repeated RoomCardInfo Units = 1;
+}
+
+message Room2C_FlashUnit // IMessage
+{
+	RoomCardInfo Units = 1;
+}
+
+message Room2C_FindCardsToShow // IMessage
+{
+	repeated RoomCardInfo Cards = 1;
+}
+
+message Room2C_GetHandCards // IMessage
+{
+	repeated RoomCardInfo Cards = 1;
+}
+
+message Room2C_EnemyGetHandCards // IMessage
+{
+	repeated RoomCardInfo Cards = 1;
 }

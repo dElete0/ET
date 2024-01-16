@@ -64,6 +64,10 @@ namespace ET.Client
             self.MyGroup = rc.Get<GameObject>("MyGroup");
             self.EnemyGroup = rc.Get<GameObject>("EnemyGroup");
             self.GetHandCardShowPos = rc.Get<GameObject>("GetHandCardShowPos");
+            
+            // Select
+            self.UISelect = rc.Get<GameObject>("UISelect");
+            self.UISelect.SetActive(false);
 
             // Model
             self.UICard = rc.Get<GameObject>("UICard");
@@ -399,6 +403,92 @@ namespace ET.Client
             if (target != null) return target;
             target = self.GetMyAgent(vector2);
             if (target != null) return target;
+            return null;
+        }
+
+        public static GameObject GetUnitTarget(this UICGGameComponent self, Vector2 vector2) {
+            GameObject target = null;
+            target = self.GetEnemyUnit(vector2);
+            if (target != null) return target;
+            target = self.GetMyUnit(vector2);
+            if (target != null) return target;
+            return null;
+        }
+        
+        public static GameObject GetEnemyUnitTarget(this UICGGameComponent self, Vector2 vector2) {
+            GameObject target = null;
+            target = self.GetEnemyUnit(vector2);
+            if (target != null) return target;
+            return null;
+        }
+        
+        public static GameObject GetMyUnitTarget(this UICGGameComponent self, Vector2 vector2) {
+            GameObject target = null;
+            target = self.GetMyUnit(vector2);
+            if (target != null) return target;
+            return null;
+        }
+        
+        public static GameObject GetEnemyAgentTarget(this UICGGameComponent self, Vector2 vector2) {
+            GameObject target = null;
+            target = self.GetEnemyAgent(vector2);
+            if (target != null) return target;
+            return null;
+        }
+        
+        public static GameObject GetMyAgentTarget(this UICGGameComponent self, Vector2 vector2) {
+            GameObject target = null;
+            target = self.GetMyAgent(vector2);
+            if (target != null) return target;
+            return null;
+        }
+
+        public static GameObject GetMyActorTarget(this UICGGameComponent self, Vector2 vector2) {
+            GameObject target = null;
+            target = self.GetMyUnit(vector2);
+            if (target != null) return target;
+            target = self.GetMyHero(vector2);
+            if (target != null) return target;
+            target = self.GetMyAgent(vector2);
+            if (target != null) return target;
+            return null;
+        }
+        
+        public static GameObject GetEnemyActorTarget(this UICGGameComponent self, Vector2 vector2)
+        {
+            GameObject target = null;
+            target = self.GetEnemyHero(vector2);
+            if (target != null) return target;
+            target = self.GetEnemyAgent(vector2);
+            if (target != null) return target;
+            target = self.GetEnemyUnit(vector2);
+            if (target != null) return target;
+            return null;
+        }
+        
+        public static UIUnitInfo GetUIUnitInfoById(this UICGGameComponent uicgGameComponent, long id) {
+            foreach (var cardUnitInfo in uicgGameComponent.HeroAndAgent)
+            {
+                if (id == cardUnitInfo.CardId)
+                {
+                    return cardUnitInfo;
+                }
+            }
+            foreach (var cardUnitInfo in uicgGameComponent.MyFightUnits)
+            {
+                if (id == cardUnitInfo.CardId)
+                {
+                    return cardUnitInfo;
+                }
+            }
+            foreach (var cardUnitInfo in uicgGameComponent.EnemyFightUnits)
+            {
+                if (id == cardUnitInfo.CardId)
+                {
+                    return cardUnitInfo;
+                }
+            }
+
             return null;
         }
 

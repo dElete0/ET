@@ -4,7 +4,8 @@ namespace ET.Client
     public class EventType_CallUnit : AEvent<Scene, CallUnit>
     {
         protected override async ETTask Run(Scene scene, CallUnit args) {
-            await scene.GetComponent<Room>().Room2C_CallUnit(args.Card, true);
+            //Log.Warning($"处理占位消息{args.Card.CardId}");
+            await scene.GetComponent<Room>().CallUnit(args.Card, true);
             await scene.GetComponent<Room>().OrderUnits(args.UnitsOrder, true);
         }
     }

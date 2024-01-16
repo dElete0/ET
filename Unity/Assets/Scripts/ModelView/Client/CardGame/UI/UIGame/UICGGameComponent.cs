@@ -50,6 +50,10 @@ namespace ET.Client
         public GameObject UICard, UIUnit, UIEnemyHandCard;
         public UIUnitInfo UIShowCardInfo, UIUnitShowInfo;
         public GameObject HurtUI;
+        
+        // Select
+        public GameObject UISelect;
+        public List<UIUnitInfo> UISelectInfos = new List<UIUnitInfo>();
 
         //Deck
         public GameObject MyHandCardsDeck;

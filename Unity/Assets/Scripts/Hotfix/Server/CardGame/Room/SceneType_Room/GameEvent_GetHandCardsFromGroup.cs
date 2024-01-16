@@ -31,7 +31,7 @@ namespace ET.Server {
                 }
 
                 Log.Debug("展示抽卡:" + i + "/" + count);
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCard(roomEventTypeComponent, player, card), eventInfo);
+                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardFromShowCard(roomEventTypeComponent, player, card), eventInfo);
                 roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.RemoveCardFromGroup(roomEventTypeComponent, player, card), eventInfo);
 
                 RoomCardInfo myCard = roomCard.RoomCard2MyHandCardInfo();

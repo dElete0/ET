@@ -12,6 +12,7 @@ namespace ET.Client {
             UI ui = uiComponent.AddChild<UI, string, GameObject>(UIType.UICGGame, gameObject);
             UICGGameComponent uicgGameComponent = ui.AddComponent<UICGGameComponent>();
             uicgGameComponent.AddComponent<UIAnimComponent>();
+            UICGGameHelper.CreateSelectInfo(uicgGameComponent);
             await uicgGameComponent.CreateUIShowCard();
             await uicgGameComponent.CreateUIUnitShowInfo();
             return ui;

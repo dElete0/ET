@@ -29,11 +29,13 @@ namespace ET.Server
                     PlayerId = rp.Id,
                 });
             }
-            
-            room.Init(room2CStart.UnitInfo, room2CStart.StartTime);
 
-            // 挂载CGServerUpdater,同时初始化各种逻辑
+            // 挂载房间的必要脚本
             room.AddComponent<CGServerUpdater>();
+            room.AddComponent<ObjectWait>();
+            
+            //游戏开始
+            room.Init(room2CStart.UnitInfo, room2CStart.StartTime);
 
             RoomMessageHelper.BroadCast(room, room2CStart);
         }
