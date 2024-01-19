@@ -88,9 +88,9 @@ namespace ET
 		public int Effect1Type { get; set; }
 		/// <summary></summary>
 		public int Effect1From { get; set; }
-		/// <summary></summary>
+		/// <summary>魔法伤害值//召唤单位BaseId</summary>
 		public int Effect1Num1 { get; set; }
-		/// <summary></summary>
+		/// <summary>召唤单位数量</summary>
 		public int Effect1Num2 { get; set; }
 		/// <summary></summary>
 		public int Effect1Num3 { get; set; }

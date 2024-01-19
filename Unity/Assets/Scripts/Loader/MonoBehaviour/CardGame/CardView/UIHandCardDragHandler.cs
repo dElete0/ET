@@ -24,7 +24,7 @@ namespace ET {
         public Func<bool> IsDragEnable;
         public Action<bool> BeSelect;
         public bool IsMy;
-        private float UI_Alpha = 1f;
+        public float UI_Alpha = 1f;
         private bool IsFindTarget;
         //鼠标位置
         Vector3 offset = Vector3.zero;
@@ -144,17 +144,20 @@ namespace ET {
             if (IsCardBeDrag.Contains(this)) IsCardBeDrag.Remove(this);
             this.IsBeDrag.Invoke(false);
             if (IsDragEnable.Invoke()) {
+                Log.Warning("本次拖拽有效");
                 if (this.TryToDoInClient.Invoke()) {
-                    //如果是需要二次选择目标的卡牌
+                    Log.Warning("需要二次选择目标的卡牌");
                     IsFindTarget = true;
                     this.UI_Alpha = 0f;
                     UIArrowHandler.Begin = this.transform;
                     UIArrowHandler.IsFindTarget = true;
                 } else {
+                    Log.Warning("可以直接打出的牌，动画恢复");
                     UIUnitShowHandler.NotFollow();
                     CardPos.Invoke(new Vector3(10000,0,0));
                 }
             } else {
+                Log.Warning("本次拖拽无效");
                 UIUnitShowHandler.NotFollow();
                 CardPos.Invoke(new Vector3(10000,0,0));
             }
@@ -168,10 +171,13 @@ namespace ET {
             IsFindTarget = false;
             UIArrowHandler.IsFindTarget = false;
             UIUnitShowHandler.NotFollow();
-            this.UI_Alpha = 1f;
+            this.UI_Alpha = 0f;
             if (SetUnitTargetToDo.Invoke()) {
+                Log.Warning("使用单位牌成功");
                 CardPos.Invoke(new Vector3(10000,0,0));
             } else {
+                Log.Warning("使用单位牌失败");
+                this.UI_Alpha = 1f;
                 this.CancelTarget.Invoke();
             }
         }

@@ -39,7 +39,7 @@ namespace ET.Server
             self.GetParent<Room>().GetComponent<RoomEventTypeComponent>().PlayerEventTypeComponents.Remove(self);
         }
 
-        public static bool SendTriggeerEvent(this PlayerEventTypeComponent self, GameEvent eventType, EventInfo eventInfo)
+        public static async ETTask<bool> SendTriggeerEvent(this PlayerEventTypeComponent self, GameEvent eventType, EventInfo eventInfo)
         {
             //通知所有监听器
             foreach (var kv in self.WaitGameEventTypes)
@@ -48,7 +48,7 @@ namespace ET.Server
                 if (eventType.IsDispose) return true;
                 if (kv.Key.Triggeer.Invoke(eventType)) {
                     //Log.Warning($"服务器事件:{kv.Value.GameEventType}被{eventType.GameEventType}触发");
-                    kv.Value.ToDo(eventType, eventInfo);
+                    await kv.Value.ToDo(eventType, eventInfo);
                 }
             }
 

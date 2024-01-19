@@ -6,8 +6,9 @@ namespace ET.Server {
     [FriendOfAttribute(typeof(ET.RoomCard))]
     public static class GameEvent_GetHandCard
     {
-        public static void ToDo_GetHandCardFromShowCard(this RoomEventTypeComponent room, RoomPlayer player, long card)
+        public static async ETTask ToDo_GetHandCardFromShowCard(this RoomEventTypeComponent room, RoomPlayer player, long card)
         {
+            await ETTask.CompletedTask;
             CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
             // Log.Debug("展示的卡加入手牌");
             playerInfo.HandCards.Add(card);
@@ -23,7 +24,8 @@ namespace ET.Server {
             RoomMessageHelper.ServerSendMessageToClient(player, room2C_GetHandCardFromShowCard);
         }
 
-        public static void ToDo_GetHandCards(this RoomEventTypeComponent room, RoomPlayer player, List<RoomCard> cards) {
+        public static async ETTask ToDo_GetHandCards(this RoomEventTypeComponent room, RoomPlayer player, List<RoomCard> cards) {
+            await ETTask.CompletedTask;
             CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
             // Log.Debug("展示的卡加入手牌");
             foreach (var card in cards) {
@@ -81,7 +83,7 @@ namespace ET.Server {
             card.PlayerId = player.Id;
             card.AttributePowers = new List<Power_Type>(baseCard.AttributePowers);
             card.OtherPowers = new List<Power_Struct>(baseCard.OtherPowers);
-            await room.BroadAndSettleEvent(GameEventFactory.GetHandCards(room, player, new List<RoomCard>(){card}), eventInfo);
+            await room.BroadEvent(GameEventFactory.GetHandCards(room, player, new List<RoomCard>(){card}), eventInfo);
             Log.Warning(num);
             if (num > 1) {
                 eventInfo.PowerStructs.Add((new Power_Struct() {

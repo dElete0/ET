@@ -525,6 +525,12 @@ namespace ET
 		[MemoryPackOrder(4)]
 		public int HP { get; set; }
 
+		[MemoryPackOrder(19)]
+		public int Armor { get; set; }
+
+		[MemoryPackOrder(20)]
+		public int UnitType { get; set; }
+
 		[MemoryPackOrder(5)]
 		public int Cost { get; set; }
 
@@ -575,6 +581,8 @@ namespace ET
 			this.Type = default;
 			this.Attack = default;
 			this.HP = default;
+			this.Armor = default;
+			this.UnitType = default;
 			this.Cost = default;
 			this.Red = default;
 			this.Blue = default;
@@ -1605,6 +1613,28 @@ namespace ET
 
 	}
 
+	[Message(LockStepOuter.Room2C_RemoveUnits)]
+	[MemoryPackable]
+	public partial class Room2C_RemoveUnits: MessageObject, IMessage
+	{
+		public static Room2C_RemoveUnits Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_RemoveUnits), isFromPool) as Room2C_RemoveUnits; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<long> CardIds { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.CardIds.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	[Message(LockStepOuter.Room2C_AttackCountEnough)]
 	[MemoryPackable]
 	public partial class Room2C_AttackCountEnough: MessageObject, IMessage
@@ -1841,6 +1871,188 @@ namespace ET
 
 	}
 
+	[Message(LockStepOuter.Room2C_RiskSuccess)]
+	[MemoryPackable]
+	public partial class Room2C_RiskSuccess: MessageObject, IMessage
+	{
+		public static Room2C_RiskSuccess Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_RiskSuccess), isFromPool) as Room2C_RiskSuccess; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Card { get; set; }
+
+		[MemoryPackOrder(1)]
+		public bool IsRiskSuccess { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			this.IsRiskSuccess = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_ShowUseCard)]
+	[MemoryPackable]
+	public partial class Room2C_ShowUseCard: MessageObject, IMessage
+	{
+		public static Room2C_ShowUseCard Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_ShowUseCard), isFromPool) as Room2C_ShowUseCard; 
+		}
+
+		[MemoryPackOrder(0)]
+		public RoomCardInfo Card { get; set; }
+
+		[MemoryPackOrder(1)]
+		public bool IsMy { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Card = default;
+			this.IsMy = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_GetArmor)]
+	[MemoryPackable]
+	public partial class Room2C_GetArmor: MessageObject, IMessage
+	{
+		public static Room2C_GetArmor Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_GetArmor), isFromPool) as Room2C_GetArmor; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int Num { get; set; }
+
+		[MemoryPackOrder(1)]
+		public bool IsMy { get; set; }
+
+		[MemoryPackOrder(2)]
+		public int Now { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Num = default;
+			this.IsMy = default;
+			this.Now = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_TreatTergets)]
+	[MemoryPackable]
+	public partial class Room2C_TreatTergets: MessageObject, IMessage
+	{
+		public static Room2C_TreatTergets Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_TreatTergets), isFromPool) as Room2C_TreatTergets; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		[MemoryPackOrder(1)]
+		public List<int> Nums { get; set; } = new();
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			this.Nums.Clear();
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_AddCardsToGroupShow)]
+	[MemoryPackable]
+	public partial class Room2C_AddCardsToGroupShow: MessageObject, IMessage
+	{
+		public static Room2C_AddCardsToGroupShow Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_AddCardsToGroupShow), isFromPool) as Room2C_AddCardsToGroupShow; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		[MemoryPackOrder(1)]
+		public bool IsMy { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			this.IsMy = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_AddCardsToGroupHide)]
+	[MemoryPackable]
+	public partial class Room2C_AddCardsToGroupHide: MessageObject, IMessage
+	{
+		public static Room2C_AddCardsToGroupHide Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_AddCardsToGroupHide), isFromPool) as Room2C_AddCardsToGroupHide; 
+		}
+
+		[MemoryPackOrder(0)]
+		public int Num { get; set; }
+
+		[MemoryPackOrder(1)]
+		public bool IsMy { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Num = default;
+			this.IsMy = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
+	[Message(LockStepOuter.Room2C_LoseArmor)]
+	[MemoryPackable]
+	public partial class Room2C_LoseArmor: MessageObject, IMessage
+	{
+		public static Room2C_LoseArmor Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_LoseArmor), isFromPool) as Room2C_LoseArmor; 
+		}
+
+		[MemoryPackOrder(0)]
+		public bool IsMy { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.IsMy = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	public static class LockStepOuter
 	{
 		 public const ushort C2G_Match = 11002;
@@ -1900,15 +2112,23 @@ namespace ET
 		 public const ushort Room2C_GetColor = 11056;
 		 public const ushort Room2C_LoseHandCard = 11057;
 		 public const ushort Room2C_UnitDead = 11058;
-		 public const ushort Room2C_AttackCountEnough = 11059;
-		 public const ushort Room2C_CardsGetDamage = 11060;
-		 public const ushort Room2C_CallUnits = 11061;
-		 public const ushort Room2C_EnemyCallUnits = 11062;
-		 public const ushort Room2C_FlashMyUnit = 11063;
-		 public const ushort Room2C_FlashEnemyUnit = 11064;
-		 public const ushort Room2C_FlashUnit = 11065;
-		 public const ushort Room2C_FindCardsToShow = 11066;
-		 public const ushort Room2C_GetHandCards = 11067;
-		 public const ushort Room2C_EnemyGetHandCards = 11068;
+		 public const ushort Room2C_RemoveUnits = 11059;
+		 public const ushort Room2C_AttackCountEnough = 11060;
+		 public const ushort Room2C_CardsGetDamage = 11061;
+		 public const ushort Room2C_CallUnits = 11062;
+		 public const ushort Room2C_EnemyCallUnits = 11063;
+		 public const ushort Room2C_FlashMyUnit = 11064;
+		 public const ushort Room2C_FlashEnemyUnit = 11065;
+		 public const ushort Room2C_FlashUnit = 11066;
+		 public const ushort Room2C_FindCardsToShow = 11067;
+		 public const ushort Room2C_GetHandCards = 11068;
+		 public const ushort Room2C_EnemyGetHandCards = 11069;
+		 public const ushort Room2C_RiskSuccess = 11070;
+		 public const ushort Room2C_ShowUseCard = 11071;
+		 public const ushort Room2C_GetArmor = 11072;
+		 public const ushort Room2C_TreatTergets = 11073;
+		 public const ushort Room2C_AddCardsToGroupShow = 11074;
+		 public const ushort Room2C_AddCardsToGroupHide = 11075;
+		 public const ushort Room2C_LoseArmor = 11076;
 	}
 }

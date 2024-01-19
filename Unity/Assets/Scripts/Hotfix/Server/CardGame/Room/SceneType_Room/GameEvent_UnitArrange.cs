@@ -7,36 +7,23 @@ namespace ET.Server;
 [FriendOfAttribute(typeof(ET.Server.CardEventTypeComponent))]
 public static class GameEvent_UnitArrange
 {
-    public static void ToDo_UnitArrange(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card, RoomCard target, RoomPlayer player)
+    public static async ETTask ToDo_UnitArrange(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card, RoomCard target, RoomPlayer player)
     {
         List<Power_Struct> powerStructs = card.GetArranges();
         foreach (var power in powerStructs)
         {
-            power.PowerToDo(roomEventTypeComponent, eventInfo, card, target, player);
+            await power.PowerToDo(roomEventTypeComponent, eventInfo, card, target, player);
         }
     }
 
-    public static void ToDo_AuraEffect(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card, RoomPlayer player) {
+    public static async ETTask ToDo_AuraEffect(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card, RoomPlayer player) {
         List<Power_Struct> powerStructs = card.GetAura();
         foreach (var power in powerStructs)
         {
-            power.PowerToDo(roomEventTypeComponent, eventInfo, card, null, player);
+            await power.PowerToDo(roomEventTypeComponent, eventInfo, card, null, player);
         }
 
         CardEventTypeComponent cardEventTypeComponent = card.GetComponent<CardEventTypeComponent>();
-        
-        {
-            //死亡或沉默，光环失效
-            TriggerEvent triggerEvent = new TriggerEvent((gameEvent) => {
-                if (gameEvent.GameEventType == GameEventType.DeadOver &&
-                    gameEvent.Actor == card.Id)
-                {
-                    return true;
-                }
-                return false;
-            });
-            cardEventTypeComponent.UnitGameEventTypes.Add(triggerEvent, GameEventFactory.AuraUnEffect(roomEventTypeComponent, card));
-        }
 
         {
             //新单位上场，光环生效
@@ -52,16 +39,16 @@ public static class GameEvent_UnitArrange
         }
     }
 
-    public static void ToDo_AuraUnEffect(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card)
+    public static async ETTask ToDo_AuraUnEffect(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card)
     {
         List<Power_Struct> powerStructs = card.GetAura();
         foreach (var power in powerStructs)
         {
-            power.PowerToLose(roomEventTypeComponent, eventInfo, card, null, null);
+            await power.PowerToLose(roomEventTypeComponent, eventInfo, card, null, null);
         }
     }
 
-    public static void ToDo_AuraEffectToTarget(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card, GameEvent trigger) {
+    public static async ETTask ToDo_AuraEffectToTarget(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card, GameEvent trigger) {
         List<Power_Struct> powerStructs = card.GetAura();
         foreach (var power in powerStructs) {
             Power_Struct powerStruct = new Power_Struct();
@@ -71,12 +58,13 @@ public static class GameEvent_UnitArrange
             powerStruct.Count2 = power.Count2;
             powerStruct.Count3 = power.Count3;
             powerStruct.TriggerEvent = trigger;
-            powerStruct.AuraPowerToTarget(roomEventTypeComponent, eventInfo, card, null, null);
+            await powerStruct.AuraPowerToTarget(roomEventTypeComponent, eventInfo, card, null, null);
         }
     }
 
-    public static void ToDo_AttributeAuraEffect(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card, Power_Struct power)
+    public static async ETTask ToDo_AttributeAuraEffect(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard card, Power_Struct power)
     {
+        await ETTask.CompletedTask;
         RoomPlayer player = card.GetOwner();
         CardGameComponent_Cards cardGameComponentCards = roomEventTypeComponent.GetParent<Room>().GetComponent<CardGameComponent_Cards>();
         CardGameComponent_Player cards = player.GetComponent<CardGameComponent_Player>();
@@ -97,7 +85,8 @@ public static class GameEvent_UnitArrange
         RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
     }
 
-    public static void ToDo_AttributeAuraUnEffect(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, Power_Struct power) {
+    public static async ETTask ToDo_AttributeAuraUnEffect(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, Power_Struct power) {
+        await ETTask.CompletedTask;
         RoomPlayer player = actor.GetOwner();
         CardGameComponent_Cards cardGameComponentCards = roomEventTypeComponent.GetParent<Room>().GetComponent<CardGameComponent_Cards>();
         CardGameComponent_Player cards = player.GetComponent<CardGameComponent_Player>();
@@ -124,7 +113,8 @@ public static class GameEvent_UnitArrange
         RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
     }
 
-    public static void ToDo_AttributeAuraEffectToTarget(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, GameEvent trigger, int num) {
+    public static async ETTask ToDo_AttributeAuraEffectToTarget(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, GameEvent trigger, int num) {
+        await ETTask.CompletedTask;
         RoomPlayer player = actor.GetOwner();
         CardGameComponent_Cards cards = actor.GetParent<CardGameComponent_Cards>();
         RoomCard target = null;

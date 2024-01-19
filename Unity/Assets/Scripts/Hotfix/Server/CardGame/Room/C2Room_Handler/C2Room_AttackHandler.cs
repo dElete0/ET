@@ -20,7 +20,6 @@ namespace ET.Server
 
         public static async ETTask C2Room_Attack(Room room, C2Room_Attack message)
         {
-            await ETTask.CompletedTask;
             RoomEventTypeComponent roomEventTypeComponent = room.GetComponent<RoomEventTypeComponent>();
             CGServerUpdater serverUpdater = room.GetComponent<CGServerUpdater>();
             RoomPlayer roomPlayer = room.GetComponent<RoomServerComponent>().GetChild<RoomPlayer>(message.PlayerId);
@@ -109,7 +108,7 @@ namespace ET.Server
                 return;
             }
             roomEventTypeComponent.CountClear();
-            roomEventTypeComponent.Event_AttackTo(new EventInfo(), card, target);
+            await roomEventTypeComponent.Event_AttackTo(card, target);
         }
     }
 }

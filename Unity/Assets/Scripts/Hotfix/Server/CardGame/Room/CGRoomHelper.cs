@@ -37,15 +37,15 @@ namespace ET.Server {
             // 抽卡
             if (room.GetComponent<CGServerUpdater>().NowPlayer == player1.Id)
             {
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player1, 3), new EventInfo());
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player2, 4), new EventInfo());
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.TurnStart(roomEventTypeComponent, player1), new EventInfo());
+                await roomEventTypeComponent.SettleEventWithLock(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player1, 3), new EventInfo(0));
+                await roomEventTypeComponent.SettleEventWithLock(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player2, 4), new EventInfo(0));
+                await roomEventTypeComponent.SettleEventWithLock(GameEventFactory.TurnStart(roomEventTypeComponent, player1), new EventInfo(0));
             }
             else
             {
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player1, 4), new EventInfo());
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player2, 3), new EventInfo());
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.TurnStart(roomEventTypeComponent, player2), new EventInfo());
+                await roomEventTypeComponent.SettleEventWithLock(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player1, 4), new EventInfo(0));
+                await roomEventTypeComponent.SettleEventWithLock(GameEventFactory.GetHandCardsFromGroup(roomEventTypeComponent, player2, 3), new EventInfo(0));
+                await roomEventTypeComponent.SettleEventWithLock(GameEventFactory.TurnStart(roomEventTypeComponent, player2), new EventInfo(0));
             }
 
             room.GetComponent<CGServerUpdater>().GameState = GameState.Run;
@@ -64,6 +64,7 @@ namespace ET.Server {
             List<int> baseIds = new List<int>() {
                 300008, 
                 3000010,
+                5000062,
                 5000063,
                 5000032,
                 5000064,
@@ -220,8 +221,31 @@ namespace ET.Server {
                 Attack = roomCard.Attack,
                 HP = roomCard.HP,
                 Cost = roomCard.Cost,
+                Armor = roomCard.Armor,
                 CardPowers = powers,
             };
         }
+        
+        //获得随机角色
+        11
+        
+        //获得随机友方单位
+        11
+        
+        //获得随机敌方单位
+        11
+        
+        //获得随机单位
+        11
+        
+        //获得随机干员
+        11
+        //获得随机友方干员
+        11
+        //获得随机敌方干员
+        11
+        //获得随机友方角色
+        11
+        //获得随机敌方角色
     }
 }

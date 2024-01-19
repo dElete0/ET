@@ -15,12 +15,12 @@ namespace ET.Client
             UICGGameComponent uicgGameComponent = ui.GetComponent<UICGGameComponent>();
             
             UIUnitInfo uiUnitInfo = uicgGameComponent.GetUIUnitInfoById(cardInfo.CardId);
-            
             if (uiUnitInfo == null) Log.Error($"获取UIUnitInfo失败:{cardInfo.CardId}");
+            Log.Warning($"客户端:{cardInfo.CardId}受到{hurt}点伤害");
             uicgGameComponent.GetComponent<UIAnimComponent>()
                     .AppendCallback(() => {
                         uiUnitInfo.HP.text = cardInfo.HP.ToString();
-                        uiUnitInfo.ShowCardGetDamage(room, hurt).Coroutine();
+                        uiUnitInfo.ShowCardGetDamage(uicgGameComponent, room, hurt);
                     });
         }
     }

@@ -15,7 +15,10 @@ namespace ET.Server {
         public int Count;
         //死亡标记
         public List<RoomCard> DeadList = new List<RoomCard>();
+        //移除标记
+        public List<RoomCard> RemoveList = new List<RoomCard>();
         //死亡结算后继续执行的能力
         public List<(Power_Struct, RoomCard, RoomCard, RoomPlayer)> PowerStructs = new List<(Power_Struct, RoomCard, RoomCard, RoomPlayer)>();
+        public EventInfo(int count) { Count = count; }
     }
 }

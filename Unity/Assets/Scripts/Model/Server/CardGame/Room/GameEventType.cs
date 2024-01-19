@@ -16,7 +16,7 @@ namespace ET.Server {
         public bool IsDispose;//是否失效
         public GameEventType GameEventType;
         //触发此事件的事件， 事件链Info
-        public Action<ETTask, GameEvent, EventInfo> ToDo;
+        public Func<GameEvent, EventInfo, ETTask> ToDo;
         public int Count1, Count2, Count3;
         public long Actor, Target, Player;
 
@@ -79,5 +79,18 @@ namespace ET.Server {
         
         KillAllUnit = 141,
         FindAndCloneCard = 142,
+        GetQualifications = 143,
+        GetArmor = 144,
+        TargetGetPower = 145,
+        
+        RemoveTargetUnit = 146,
+        RemoveUnits = 147,
+        TreatTarget = 148,
+        AddCardToGroup = 149,
+        SwapArmor = 150,
+        
+        TargetGetAttribute = 151,
+        GoldenShip = 152,
+        PowerToUseCard = 153,
     }
 }

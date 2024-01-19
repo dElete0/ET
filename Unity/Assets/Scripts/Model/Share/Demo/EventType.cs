@@ -67,6 +67,11 @@ namespace ET.Client {
         public bool IsMy;
     }
 
+    public struct GetArmor {
+        public int Num;
+        public bool IsMy;
+    }
+
     public struct FlashMyUnits {
         public List<RoomCardInfo> Cards;
     }
@@ -138,6 +143,21 @@ namespace ET.Client {
         public RoomCardInfo Card;
     }
 
+    public struct RiskSuccess {
+        public RoomCardInfo Card;
+        public bool IsSuccess;
+    }
+
+    public struct ShowUseCard {
+        public RoomCardInfo Card;
+        public bool IsMy;
+    }
+
+    public struct TreatTergets {
+        public List<RoomCardInfo> CardInfos;
+        public List<int> Nums;
+    }
+
     public struct GetHandCards {
         public List<RoomCardInfo> Cards;
     }
@@ -187,5 +207,15 @@ namespace ET.Client {
     public struct RoomCardAttack {
         public long ActorId;
         public long TargetId;
+    }
+
+    public struct AddCardsToGroupShow {
+        public List<RoomCardInfo> Cards;
+        public bool IsMy;
+    }
+    
+    public struct AddCardsToGroupHide {
+        public int Num;
+        public bool IsMy;
     }
 }

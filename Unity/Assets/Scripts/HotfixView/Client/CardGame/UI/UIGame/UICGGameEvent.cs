@@ -15,6 +15,7 @@ namespace ET.Client {
             UICGGameHelper.CreateSelectInfo(uicgGameComponent);
             await uicgGameComponent.CreateUIShowCard();
             await uicgGameComponent.CreateUIUnitShowInfo();
+            await uicgGameComponent.CreateHeroAndAgent();
             return ui;
         }
 

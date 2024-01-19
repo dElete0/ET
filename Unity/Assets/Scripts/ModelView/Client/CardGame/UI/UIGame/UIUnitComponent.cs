@@ -43,6 +43,8 @@ namespace ET.Client
         public Text Grey;
         public Text Black;
         public Text White;
+        
+        public Text Armor;
 
         public Text Attack { set; get; }
         public Text HP;

@@ -18,17 +18,16 @@ namespace ET.Server
         {
             await C2Room_UseCard(ai.GetParent<Room>(), message);
         } 
-        private static async ETTask C2Room_UseCard(Room room, C2Room_UseCard message)
-        {
-            await ETTask.CompletedTask;
+        private static async ETTask<bool> C2Room_UseCard(Room room, C2Room_UseCard message) {
             CGServerUpdater updater = room.GetComponent<CGServerUpdater>();
             RoomServerComponent roomServerComponent = room.GetComponent<RoomServerComponent>();
             RoomPlayer roomPlayer = roomServerComponent.GetChild<RoomPlayer>(message.PlayerId);
 
             if (updater.NowPlayer != roomPlayer.Id)
             {
+                Log.Warning($"{updater.NowPlayer}的回合，{roomPlayer.Id}无法操作");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.CantOperateNow });
-                return;
+                return false;
             }
 
             CardGameComponent_Cards cardGameComponentCards = room.GetComponent<CardGameComponent_Cards>();
@@ -39,12 +38,12 @@ namespace ET.Server
 
             if (playerInfo.Units.Count >= CardGameMsg.UnitMax) {
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.CantGetMoreUnit });
-                return;
+                return false;
             }
             if (playerInfo.Cost < card.Cost)
             {
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.NotEnoughCost });
-                return;
+                return false;
             }
 
             if (card.UseCardType != UseCardType.NoTarget && target == null) {
@@ -57,11 +56,14 @@ namespace ET.Server
                 } else if (card.UseCardType == UseCardType.ToEnemyUnit && enemyCount < 1) {
                     
                 }
-                return;
+                Log.Warning("给的单位没目标");
+                return false;
             }
             RoomEventTypeComponent roomEventTypeComponent = roomPlayer.GetParent<Room>().GetComponent<RoomEventTypeComponent>();
             roomEventTypeComponent.CountClear();
-            roomEventTypeComponent.Event_UseCard(new EventInfo(), roomPlayer, card, target, message.Pos);
+            Log.Warning(target == null);
+            await roomEventTypeComponent.Event_UseCard(roomPlayer, card, target, message.Pos);
+            return true;
         }
     }
 }

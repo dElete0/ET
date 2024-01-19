@@ -42,12 +42,6 @@ namespace ET.Client
             self.EnemyGrey = rc.Get<GameObject>("EnemyGrey").GetComponentInChildren<Text>();
 
             // HeroDeck
-            self.MyHero = rc.Get<GameObject>("MyHero");
-            self.EnemyHero = rc.Get<GameObject>("EnemyHero");
-            self.MyAgent1 = rc.Get<GameObject>("MyAgent1");
-            self.MyAgent2 = rc.Get<GameObject>("MyAgent2");
-            self.EnemyAgent1 = rc.Get<GameObject>("EnemyAgent1");
-            self.EnemyAgent2 = rc.Get<GameObject>("EnemyAgent2");
             self.MyTalkUI = rc.Get<GameObject>("MyTalkUI").GetComponentInChildren<Text>();
             self.EnemyTalkUI = rc.Get<GameObject>("EnemyTalkUI").GetComponentInChildren<Text>();
             self.MyTalkUI.transform.parent.gameObject.SetActive(false);
@@ -157,6 +151,40 @@ namespace ET.Client
             self.EnemyTalkSequence = DOTween.Sequence()
                     .AppendInterval(waitTime)
                     .AppendCallback(() => talkUI.transform.parent.gameObject.SetActive(false));
+        }
+
+        public static async ETTask CreateHeroAndAgent(this UICGGameComponent self) {
+            ReferenceCollector rc = self.GetParent<UI>().GameObject.GetComponent<ReferenceCollector>();
+            self.MyHero = self.CreateHero(rc.Get<GameObject>("MyHero"));
+            self.EnemyHero = self.CreateHero(rc.Get<GameObject>("EnemyHero"));
+            self.MyAgent1 = self.CreateAgent(rc.Get<GameObject>("MyAgent1"));
+            self.MyAgent2 = self.CreateAgent(rc.Get<GameObject>("MyAgent2"));
+            self.EnemyAgent1 = self.CreateAgent(rc.Get<GameObject>("EnemyAgent1"));
+            self.EnemyAgent2 = self.CreateAgent(rc.Get<GameObject>("EnemyAgent2"));
+            await ETTask.CompletedTask;
+        }
+        
+        private static UIUnitInfo CreateAgent(this UICGGameComponent uicgGameComponent, GameObject agentGo) {
+            ReferenceCollector rc = agentGo.GetComponent<ReferenceCollector>();
+            UIUnitInfo unitInfo = uicgGameComponent.GetComponent<UIAnimComponent>().AddChild<UIUnitInfo, GameObject>(agentGo);
+            unitInfo.Attack = rc.Get<GameObject>("Attack").GetComponentInChildren<Text>();
+            unitInfo.HP = rc.Get<GameObject>("HP").GetComponentInChildren<Text>();
+            unitInfo.Image = rc.Get<GameObject>("Image").GetComponent<Image>();
+            uicgGameComponent.HeroAndAgent.Add(unitInfo);
+            return unitInfo;
+        }
+
+        private static UIUnitInfo CreateHero(this UICGGameComponent uicgGameComponent, GameObject hero) {
+            ReferenceCollector rc = hero.GetComponent<ReferenceCollector>();
+            UIUnitInfo unitInfo = uicgGameComponent.GetComponent<UIAnimComponent>().AddChild<UIUnitInfo, GameObject>(hero);
+            unitInfo.Attack = rc.Get<GameObject>("Attack").GetComponentInChildren<Text>();
+            unitInfo.HP = rc.Get<GameObject>("HP").GetComponentInChildren<Text>();
+            unitInfo.Armor = rc.Get<GameObject>("Armor").GetComponentInChildren<Text>();
+            unitInfo.Image = rc.Get<GameObject>("Image").GetComponent<Image>();
+            uicgGameComponent.HeroAndAgent.Add(unitInfo);
+            unitInfo.Attack.transform.parent.gameObject.SetActive(false);
+            unitInfo.Armor.transform.parent.gameObject.SetActive(false);
+            return unitInfo;
         }
 
         public static async ETTask CreateUIShowCard(this UICGGameComponent self) {
@@ -332,8 +360,14 @@ namespace ET.Client
         {
             if (self.MyFightUnits != null)
             {
+                for (int i = self.MyFightUnits.Count - 1; i > 0; --i) {
+                    if (self.MyFightUnits[i] == null) {
+                        self.MyFightUnits.RemoveAt(i);
+                    }
+                }
                 if (self.MyHandCardPos == -1)
                 {
+                    
                     for (int i = 0; i < self.MyFightUnits.Count; i++) {
                         self.MyFightUnits[i].TargetPos =
                                 (i * UICGGameComponent.UnitsDes - UICGGameComponent.UnitsDes / 2 * (self.MyFightUnits.Count - 1)) * Vector3.right +
@@ -363,6 +397,11 @@ namespace ET.Client
 
         private static void EnemyUnitsPos(this UICGGameComponent self)
         {
+            for (int i = self.EnemyFightUnits.Count - 1; i > 0; --i) {
+                if (self.EnemyFightUnits[i] == null) {
+                    self.EnemyFightUnits.RemoveAt(i);
+                }
+            }
             if (self.EnemyFightUnits != null)
             {
                 int i = 0;
@@ -376,9 +415,9 @@ namespace ET.Client
             }
         }
 
-        public static GameObject GetAttackTarget(this UICGGameComponent self, Vector2 vector2)
+        public static UIUnitInfo GetAttackTarget(this UICGGameComponent self, Vector2 vector2)
         {
-            GameObject target = null;
+            UIUnitInfo target = null;
             target = self.GetEnemyHero(vector2);
             if (target != null) return target;
             target = self.GetEnemyAgent(vector2);
@@ -388,9 +427,9 @@ namespace ET.Client
             return null;
         }
 
-        public static GameObject GetActorTarget(this UICGGameComponent self, Vector2 vector2)
+        public static UIUnitInfo GetActorTarget(this UICGGameComponent self, Vector2 vector2)
         {
-            GameObject target = null;
+            UIUnitInfo target = null;
             target = self.GetEnemyHero(vector2);
             if (target != null) return target;
             target = self.GetEnemyAgent(vector2);
@@ -406,8 +445,8 @@ namespace ET.Client
             return null;
         }
 
-        public static GameObject GetUnitTarget(this UICGGameComponent self, Vector2 vector2) {
-            GameObject target = null;
+        public static UIUnitInfo GetUnitTarget(this UICGGameComponent self, Vector2 vector2) {
+            UIUnitInfo target = null;
             target = self.GetEnemyUnit(vector2);
             if (target != null) return target;
             target = self.GetMyUnit(vector2);
@@ -415,36 +454,36 @@ namespace ET.Client
             return null;
         }
         
-        public static GameObject GetEnemyUnitTarget(this UICGGameComponent self, Vector2 vector2) {
-            GameObject target = null;
+        public static UIUnitInfo GetEnemyUnitTarget(this UICGGameComponent self, Vector2 vector2) {
+            UIUnitInfo target = null;
             target = self.GetEnemyUnit(vector2);
             if (target != null) return target;
             return null;
         }
         
-        public static GameObject GetMyUnitTarget(this UICGGameComponent self, Vector2 vector2) {
-            GameObject target = null;
+        public static UIUnitInfo GetMyUnitTarget(this UICGGameComponent self, Vector2 vector2) {
+            UIUnitInfo target = null;
             target = self.GetMyUnit(vector2);
             if (target != null) return target;
             return null;
         }
         
-        public static GameObject GetEnemyAgentTarget(this UICGGameComponent self, Vector2 vector2) {
-            GameObject target = null;
+        public static UIUnitInfo GetEnemyAgentTarget(this UICGGameComponent self, Vector2 vector2) {
+            UIUnitInfo target = null;
             target = self.GetEnemyAgent(vector2);
             if (target != null) return target;
             return null;
         }
         
-        public static GameObject GetMyAgentTarget(this UICGGameComponent self, Vector2 vector2) {
-            GameObject target = null;
+        public static UIUnitInfo GetMyAgentTarget(this UICGGameComponent self, Vector2 vector2) {
+            UIUnitInfo target = null;
             target = self.GetMyAgent(vector2);
             if (target != null) return target;
             return null;
         }
 
-        public static GameObject GetMyActorTarget(this UICGGameComponent self, Vector2 vector2) {
-            GameObject target = null;
+        public static UIUnitInfo GetMyActorTarget(this UICGGameComponent self, Vector2 vector2) {
+            UIUnitInfo target = null;
             target = self.GetMyUnit(vector2);
             if (target != null) return target;
             target = self.GetMyHero(vector2);
@@ -454,9 +493,9 @@ namespace ET.Client
             return null;
         }
         
-        public static GameObject GetEnemyActorTarget(this UICGGameComponent self, Vector2 vector2)
+        public static UIUnitInfo GetEnemyActorTarget(this UICGGameComponent self, Vector2 vector2)
         {
-            GameObject target = null;
+            UIUnitInfo target = null;
             target = self.GetEnemyHero(vector2);
             if (target != null) return target;
             target = self.GetEnemyAgent(vector2);
@@ -492,35 +531,35 @@ namespace ET.Client
             return null;
         }
 
-        private static GameObject GetEnemyHero(this UICGGameComponent self, Vector2 vector2)
+        private static UIUnitInfo GetEnemyHero(this UICGGameComponent self, Vector2 vector2)
         {
-            if (Mathf.Abs(vector2.x - self.EnemyHero.transform.position.x) < UICGGameComponent.FindTarget &&
-                Mathf.Abs(vector2.y - self.EnemyHero.transform.position.y) < UICGGameComponent.FindTarget)
+            if (Mathf.Abs(vector2.x - self.EnemyHero.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.EnemyHero.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
             {
                 return self.EnemyHero;
             }
             return null;
         }
 
-        private static GameObject GetMyHero(this UICGGameComponent self, Vector2 vector2)
+        private static UIUnitInfo GetMyHero(this UICGGameComponent self, Vector2 vector2)
         {
-            if (Mathf.Abs(vector2.x - self.MyHero.transform.position.x) < UICGGameComponent.FindTarget &&
-                Mathf.Abs(vector2.y - self.MyHero.transform.position.y) < UICGGameComponent.FindTarget)
+            if (Mathf.Abs(vector2.x - self.MyHero.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.MyHero.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
             {
                 return self.MyHero;
             }
             return null;
         }
 
-        private static GameObject GetEnemyAgent(this UICGGameComponent self, Vector2 vector2)
+        private static UIUnitInfo GetEnemyAgent(this UICGGameComponent self, Vector2 vector2)
         {
-            if (Mathf.Abs(vector2.x - self.EnemyAgent1.transform.position.x) < UICGGameComponent.FindTarget &&
-                Mathf.Abs(vector2.y - self.EnemyAgent1.transform.position.y) < UICGGameComponent.FindTarget)
+            if (Mathf.Abs(vector2.x - self.EnemyAgent1.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.EnemyAgent1.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
             {
                 return self.EnemyAgent1;
             }
-            if (Mathf.Abs(vector2.x - self.EnemyAgent2.transform.position.x) < UICGGameComponent.FindTarget &&
-                Mathf.Abs(vector2.y - self.EnemyAgent2.transform.position.y) < UICGGameComponent.FindTarget)
+            if (Mathf.Abs(vector2.x - self.EnemyAgent2.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.EnemyAgent2.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
             {
                 return self.EnemyAgent2;
             }
@@ -528,15 +567,15 @@ namespace ET.Client
             return null;
         }
 
-        private static GameObject GetMyAgent(this UICGGameComponent self, Vector2 vector2)
+        private static UIUnitInfo GetMyAgent(this UICGGameComponent self, Vector2 vector2)
         {
-            if (Mathf.Abs(vector2.x - self.MyAgent1.transform.position.x) < UICGGameComponent.FindTarget &&
-                Mathf.Abs(vector2.y - self.MyAgent1.transform.position.y) < UICGGameComponent.FindTarget)
+            if (Mathf.Abs(vector2.x - self.MyAgent1.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.MyAgent1.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
             {
                 return self.MyAgent1;
             }
-            if (Mathf.Abs(vector2.x - self.MyAgent2.transform.position.x) < UICGGameComponent.FindTarget &&
-                Mathf.Abs(vector2.y - self.MyAgent2.transform.position.y) < UICGGameComponent.FindTarget)
+            if (Mathf.Abs(vector2.x - self.MyAgent2.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
+                Mathf.Abs(vector2.y - self.MyAgent2.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
             {
                 return self.MyAgent2;
             }
@@ -544,7 +583,7 @@ namespace ET.Client
             return null;
         }
 
-        private static GameObject GetEnemyUnit(this UICGGameComponent self, Vector2 vector2)
+        private static UIUnitInfo GetEnemyUnit(this UICGGameComponent self, Vector2 vector2)
         {
 
             foreach (var unit in self.EnemyFightUnits)
@@ -552,14 +591,14 @@ namespace ET.Client
                 if (Mathf.Abs(vector2.x - unit.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
                     Mathf.Abs(vector2.y - unit.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
                 {
-                    return unit.CardGo;
+                    return unit;
                 }
             }
 
             return null;
         }
 
-        private static GameObject GetMyUnit(this UICGGameComponent self, Vector2 vector2)
+        private static UIUnitInfo GetMyUnit(this UICGGameComponent self, Vector2 vector2)
         {
 
             foreach (var unit in self.MyFightUnits)
@@ -567,7 +606,7 @@ namespace ET.Client
                 if (Mathf.Abs(vector2.x - unit.CardGo.transform.position.x) < UICGGameComponent.FindTarget &&
                     Mathf.Abs(vector2.y - unit.CardGo.transform.position.y) < UICGGameComponent.FindTarget)
                 {
-                    return unit.CardGo;
+                    return unit;
                 }
             }
 

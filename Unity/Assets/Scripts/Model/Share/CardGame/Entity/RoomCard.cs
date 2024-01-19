@@ -7,6 +7,7 @@ namespace ET {
     public class RoomCard : Entity, IAwake<int, long> {
         public int ConfigId { get; set; } //配置表id
         public CardType CardType;
+        public CardUnitType UnitType;
         public string Name;
 
         public long PlayerId;
@@ -17,6 +18,7 @@ namespace ET {
         public int HP;//当前血量
         public int Attack;
         public int AttackD;
+        public int Armor;
         
         //提供的资质
         public (CardColor, CardColor) Colors;
@@ -67,6 +69,26 @@ namespace ET {
         public TriggerPowerType TriggerPowerType;
         public int Count1, Count2, Count3;
         public GameEvent TriggerEvent;
+
+        public Power_Struct(Power_Struct basePower, int type, int count) {
+            this.PowerType = basePower.PowerType;
+            this.TriggerEvent = basePower.TriggerEvent;
+            this.TriggerPowerType = basePower.TriggerPowerType;
+            this.Count1 = basePower.Count1;
+            this.Count2 = basePower.Count2;
+            this.Count3 = basePower.Count3;
+            switch (type) {
+                case 1:
+                    this.Count1 += count;
+                    break;
+                case 2:
+                    this.Count2 += count;
+                    break;
+                case 3:
+                    this.Count3 += count;
+                    break;
+            }
+        }
     }
 
     // 触发方式
@@ -143,6 +165,17 @@ namespace ET {
         Weapon = 8,
         Building = 9,
         Agent = 10,
+        ExclusionZone = 11,
+    }
+    
+    public enum CardUnitType {
+        None = 0,
+        Legend = 1,
+        Nomal = 2,
+        God = 3,
+        Star = 5,
+        Building = 9,
+        ExclusionZone = 11,
     }
 
     public enum CallType {
@@ -167,6 +200,12 @@ namespace ET {
         Taunt = 108,
         // 不能攻击英雄
         CantAttackHeroAndAgent = 109,
+        // 风险
+        Risk = 110,
+        // 泡泡
+        Bubbles = 111,
+        // 传承
+        Inherit = 112,
         
         
         //每当你打出一张费用大于3的法术牌，获得1点攻击力
@@ -193,7 +232,7 @@ namespace ET {
         LetAgentAdd = 1011,
         // 抽牌
         GetHandCardFromGroup = 1012,
-        //造成伤害
+        //对目标造成伤害
         DamageHurt = 1013,
         //亵渎
         Desecrate = 1014,
@@ -211,7 +250,29 @@ namespace ET {
         KillTargetUnit = 1020,
         //消灭所有单位
         KillAllUnit = 1021,
-        //发现并复制牌库中的n张卡
+        //发现并复制目标来源的中的n张卡
         FindAndCloneCard = 1022,
+        //获得资质
+        GetQualifications = 1023,
+        //获得护甲
+        GetArmor = 1024,
+        //目标获得异能
+        TargetGetPower = 1025,
+        //移除目标单位
+        RemoveTargetUnit = 1026,
+        //治疗目标角色
+        TreatTarget = 1027,
+        //向牌库增加目标卡牌(显式)
+        AddCardToGroupShow = 1028,
+        //向牌库增加目标卡牌(隐式)
+        AddCardToGroupHide = 1029,
+        //交换双方护甲
+        SwapArmor = 1030,
+        //目标单位获得属性
+        TargetGetAttribute = 1031,
+        //跨越时代的黄金船
+        GoldenShip = 1032,
+        //打出一张牌
+        PowerToUseCard = 1033,
     }
 }

@@ -35,11 +35,11 @@ namespace ET.Client
         public Text EnemyBlack;
         public Text EnemyWhite;
 
-        public GameObject MyHero;
-        public GameObject MyAgent1, MyAgent2;
+        public UIUnitInfo MyHero;
+        public UIUnitInfo MyAgent1, MyAgent2;
 
-        public GameObject EnemyHero;
-        public GameObject EnemyAgent1, EnemyAgent2;
+        public UIUnitInfo EnemyHero;
+        public UIUnitInfo EnemyAgent1, EnemyAgent2;
 
         public Text MyTalkUI, EnemyTalkUI;
         public Sequence MyTalkSequence, EnemyTalkSequence;

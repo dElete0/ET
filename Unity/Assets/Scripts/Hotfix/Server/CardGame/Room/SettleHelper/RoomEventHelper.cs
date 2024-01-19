@@ -7,60 +7,22 @@ namespace ET.Server {
     {
 
         //回合结束
-        public static void Event_TurnOver(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomPlayer player)
+        public static async ETTask Event_TurnOver(this RoomEventTypeComponent roomEventTypeComponent, RoomPlayer player)
         {
             roomEventTypeComponent.CountClear();
-            roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.TurnStart(roomEventTypeComponent, player.GetNextRoomPlayer()), eventInfo);
+            await roomEventTypeComponent.SettleEventWithLock(GameEventFactory.TurnStart(roomEventTypeComponent, player.GetNextRoomPlayer()), new EventInfo(0));
         }
 
-        public static void Event_UseCard(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomPlayer player, RoomCard card, RoomCard target, int pos)
+        public static async ETTask Event_UseCard(this RoomEventTypeComponent roomEventTypeComponent, RoomPlayer player, RoomCard card, RoomCard target, int pos)
         {
-            roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.UseCard(roomEventTypeComponent, player, card, target, pos), eventInfo);
+            roomEventTypeComponent.CountClear();
+            await roomEventTypeComponent.SettleEventWithLock(GameEventFactory.UseCard(roomEventTypeComponent, player, card, target, pos), new EventInfo(0));
         }
 
-        public static void Event_AttackTo(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomCard card, RoomCard target)
+        public static async ETTask Event_AttackTo(this RoomEventTypeComponent eventTypeComponent, RoomCard card, RoomCard target)
         {
-            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.AttackTo(eventTypeComponent, card, target), eventInfo);
-        }
-
-        public static void Event_UseUnitCard(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomPlayer player, RoomCard card, RoomCard target, int pos)
-        {
-            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.UseUnitCard(eventTypeComponent, player, card, target, pos), eventInfo);
-        }
-
-        public static void Event_UseMagicCard(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomPlayer player, RoomCard card, RoomCard target)
-        {
-            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.UseMagicCard(eventTypeComponent, player, card, target), eventInfo);
-        }
-        
-        public static void Event_UsePlotCard(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomPlayer player, RoomCard card, RoomCard target)
-        {
-            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.UsePlotCard(eventTypeComponent, player, card, target), eventInfo);
-        }
-
-        public static void Event_UnitArrange(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomCard card, RoomCard target, RoomPlayer player)
-        {
-            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.UnitArrange(eventTypeComponent, card, target, player), eventInfo);
-        }
-
-        public static void Event_AuraEffect(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomCard card, RoomPlayer player)
-        {
-            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.AuraEffect(eventTypeComponent, card, player), eventInfo);
-        }
-
-        public static void Event_MagicTakesEffect(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomPlayer player, RoomCard card, RoomCard target)
-        {
-            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.MagicTakesEffect(eventTypeComponent, card, target, player), eventInfo);
-        }
-        
-        public static void Event_PlotTakesEffect(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomPlayer player, RoomCard card, RoomCard target)
-        {
-            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.PlotTakesEffect(eventTypeComponent, card, target, player), eventInfo);
-        }
-
-        public static void Event_HeroDamage(this RoomEventTypeComponent eventTypeComponent, EventInfo eventInfo, RoomCard card, RoomCard target, int num)
-        {
-            eventTypeComponent.BroadAndSettleEvent(GameEventFactory.HeroDamage(eventTypeComponent, card, target, num), eventInfo);
+            eventTypeComponent.CountClear();
+            await eventTypeComponent.SettleEventWithLock(GameEventFactory.AttackTo(eventTypeComponent, card, target), new EventInfo(0));
         }
     }
 }

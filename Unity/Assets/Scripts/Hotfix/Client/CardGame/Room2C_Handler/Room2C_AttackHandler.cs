@@ -6,7 +6,6 @@ namespace ET.Client
         protected override async ETTask Run(Scene root, Room2C_Attack message)
         {
             await EventSystem.Instance.PublishAsync(root, new RoomCardAttack() {ActorId = message.Actor, TargetId = message.Target});
-            await ETTask.CompletedTask;
         }
     }
 }

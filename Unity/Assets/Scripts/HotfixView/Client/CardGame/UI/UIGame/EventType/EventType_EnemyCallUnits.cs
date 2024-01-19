@@ -4,8 +4,10 @@ namespace ET.Client
     public class EventType_EnemyCallUnits : AEvent<Scene, EnemyCallUnits>
     {
         protected override async ETTask Run(Scene scene, EnemyCallUnits args) {
-            await scene.GetComponent<Room>().CallUnits(args.Card, false);
-            await scene.GetComponent<Room>().OrderUnits(args.UnitsOrder, false);
+            UI ui = await UIHelper.Get(scene.GetComponent<Room>(), UIType.UICGGame);
+            UICGGameComponent uicgGameComponent = ui.GetComponent<UICGGameComponent>();
+            await scene.GetComponent<Room>().CallUnits(uicgGameComponent, args.Card, false);
+            scene.GetComponent<Room>().OrderUnits(uicgGameComponent, args.UnitsOrder, false);
         }
     }
 }

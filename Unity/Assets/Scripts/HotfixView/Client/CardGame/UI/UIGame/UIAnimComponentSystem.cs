@@ -43,8 +43,9 @@ namespace ET.Client {
         {
             foreach (UIUnitInfo info in self.Children.Values)
             {
-                if (info.CardGo.Equals(go))
+                if (info.CardGo.Equals(go)) {
                     return info;
+                }
             }
 
             return null;

@@ -34,5 +34,9 @@ namespace ET.Server
 
         //本场召唤的红龙数量
         public int RedGragonNum;
+        //本场的传承计数
+        public Dictionary<int, int> InheritCount = new Dictionary<int, int>();
+        //本场打出过的法术
+        public List<int> UsedMagicList = new List<int>();
     }
 }

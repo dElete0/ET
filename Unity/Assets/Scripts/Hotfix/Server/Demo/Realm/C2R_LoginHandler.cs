@@ -20,6 +20,7 @@ namespace ET.Server
                 return;
             }
 
+            //Account加锁
             using (await session.Root().GetComponent<CoroutineLockComponent>().Wait(CoroutineLockType.LoginAccount, request.Account.GetLongHashCode())) 
             {
                 DBComponent dbComponent = session.Root().GetComponent<DBManagerComponent>().GetZoneDB(session.Zone());

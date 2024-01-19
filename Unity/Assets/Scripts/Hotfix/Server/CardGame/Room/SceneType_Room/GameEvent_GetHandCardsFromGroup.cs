@@ -5,8 +5,8 @@ namespace ET.Server {
     [FriendOfAttribute(typeof(ET.RoomCard))]
     public static class GameEvent_GetHandCardsFromGroup
     {
-        public static void ToDo_GetHandCardsFromGroup(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomPlayer player, int count)
-        {
+        public static async ETTask ToDo_GetHandCardsFromGroup(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomPlayer player, int count) {
+            await ETTask.CompletedTask;
             Room room = roomEventTypeComponent.GetParent<Room>();
             CardGameComponent_Player cards = player.GetComponent<CardGameComponent_Player>();
             List<long> group = cards.Groups;
@@ -31,8 +31,8 @@ namespace ET.Server {
                 }
 
                 Log.Debug("展示抽卡:" + i + "/" + count);
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.GetHandCardFromShowCard(roomEventTypeComponent, player, card), eventInfo);
-                roomEventTypeComponent.BroadAndSettleEvent(GameEventFactory.RemoveCardFromGroup(roomEventTypeComponent, player, card), eventInfo);
+                await roomEventTypeComponent.BroadEvent(GameEventFactory.GetHandCardFromShowCard(roomEventTypeComponent, player, card), eventInfo);
+                await roomEventTypeComponent.BroadEvent(GameEventFactory.RemoveCardFromGroup(roomEventTypeComponent, player, card), eventInfo);
 
                 RoomCardInfo myCard = roomCard.RoomCard2MyHandCardInfo();
 

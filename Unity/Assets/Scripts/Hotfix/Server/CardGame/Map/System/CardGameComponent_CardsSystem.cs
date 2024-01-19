@@ -20,12 +20,14 @@ namespace ET.Server {
                 //Log.Warning($"移除:{card.Id}");
                 if (playerCards.HandCards.Contains(card.Id)) 
                     playerCards.HandCards.Remove(card.Id);
-                if (playerCards.Units.Contains(card.Id))
+                if (playerCards.Units.Contains(card.Id)) {
+                    Log.Warning($"移除:{card.Id}");
                     playerCards.Units.Remove(card.Id);
+                }
                 if (playerCards.Groups.Contains(card.Id))
                     playerCards.Groups.Remove(card.Id);
-                self.RemoveChild(card.Id);
             }
+            self.RemoveChild(card.Id);
         }
 
         public static bool IsHandCards(this CardGameComponent_Cards self, RoomCard card) {

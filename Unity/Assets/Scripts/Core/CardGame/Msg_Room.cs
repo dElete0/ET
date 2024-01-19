@@ -1,5 +1,5 @@
 namespace ET {
     public static class Msg_Room {
-        public const int EventToDoCountMax = 128;
+        public const int EventToDoCountMax = 200;
     }
 }

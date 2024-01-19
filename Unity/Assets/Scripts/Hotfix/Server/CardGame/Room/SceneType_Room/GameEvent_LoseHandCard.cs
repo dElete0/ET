@@ -2,8 +2,9 @@ namespace ET.Server;
 [FriendOfAttribute(typeof(ET.Server.CardGameComponent_Player))]
 public static class GameEvent_LoseHandCard
 {
-    public static void ToDo_LoseHandCard(this RoomEventTypeComponent roomEventTypeComponent, RoomPlayer player, RoomCard card)
+    public static async ETTask ToDo_LoseHandCard(this RoomEventTypeComponent roomEventTypeComponent, RoomPlayer player, RoomCard card)
     {
+        await ETTask.CompletedTask;
         CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
         playerInfo.HandCards.Remove(card.Id);
 

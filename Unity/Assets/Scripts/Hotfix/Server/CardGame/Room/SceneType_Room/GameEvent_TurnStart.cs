@@ -4,8 +4,9 @@ namespace ET.Server {
     [FriendOfAttribute(typeof(ET.Server.CGServerUpdater))]
     public static class GameEvent_TurnStart
     {
-        public static void ToDo_TurnStart(this RoomEventTypeComponent room, RoomPlayer player)
+        public static async ETTask ToDo_TurnStart(this RoomEventTypeComponent room, RoomPlayer player)
         {
+            await ETTask.CompletedTask;
             room.CountClear();
             CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
             room.GetParent<Room>().GetComponent<CGServerUpdater>().NowPlayer = player.Id;

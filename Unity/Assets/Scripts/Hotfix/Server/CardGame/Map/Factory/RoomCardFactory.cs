@@ -10,7 +10,11 @@ namespace ET.Server
         public static RoomCard CreateGroupCard(CardGameComponent_Cards cards, int configId, long playerId)
         {
             RoomCard card = cards.AddChild<RoomCard, int, long>(configId, playerId);
-            if (card.CardType == CardType.Star || card.CardType == CardType.Legend) {
+            if (card.CardType == CardType.Star || 
+                card.CardType == CardType.Legend || 
+                card.CardType == CardType.Unit ||
+                card.CardType == CardType.ExclusionZone) {
+                card.UnitType = (CardUnitType)card.CardType;
                 card.CardType = CardType.Unit;
             }
             return card;

@@ -19,11 +19,14 @@ namespace ET.Client
 
             List<Action> actions = new List<Action>();
             for (int i = 0; i < cardInfo.Count; i++) {
+                int hp = cardInfo[i].HP;
+                int hurtNum = hurt[i];
                 UIUnitInfo uiUnitInfo = uicgGameComponent.GetUIUnitInfoById(cardInfo[i].CardId);
                 if (uiUnitInfo == null) Log.Error($"获取UIUnitInfo失败:{cardInfo[i].CardId}");
+                Log.Warning($"客户端:{cardInfo[i].CardId}受到{hurt[i]}点伤害");
                 actions.Add(() => {
-                    uiUnitInfo.HP.text = cardInfo[i].HP.ToString();
-                    uiUnitInfo.ShowCardGetDamage(room, hurt[i]).Coroutine();
+                    uiUnitInfo.HP.text = hp.ToString();
+                    uiUnitInfo.ShowCardGetDamage(uicgGameComponent, room, hurtNum);
                 });
             }
             uicgGameComponent.GetComponent<UIAnimComponent>()
