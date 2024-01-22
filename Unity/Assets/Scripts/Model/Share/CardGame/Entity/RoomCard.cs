@@ -47,7 +47,7 @@ namespace ET {
         public bool CantBeMagicTarget;
 
         //属性异能
-        public List<Power_Type> AttributePowers = new List<Power_Type>();
+        public Dictionary<Power_Type, int> AttributePowers = new Dictionary<Power_Type, int>();
         //其他异能
         public List<Power_Struct> OtherPowers = new List<Power_Struct>();
         //身上的光环效果
@@ -109,6 +109,8 @@ namespace ET {
         Release = 6,
         //监听器触发
         Monitor = 7,
+        //在手牌中，回合结束时触发
+        WhenTurnOverInHandCard = 8,
     }
 
     public enum UseCardType {
@@ -133,6 +135,7 @@ namespace ET {
         Black = 4,
         White = 5,
         Grey = 6,
+        All = 7,
     }
 
     public enum CardPos {
@@ -192,7 +195,7 @@ namespace ET {
         AttackTwice = 102,
         //突袭
         Rush = 103,
-        // 免疫
+        // 无敌
         Immunity = 106,
         // 英雄免疫
         HeroImmunity = 107,
@@ -206,8 +209,13 @@ namespace ET {
         Bubbles = 111,
         // 传承
         Inherit = 112,
-        
-        
+        // 吸血
+        SuckBlood = 113,
+        // 幻形
+        Metamorphosis = 114,
+        // 抽到时释放
+        UseCardWhenGetThisCardFromGroup = 115,
+
         //每当你打出一张费用大于3的法术牌，获得1点攻击力
         GetAttackByUseMagci = 1001,
         // 你获得一个额外回合
@@ -263,9 +271,9 @@ namespace ET {
         //治疗目标角色
         TreatTarget = 1027,
         //向牌库增加目标卡牌(显式)
-        AddCardToGroupShow = 1028,
+        AddCardToGroupByBaseIdShow = 1028,
         //向牌库增加目标卡牌(隐式)
-        AddCardToGroupHide = 1029,
+        AddCardToGroupByBaseIdHide = 1029,
         //交换双方护甲
         SwapArmor = 1030,
         //目标单位获得属性
@@ -273,6 +281,29 @@ namespace ET {
         //跨越时代的黄金船
         GoldenShip = 1032,
         //打出一张牌
-        PowerToUseCard = 1033,
+        PowerToUseBaseCard = 1033,
+        //对敌方英雄造成伤害
+        DamageEnemyHero = 1034,
+        //对你的英雄造成伤害
+        DamageMyHero = 1035,
+        //你的英雄本回合获得攻击力
+        MyHeroGetAttackThisTurn = 1036,
+        //所有单位获得属性
+        UnitsGetAttribute = 1037,
+        //牌库中的指定单位获得属性
+        UnitsInGroupGetAttribute = 1038,
+        UnitsInGroupLoseAttributeAddDamageEnemyHero = 1039,
+        //目标单位回到手牌
+        TargetBackToHandCards = 1040,
+        //目标卡牌加入手牌
+        GetHandCards = 1041,
+        //目标回到拥有者牌库顶
+        TargetBackToGroup = 1042,
+        //将目标卡牌加入牌库
+        AddCardToGroupShow = 1043,
+        //你的英雄本回合获得指定能力
+        MyHeroGetTargetPowerThisTurn = 1044,
+        TreatMyHero = 1045,
+        GetHandCardsByBaseIds = 1046,
     }
 }

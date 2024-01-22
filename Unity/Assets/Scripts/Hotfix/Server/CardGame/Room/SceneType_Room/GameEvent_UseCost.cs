@@ -57,7 +57,7 @@ public static class GameEvent_UseCost
     public static async ETTask ToDo_UseMagicCard(this RoomEventTypeComponent room, EventInfo info, RoomPlayer player, RoomCard card, RoomCard target) {
         //if (target != null) Log.Warning(target.Name);
         //await ETTask.CompletedTask;
-        if (card.AttributePowers.Contains(Power_Type.Risk)) {
+        if (card.AttributePowers.ContainsKey(Power_Type.Risk)) {
             bool randomBool = new Random().NextDouble() > 0.5;
             if (randomBool) {
                 Room2C_RiskSuccess message = new Room2C_RiskSuccess() { Card = card.RoomCard2MyHandCardInfo(), IsRiskSuccess = false };

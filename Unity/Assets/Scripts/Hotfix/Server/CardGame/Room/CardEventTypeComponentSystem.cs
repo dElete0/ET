@@ -57,7 +57,7 @@ namespace ET.Server
             return false;
         }
 
-        public static async ETTask PowerToDo(this Power_Struct power, RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, RoomCard target, RoomPlayer player)
+        public static async ETTask PowerToDo(this Power_Struct power, RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, RoomCard target, List<RoomCard> targets, RoomPlayer player)
         {
             switch (power.PowerType) {
                 case Power_Type.GetHandCardFromGroup:
@@ -108,11 +108,14 @@ namespace ET.Server
                 case Power_Type.TreatTarget:
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.TreatTarget(roomEventTypeComponent, actor, target, power.Count1), eventInfo);
                     break;
-                case Power_Type.AddCardToGroupShow:
-                    await roomEventTypeComponent.BroadEvent(GameEventFactory.AddCardToGroupShow(roomEventTypeComponent, actor, power.Count1, power.Count2, power.Count3), eventInfo);
+                case Power_Type.TreatMyHero:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.TreatTarget(roomEventTypeComponent, actor, actor.GetOwner().GetHero(), power.Count1), eventInfo);
                     break;
-                case Power_Type.AddCardToGroupHide:
-                    await roomEventTypeComponent.BroadEvent(GameEventFactory.AddCardToGroupHide(roomEventTypeComponent, actor, power.Count1, power.Count2, power.Count3), eventInfo);
+                case Power_Type.AddCardToGroupByBaseIdShow:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.AddCardToGroupByBaseIdShow(roomEventTypeComponent, actor, power.Count1, power.Count2, power.Count3), eventInfo);
+                    break;
+                case Power_Type.AddCardToGroupByBaseIdHide:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.AddCardToGroupByBaseIdHide(roomEventTypeComponent, actor, power.Count1, power.Count2, power.Count3), eventInfo);
                     break;
                 case Power_Type.SwapArmor:
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.SwapArmor(roomEventTypeComponent, actor), eventInfo);
@@ -123,8 +126,47 @@ namespace ET.Server
                 case Power_Type.GoldenShip:
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.GoldenShip(roomEventTypeComponent, actor), eventInfo);
                     break;
-                case Power_Type.PowerToUseCard:
-                    await roomEventTypeComponent.BroadEvent(GameEventFactory.PowerToUseCard(roomEventTypeComponent, actor, power.Count1), eventInfo);
+                case Power_Type.PowerToUseBaseCard:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.PowerToUseBaseCard(roomEventTypeComponent, actor, power.Count1), eventInfo);
+                    break;
+                case Power_Type.DamageEnemyHero:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.DamageEnemyHero(roomEventTypeComponent, actor, power.Count1), eventInfo);
+                    break;
+                case Power_Type.DamageMyHero:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.DamageMyHero(roomEventTypeComponent, actor, power.Count1), eventInfo);
+                    break;
+                case Power_Type.MyHeroGetAttackThisTurn:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.MyHeroGetAttackThisTurn(roomEventTypeComponent, actor, power.Count1), eventInfo);
+                    break;
+                case Power_Type.UnitsGetAttribute:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.UnitsGetAttribute(roomEventTypeComponent, actor, power.Count1, power.Count2), eventInfo);
+                    break;
+                case Power_Type.UnitsInGroupGetAttribute:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.UnitsInGroupGetAttribute(roomEventTypeComponent, actor, power.Count1, power.Count2), eventInfo);
+                    break;
+                case Power_Type.UnitsInGroupLoseAttributeAddDamageEnemyHero:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.UnitsInGroupLoseAttributeAddDamageEnemyHero(roomEventTypeComponent, actor, power.Count1, power.Count2), eventInfo);
+                    break;
+                case Power_Type.TargetBackToHandCards:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.TargetBackToHandCards(roomEventTypeComponent, actor, target), eventInfo);
+                    break;
+                case Power_Type.GetHandCards:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.GetHandCards(roomEventTypeComponent, player, target, targets), eventInfo);
+                    break;
+                case Power_Type.TargetBackToGroup:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.TargetBackToGroup(roomEventTypeComponent, actor, target), eventInfo);
+                    break;
+                case Power_Type.AddCardToGroupShow:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.AddTargetCardToGroupShow(roomEventTypeComponent, actor, target), eventInfo);
+                    break;
+                case Power_Type.Erosion:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.Erosion(roomEventTypeComponent, actor, power.Count1), eventInfo);
+                    break;
+                case Power_Type.MyHeroGetTargetPowerThisTurn:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.MyHeroGetTargetPowerThisTurn(roomEventTypeComponent, actor, (Power_Type)power.Count1), eventInfo);
+                    break;
+                case Power_Type.GetHandCardsByBaseIds:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.GetHandCardsByBaseIds(roomEventTypeComponent, actor.GetOwner(), power.Count1, power.Count2, power.Count3), eventInfo);
                     break;
             }
         }

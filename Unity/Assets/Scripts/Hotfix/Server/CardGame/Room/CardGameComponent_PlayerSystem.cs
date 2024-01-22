@@ -11,23 +11,24 @@ namespace ET.Server
         [EntitySystem]
         private static void Awake(this ET.Server.CardGameComponent_Player self)
         {
-            self.CostMax = 12;
+            self.CostMax = CardGameMsg.CostMax;
+            self.HandCardsCountMax = CardGameMsg.HandCardsCountMax;
         }
 
-        public static CardColor GetColorByNum(this CardGameComponent_Player self, int num)
+        public static (CardColor, RoomCard) GetColorByNum(this CardGameComponent_Player self, int num)
         {
             Room room = self.GetParent<Room>();
             CardGameComponent_Cards cards = room.GetComponent<CardGameComponent_Cards>();
             if (num < 2)
             {
                 RoomCard hero = cards.GetChild<RoomCard>(self.Hero);
-                return num == 0 ? hero.Colors.Item1 : hero.Colors.Item2;
+                return (num == 0 ? hero.Colors.Item1 : hero.Colors.Item2, hero);
             } else if (num < 4) {
                 RoomCard agent1 = cards.GetChild<RoomCard>(self.Agent1);
-                return num == 2 ? agent1.Colors.Item1 : agent1.Colors.Item2;
+                return (num == 2 ? agent1.Colors.Item1 : agent1.Colors.Item2, agent1);
             } else {
                 RoomCard agent2 = cards.GetChild<RoomCard>(self.Agent2);
-                return num == 4 ? agent2.Colors.Item1 : agent2.Colors.Item2;
+                return (num == 4 ? agent2.Colors.Item1 : agent2.Colors.Item2, agent2);
             }
         }
 

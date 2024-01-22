@@ -57,6 +57,4 @@ namespace ET
 			World.Instance.Dispose();
 		}
 	}
-	
-	
 }

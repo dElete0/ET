@@ -1,11 +1,11 @@
 namespace ET.Client
 {
     [MessageHandler(SceneType.CardGame)]
-    public class Room2C_FlashMyUnitHandler: MessageHandler<Scene, Room2C_FlashMyUnit>
+    public class Room2C_FlashUnitsHandler: MessageHandler<Scene, Room2C_FlashUnits>
     {
-        protected override async ETTask Run(Scene root, Room2C_FlashMyUnit message)
+        protected override async ETTask Run(Scene root, Room2C_FlashUnits message)
         {
-            await EventSystem.Instance.PublishAsync(root, new FlashMyUnits() {Cards = message.Units});
+            await EventSystem.Instance.PublishAsync(root, new FlashUnits() {Cards = message.Units});
         }
     }
 }

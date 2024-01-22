@@ -12,7 +12,7 @@ public static class GameEvent_UnitArrange
         List<Power_Struct> powerStructs = card.GetArranges();
         foreach (var power in powerStructs)
         {
-            await power.PowerToDo(roomEventTypeComponent, eventInfo, card, target, player);
+            await power.PowerToDo(roomEventTypeComponent, eventInfo, card, target, null, player);
         }
     }
 
@@ -20,7 +20,7 @@ public static class GameEvent_UnitArrange
         List<Power_Struct> powerStructs = card.GetAura();
         foreach (var power in powerStructs)
         {
-            await power.PowerToDo(roomEventTypeComponent, eventInfo, card, null, player);
+            await power.PowerToDo(roomEventTypeComponent, eventInfo, card, null, null, player);
         }
 
         CardEventTypeComponent cardEventTypeComponent = card.GetComponent<CardEventTypeComponent>();
@@ -79,10 +79,8 @@ public static class GameEvent_UnitArrange
             cardInfos.Add(unit.RoomCard2AgentInfo());
         }
 
-        Room2C_FlashMyUnit myMessage = new Room2C_FlashMyUnit() { Units = cardInfos };
-        RoomMessageHelper.ServerSendMessageToClient(player, myMessage);
-        Room2C_FlashEnemyUnit enemyMessage = new Room2C_FlashEnemyUnit() { Units = cardInfos };
-        RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
+        Room2C_FlashUnits myMessage = new Room2C_FlashUnits() { Units = cardInfos };
+        RoomMessageHelper.BroadCast(roomEventTypeComponent.GetParent<Room>(), myMessage);
     }
 
     public static async ETTask ToDo_AttributeAuraUnEffect(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, Power_Struct power) {
@@ -107,10 +105,8 @@ public static class GameEvent_UnitArrange
             }
         }
 
-        Room2C_FlashMyUnit myMessage = new Room2C_FlashMyUnit() { Units = cardInfos };
-        RoomMessageHelper.ServerSendMessageToClient(player, myMessage);
-        Room2C_FlashEnemyUnit enemyMessage = new Room2C_FlashEnemyUnit() { Units = cardInfos };
-        RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
+        Room2C_FlashUnits myMessage = new Room2C_FlashUnits() { Units = cardInfos };
+        RoomMessageHelper.BroadCast(roomEventTypeComponent.GetParent<Room>(), myMessage);
     }
 
     public static async ETTask ToDo_AttributeAuraEffectToTarget(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, GameEvent trigger, int num) {
@@ -131,7 +127,7 @@ public static class GameEvent_UnitArrange
         target.HPMax += num;
         Log.Warning(num);
         Log.Warning(target.Attack);
-        Room2C_FlashUnit message = new Room2C_FlashUnit() { Units = target.RoomCard2AgentInfo() };
+        Room2C_FlashUnit message = new Room2C_FlashUnit() { Unit = target.RoomCard2AgentInfo() };
         RoomMessageHelper.BroadCast(roomEventTypeComponent.GetParent<Room>(), message);
     }
 }

@@ -210,8 +210,8 @@ namespace ET.Server {
 
         public static RoomCardInfo RoomCard2UnitInfo(this RoomCard roomCard) {
             List<int> powers = new List<int>();
-            foreach (Power_Type type in roomCard.AttributePowers) {
-                powers.Add((int)type);
+            foreach (var type in roomCard.AttributePowers) {
+                powers.Add((int)type.Key);
             }
             return new RoomCardInfo()
             {
@@ -227,25 +227,173 @@ namespace ET.Server {
         }
         
         //获得随机角色
-        11
+        public static RoomCard GetRandomActor(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            CardGameComponent_Player enemyInfo = player.GetEnemy().GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = player.GetAllUnits(cards);
+            actors.Add(cards.GetChild<RoomCard>(playerInfo.Hero));
+            actors.Add(cards.GetChild<RoomCard>(enemyInfo.Hero));
+            if (playerInfo.Agent1 > 0) actors.Add(cards.GetChild<RoomCard>(playerInfo.Agent1));
+            if (enemyInfo.Agent1 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent1));
+            if (playerInfo.Agent2 > 0) actors.Add(cards.GetChild<RoomCard>(playerInfo.Agent2));
+            if (enemyInfo.Agent2 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent2));
+            return actors[new Random().Next(0, actors.Count)];
+        }
         
         //获得随机友方单位
-        11
+        public static RoomCard GetRandomMyActor(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = player.GetAllMyUnits(cards);
+            actors.Add(cards.GetChild<RoomCard>(playerInfo.Hero));
+            if (playerInfo.Agent1 > 0) actors.Add(cards.GetChild<RoomCard>(playerInfo.Agent1));
+            if (playerInfo.Agent2 > 0) actors.Add(cards.GetChild<RoomCard>(playerInfo.Agent2));
+            return actors[new Random().Next(0, actors.Count)];
+        }
         
         //获得随机敌方单位
-        11
+        public static RoomCard GetRandomEnemyActor(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player enemyInfo = player.GetEnemy().GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = player.GetEnemy().GetAllMyUnits(cards);
+            actors.Add(cards.GetChild<RoomCard>(enemyInfo.Hero));
+            if (enemyInfo.Agent1 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent1));
+            if (enemyInfo.Agent2 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent2));
+            return actors[new Random().Next(0, actors.Count)];
+        }
         
         //获得随机单位
-        11
+        public static RoomCard GetRandomUnit(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            CardGameComponent_Player enemyInfo = player.GetEnemy().GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = player.GetAllUnits(cards);
+            if (actors.Count < 1) {
+                return null;
+            }
+            return actors[new Random().Next(0, actors.Count)];
+        }
         
         //获得随机干员
-        11
+        public static RoomCard GetRandomAgent(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            CardGameComponent_Player enemyInfo = player.GetEnemy().GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = new List<RoomCard>();
+            if (playerInfo.Agent1 > 0) actors.Add(cards.GetChild<RoomCard>(playerInfo.Agent1));
+            if (enemyInfo.Agent1 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent1));
+            if (playerInfo.Agent2 > 0) actors.Add(cards.GetChild<RoomCard>(playerInfo.Agent2));
+            if (enemyInfo.Agent2 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent2));
+            if (actors.Count < 1) {
+                return null;
+            }
+            return actors[new Random().Next(0, actors.Count)];
+        }
         //获得随机友方干员
-        11
+        public static RoomCard GetRandomMyAgent(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = new List<RoomCard>();
+            if (playerInfo.Agent1 > 0) actors.Add(cards.GetChild<RoomCard>(playerInfo.Agent1));
+            if (playerInfo.Agent2 > 0) actors.Add(cards.GetChild<RoomCard>(playerInfo.Agent2));
+            if (actors.Count < 1) {
+                return null;
+            }
+            return actors[new Random().Next(0, actors.Count)];
+        }
         //获得随机敌方干员
-        11
+        public static RoomCard GetRandomEnemyAgent(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player enemyInfo = player.GetEnemy().GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = new List<RoomCard>();
+            if (enemyInfo.Agent1 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent1));
+            if (enemyInfo.Agent2 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent2));
+            if (actors.Count < 1) {
+                return null;
+            }
+            return actors[new Random().Next(0, actors.Count)];
+        }
         //获得随机友方角色
-        11
+        public static RoomCard GetRandomMyUnit(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = new List<RoomCard>();
+            foreach (var unit in playerInfo.Units) {
+                RoomCard actor = cards.GetChild<RoomCard>(unit);
+                if (actor.UnitType != CardUnitType.ExclusionZone) {
+                    actors.Add(actor);
+                }
+            }
+            if (actors.Count < 1) {
+                return null;
+            }
+            return actors[new Random().Next(0, actors.Count)];
+        }
         //获得随机敌方角色
+        public static RoomCard GetRandomEnemyUnit(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player enemyInfo = player.GetEnemy().GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = new List<RoomCard>();
+            foreach (var unit in enemyInfo.Units) {
+                RoomCard actor = cards.GetChild<RoomCard>(unit);
+                if (actor.UnitType != CardUnitType.ExclusionZone) {
+                    actors.Add(actor);
+                }
+            }
+            actors.Add(cards.GetChild<RoomCard>(enemyInfo.Hero));
+            if (enemyInfo.Agent1 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent1));
+            if (enemyInfo.Agent2 > 0) actors.Add(cards.GetChild<RoomCard>(enemyInfo.Agent2));
+            if (actors.Count < 1) {
+                return null;
+            }
+            return actors[new Random().Next(0, actors.Count)];
+        }
+
+        public static RoomCard GetRandomHero(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            CardGameComponent_Player enemyInfo = player.GetEnemy().GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = new List<RoomCard>();
+            actors.Add(cards.GetChild<RoomCard>(playerInfo.Hero));
+            actors.Add(cards.GetChild<RoomCard>(enemyInfo.Hero));
+            return actors[new Random().Next(0, actors.Count)];
+        }
+
+        public static List<RoomCard> GetAllUnits(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            CardGameComponent_Player enemyInfo = player.GetEnemy().GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = new List<RoomCard>();
+            foreach (var unit in playerInfo.Units) {
+                RoomCard actor = cards.GetChild<RoomCard>(unit);
+                if (actor.UnitType != CardUnitType.ExclusionZone) {
+                    actors.Add(actor);
+                }
+            }
+            foreach (var unit in enemyInfo.Units) {
+                RoomCard actor = cards.GetChild<RoomCard>(unit);
+                if (actor.UnitType != CardUnitType.ExclusionZone) {
+                    actors.Add(actor);
+                }
+            }
+
+            return actors;
+        }
+        
+        public static List<RoomCard> GetAllMyUnits(this RoomPlayer player, CardGameComponent_Cards cards) {
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            List<RoomCard> actors = new List<RoomCard>();
+            foreach (var unit in playerInfo.Units) {
+                RoomCard actor = cards.GetChild<RoomCard>(unit);
+                if (actor.UnitType != CardUnitType.ExclusionZone) {
+                    actors.Add(actor);
+                }
+            }
+
+            return actors;
+        }
+
+        public static List<RoomCard> GetAllMyCardsInGroupByBaseId(this RoomPlayer player, CardGameComponent_Cards cards, int baseId) {
+            var groups = player.GetComponent<CardGameComponent_Player>().Groups;
+            List<RoomCard> roomCards = new List<RoomCard>();
+            foreach (var cardId in groups) {
+                RoomCard card = cards.GetChild<RoomCard>(cardId);
+                if (card.ConfigId == baseId) {
+                    roomCards.Add(card);
+                }
+            }
+
+            return roomCards;
+        }
     }
 }

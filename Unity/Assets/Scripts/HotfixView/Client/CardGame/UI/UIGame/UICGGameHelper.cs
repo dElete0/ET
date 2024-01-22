@@ -778,10 +778,11 @@ namespace ET.Client
             }
         }
 
-        public static async ETTask Room2C_FlashUnits(Entity room, List<RoomCardInfo> cardInfos, bool isMy) {
+        public static async ETTask Room2C_FlashUnits(Entity room, List<RoomCardInfo> cardInfos) {
             UI ui = await UIHelper.Get(room, UIType.UICGGame);
             UICGGameComponent uicgGameComponent = ui.GetComponent<UICGGameComponent>();
-            List<UIUnitInfo> unitInfos = isMy? uicgGameComponent.MyFightUnits : uicgGameComponent.EnemyFightUnits;
+            List<UIUnitInfo> unitInfos = new List<UIUnitInfo>(uicgGameComponent.MyFightUnits);
+            unitInfos.AddRange(uicgGameComponent.EnemyFightUnits);
             foreach (var unitInfo in unitInfos) {
                 RoomCardInfo cardInfo = cardInfos.GetRoomCardInfoById(unitInfo.CardId);
                 if (cardInfo == null) continue;

@@ -72,11 +72,7 @@ namespace ET.Client {
         public bool IsMy;
     }
 
-    public struct FlashMyUnits {
-        public List<RoomCardInfo> Cards;
-    }
-
-    public struct FlashEnemyUnits {
+    public struct FlashUnits {
         public List<RoomCardInfo> Cards;
     }
 

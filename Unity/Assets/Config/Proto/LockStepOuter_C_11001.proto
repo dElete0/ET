@@ -389,6 +389,7 @@ message Room2C_UnitDead // IMessage
 message Room2C_RemoveUnits // IMessage
 {
 	repeated int64 CardIds = 1;
+ 	repeated int32 RemoveType = 2;
 }
 
 message Room2C_AttackCountEnough // IMessage
@@ -415,19 +416,14 @@ message Room2C_EnemyCallUnits // IMessage
 	repeated int64 Order = 2;
 }
 
-message Room2C_FlashMyUnit // IMessage
-{
-	repeated RoomCardInfo Units = 1;
-}
-
-message Room2C_FlashEnemyUnit // IMessage
+message Room2C_FlashUnits // IMessage
 {
 	repeated RoomCardInfo Units = 1;
 }
 
 message Room2C_FlashUnit // IMessage
 {
-	RoomCardInfo Units = 1;
+	RoomCardInfo Unit = 1;
 }
 
 message Room2C_FindCardsToShow // IMessage
@@ -485,4 +481,10 @@ message Room2C_AddCardsToGroupHide // IMessage
 message Room2C_LoseArmor // IMessage
 {
 	bool IsMy = 1;
+}
+
+message Room2C_BreakCards // IMessage
+{
+	repeated RoomCardInfo Cards = 1;
+	bool IsMy = 2;
 }

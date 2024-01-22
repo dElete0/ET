@@ -72,8 +72,8 @@ namespace ET.Server
             }
 
             if (card.IsCallThisTurn && (
-                    card.AttributePowers.Contains(Power_Type.Charge) ||
-                    card.AttributePowers.Contains(Power_Type.Rush)))
+                    card.AttributePowers.ContainsKey(Power_Type.Charge) ||
+                    card.AttributePowers.ContainsKey(Power_Type.Rush)))
             {
                 Log.Warning("刚上场");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer,
@@ -81,8 +81,8 @@ namespace ET.Server
                 return;
             }
             if (card.IsCallThisTurn &&
-                !card.AttributePowers.Contains(Power_Type.Charge) &&
-                card.AttributePowers.Contains(Power_Type.Rush) &&
+                !card.AttributePowers.ContainsKey(Power_Type.Charge) &&
+                card.AttributePowers.ContainsKey(Power_Type.Rush) &&
                 (target.CardType == CardType.Agent || target.CardType == CardType.Hero))
             {
                 Log.Warning("突袭不能攻击英雄和干员");
@@ -91,15 +91,23 @@ namespace ET.Server
                 return;
             }
 
+            if (card.AttributePowers.ContainsKey(Power_Type.CantAttackHeroAndAgent) &&
+                (target.CardType == CardType.Agent || target.CardType == CardType.Hero)) {
+                Log.Warning("此角色不能攻击英雄和干员");
+                RoomMessageHelper.ServerSendMessageToClient(roomPlayer,
+                    new Room2C_OperateFail() { FailId = (int)Room2C_OperateFailType.CantOperateNow });
+                return;
+            }
+
             bool isEnemyHaveTaunt = false;
             foreach (var unitID in enemyInfo.Units)
             {
-                if (cardGameComponentCards.GetChild<RoomCard>(unitID).AttributePowers.Contains(Power_Type.Taunt)) {
+                if (cardGameComponentCards.GetChild<RoomCard>(unitID).AttributePowers.ContainsKey(Power_Type.Taunt)) {
                     isEnemyHaveTaunt = true;
                     break;
                 }
             }
-            if (isEnemyHaveTaunt && !target.AttributePowers.Contains(Power_Type.Taunt)) {
+            if (isEnemyHaveTaunt && !target.AttributePowers.ContainsKey(Power_Type.Taunt)) {
                 Log.Warning("必须先攻击嘲讽");
                 RoomMessageHelper.ServerSendMessageToClient(roomPlayer, new Room2C_OperateFail()
                 {

@@ -61,7 +61,7 @@ namespace ET.Server
             Log.Warning($"服务器处理开始:{eventType.ToStr()}");
             //事件执行
             if (eventType.ToDo != null) {
-                await eventType.ToDo.Invoke(null, eventInfo);
+                await eventType.ToDo.Invoke(GameEvent.Instance, eventInfo);
             }
 
             Log.Warning($"服务器处理完成:{eventType.ToStr()}");
@@ -81,7 +81,7 @@ namespace ET.Server
                     Log.Warning("继续执行新的逻辑");
                     var power = eventInfo.PowerStructs[0];
                     eventInfo.PowerStructs.RemoveAt(0);
-                    await power.Item1.PowerToDo(self, eventInfo, power.Item2, power.Item3, power.Item4);
+                    await power.Item1.PowerToDo(self, eventInfo, power.Item2, power.Item3, power.Item4, power.Item5);
                     Log.Warning(eventInfo.PowerStructs.Count); 
                 } else {
                     Log.Warning("没有新的逻辑需要执行");

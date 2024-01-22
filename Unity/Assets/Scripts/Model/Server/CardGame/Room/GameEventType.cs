@@ -2,7 +2,7 @@ using System;
 
 namespace ET.Server {
     //触发条件
-    public class TriggerEvent {
+    public struct TriggerEvent {
         /*public GameEventType GameEventType { private set; get; }
         //计数工具
         public int Count1, Count2, Count3;
@@ -12,7 +12,10 @@ namespace ET.Server {
         public TriggerEvent(Func<GameEvent, bool> triggeer) { this.Triggeer = triggeer; }
     }
     //事件
-    public class GameEvent {
+    public struct GameEvent {
+        [StaticField]
+        [ThreadStatic]
+        public static GameEvent Instance;
         public bool IsDispose;//是否失效
         public GameEventType GameEventType;
         //触发此事件的事件， 事件链Info
@@ -86,11 +89,24 @@ namespace ET.Server {
         RemoveTargetUnit = 146,
         RemoveUnits = 147,
         TreatTarget = 148,
-        AddCardToGroup = 149,
+        AddCardToGroupByBaseId = 149,
         SwapArmor = 150,
         
         TargetGetAttribute = 151,
         GoldenShip = 152,
         PowerToUseCard = 153,
+        TargetGetAttackThisTurn = 154,
+        LoseAttack = 155,
+        
+        UnitsGetAttribute = 156,
+        UnitsInGroupGetAttribute = 157,
+        UnitsInGroupLoseAttributeAddDamageEnemyHero = 158,
+        TargetBackToHandCards = 159,
+        TargetBackToGroup = 160,
+        
+        AddTargetCardToGroup = 161,
+        Erosion = 162,
+        MyHeroGetTargetPowerThisTurn = 163,
+        TargetLosePower = 164,
     }
 }

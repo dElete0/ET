@@ -14,7 +14,6 @@ namespace ET.Server {
         {
             Log.Debug("Server: 创建了一个房间");
             self.state = GameState.Wait;
-            self.AddComponent<ObjectWait>();
         }
         [EntitySystem]
         private static void Update(this ET.GameRoom self)

@@ -33,6 +33,7 @@ namespace ET.Server
             // 挂载房间的必要脚本
             room.AddComponent<CGServerUpdater>();
             room.AddComponent<ObjectWait>();
+            GameEvent.Instance = GameEventFactory.Instance();
             
             //游戏开始
             room.Init(room2CStart.UnitInfo, room2CStart.StartTime);

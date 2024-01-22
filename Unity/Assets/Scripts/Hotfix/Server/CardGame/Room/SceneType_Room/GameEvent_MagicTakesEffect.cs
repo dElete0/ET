@@ -14,7 +14,7 @@ public static class GameEvent_MagicTakesEffect
             int countNum = PowerNumChangeHelper.GetCountNumByAddMagicDamage(power.PowerType);
             Power_Struct powerToDo = power;
             powerToDo = new Power_Struct(power, countNum, magicAdd);
-            if (card.AttributePowers.Contains(Power_Type.Inherit))
+            if (card.AttributePowers.ContainsKey(Power_Type.Inherit))
             {
                 int Inherit = player.GetInheritByBaseId(card.ConfigId);
                 if (Inherit > 0)
@@ -27,7 +27,7 @@ public static class GameEvent_MagicTakesEffect
                     player.GetComponent<CardGameComponent_Player>().InheritCount.Add(card.ConfigId, 1);
                 }
             }
-            await powerToDo.PowerToDo(roomEventTypeComponent, eventInfo, card, target, player);
+            await powerToDo.PowerToDo(roomEventTypeComponent, eventInfo, card, target, null, player);
         }
     }
 
@@ -36,7 +36,7 @@ public static class GameEvent_MagicTakesEffect
         List<Power_Struct> powerStructs = card.GetRelease();
         foreach (var power in powerStructs)
         {
-            await power.PowerToDo(roomEventTypeComponent, eventInfo, card, target, player);
+            await power.PowerToDo(roomEventTypeComponent, eventInfo, card, target, null, player);
         }
     }
 }

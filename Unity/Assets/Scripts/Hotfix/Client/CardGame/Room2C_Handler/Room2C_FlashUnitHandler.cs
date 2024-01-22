@@ -5,7 +5,7 @@ namespace ET.Client
     {
         protected override async ETTask Run(Scene root, Room2C_FlashUnit message)
         {
-            await EventSystem.Instance.PublishAsync(root, new FlashUnit() {Card = message.Units});
+            await EventSystem.Instance.PublishAsync(root, new FlashUnit() {Card = message.Unit});
         }
     }
 }

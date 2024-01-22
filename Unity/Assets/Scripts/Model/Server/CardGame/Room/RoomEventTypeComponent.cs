@@ -16,9 +16,16 @@ namespace ET.Server {
         //死亡标记
         public List<RoomCard> DeadList = new List<RoomCard>();
         //移除标记
-        public List<RoomCard> RemoveList = new List<RoomCard>();
+        public List<(RoomCard, RemoveType)> RemoveList = new List<(RoomCard, RemoveType)>();
+        public RemoveType RemoveType;
         //死亡结算后继续执行的能力
-        public List<(Power_Struct, RoomCard, RoomCard, RoomPlayer)> PowerStructs = new List<(Power_Struct, RoomCard, RoomCard, RoomPlayer)>();
+        public List<(Power_Struct, RoomCard, RoomCard, List<RoomCard>, RoomPlayer)> PowerStructs = new List<(Power_Struct, RoomCard, RoomCard, List<RoomCard>, RoomPlayer)>();
         public EventInfo(int count) { Count = count; }
+    }
+
+    public enum RemoveType {
+        Nomal = 0,
+        BackToHandCards = 1,
+        TargetBackToGroup = 2,
     }
 }

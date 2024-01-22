@@ -20,5 +20,15 @@ public static class TriggerEventFactory {
             return false;
         });
         return turnStart;
-    } 
+    }
+
+    public static TriggerEvent TurnOver() {
+        TriggerEvent turnStart = new((gameEvent) => {
+            if (gameEvent.GameEventType == GameEventType.TurnOver) {
+                return true;
+            }
+            return false;
+        });
+        return turnStart;
+    }
 }

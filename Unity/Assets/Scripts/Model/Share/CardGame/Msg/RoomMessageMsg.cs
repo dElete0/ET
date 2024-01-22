@@ -6,6 +6,8 @@ namespace ET {
     public static class CardGameMsg {
         public const int UnitMax = 7;
         public const int GroupMax = 50;
+        public const int HandCardsCountMax = 10;
+        public const int CostMax = 12;
     }
 
     public enum Room2C_OperateFailType {

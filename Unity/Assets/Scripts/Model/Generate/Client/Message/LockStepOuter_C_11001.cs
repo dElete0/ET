@@ -1625,10 +1625,14 @@ namespace ET
 		[MemoryPackOrder(0)]
 		public List<long> CardIds { get; set; } = new();
 
+		[MemoryPackOrder(1)]
+		public List<int> RemoveType { get; set; } = new();
+
 		public override void Dispose() 
 		{
 			if (!this.IsFromPool) return;
 			this.CardIds.Clear();
+			this.RemoveType.Clear();
 			
 			ObjectPool.Instance.Recycle(this); 
 		}
@@ -1739,35 +1743,13 @@ namespace ET
 
 	}
 
-	[Message(LockStepOuter.Room2C_FlashMyUnit)]
+	[Message(LockStepOuter.Room2C_FlashUnits)]
 	[MemoryPackable]
-	public partial class Room2C_FlashMyUnit: MessageObject, IMessage
+	public partial class Room2C_FlashUnits: MessageObject, IMessage
 	{
-		public static Room2C_FlashMyUnit Create(bool isFromPool = true) 
+		public static Room2C_FlashUnits Create(bool isFromPool = true) 
 		{ 
-			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashMyUnit), isFromPool) as Room2C_FlashMyUnit; 
-		}
-
-		[MemoryPackOrder(0)]
-		public List<RoomCardInfo> Units { get; set; } = new();
-
-		public override void Dispose() 
-		{
-			if (!this.IsFromPool) return;
-			this.Units.Clear();
-			
-			ObjectPool.Instance.Recycle(this); 
-		}
-
-	}
-
-	[Message(LockStepOuter.Room2C_FlashEnemyUnit)]
-	[MemoryPackable]
-	public partial class Room2C_FlashEnemyUnit: MessageObject, IMessage
-	{
-		public static Room2C_FlashEnemyUnit Create(bool isFromPool = true) 
-		{ 
-			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashEnemyUnit), isFromPool) as Room2C_FlashEnemyUnit; 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_FlashUnits), isFromPool) as Room2C_FlashUnits; 
 		}
 
 		[MemoryPackOrder(0)]
@@ -1793,12 +1775,12 @@ namespace ET
 		}
 
 		[MemoryPackOrder(0)]
-		public RoomCardInfo Units { get; set; }
+		public RoomCardInfo Unit { get; set; }
 
 		public override void Dispose() 
 		{
 			if (!this.IsFromPool) return;
-			this.Units = default;
+			this.Unit = default;
 			
 			ObjectPool.Instance.Recycle(this); 
 		}
@@ -2053,6 +2035,32 @@ namespace ET
 
 	}
 
+	[Message(LockStepOuter.Room2C_BreakCards)]
+	[MemoryPackable]
+	public partial class Room2C_BreakCards: MessageObject, IMessage
+	{
+		public static Room2C_BreakCards Create(bool isFromPool = true) 
+		{ 
+			return ObjectPool.Instance.Fetch(typeof(Room2C_BreakCards), isFromPool) as Room2C_BreakCards; 
+		}
+
+		[MemoryPackOrder(0)]
+		public List<RoomCardInfo> Cards { get; set; } = new();
+
+		[MemoryPackOrder(1)]
+		public bool IsMy { get; set; }
+
+		public override void Dispose() 
+		{
+			if (!this.IsFromPool) return;
+			this.Cards.Clear();
+			this.IsMy = default;
+			
+			ObjectPool.Instance.Recycle(this); 
+		}
+
+	}
+
 	public static class LockStepOuter
 	{
 		 public const ushort C2G_Match = 11002;
@@ -2117,18 +2125,18 @@ namespace ET
 		 public const ushort Room2C_CardsGetDamage = 11061;
 		 public const ushort Room2C_CallUnits = 11062;
 		 public const ushort Room2C_EnemyCallUnits = 11063;
-		 public const ushort Room2C_FlashMyUnit = 11064;
-		 public const ushort Room2C_FlashEnemyUnit = 11065;
-		 public const ushort Room2C_FlashUnit = 11066;
-		 public const ushort Room2C_FindCardsToShow = 11067;
-		 public const ushort Room2C_GetHandCards = 11068;
-		 public const ushort Room2C_EnemyGetHandCards = 11069;
-		 public const ushort Room2C_RiskSuccess = 11070;
-		 public const ushort Room2C_ShowUseCard = 11071;
-		 public const ushort Room2C_GetArmor = 11072;
-		 public const ushort Room2C_TreatTergets = 11073;
-		 public const ushort Room2C_AddCardsToGroupShow = 11074;
-		 public const ushort Room2C_AddCardsToGroupHide = 11075;
-		 public const ushort Room2C_LoseArmor = 11076;
+		 public const ushort Room2C_FlashUnits = 11064;
+		 public const ushort Room2C_FlashUnit = 11065;
+		 public const ushort Room2C_FindCardsToShow = 11066;
+		 public const ushort Room2C_GetHandCards = 11067;
+		 public const ushort Room2C_EnemyGetHandCards = 11068;
+		 public const ushort Room2C_RiskSuccess = 11069;
+		 public const ushort Room2C_ShowUseCard = 11070;
+		 public const ushort Room2C_GetArmor = 11071;
+		 public const ushort Room2C_TreatTergets = 11072;
+		 public const ushort Room2C_AddCardsToGroupShow = 11073;
+		 public const ushort Room2C_AddCardsToGroupHide = 11074;
+		 public const ushort Room2C_LoseArmor = 11075;
+		 public const ushort Room2C_BreakCards = 11076;
 	}
 }

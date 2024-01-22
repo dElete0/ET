@@ -49,7 +49,7 @@ namespace ET.Server {
                     TriggerPowerType = TriggerPowerType.Release,
                     Count1 = num,
                     Count2 = loopCount - 1,
-                }, null, null, player));
+                }, null, null, null, player));
             }
         }
 
@@ -61,6 +61,7 @@ namespace ET.Server {
 
             List<RoomCardInfo> cardInfos = new List<RoomCardInfo>();
             List<int> hurts = new List<int>();
+            int allHurts = 0;
 
             foreach (var targetId in targetIds)
             {
@@ -68,30 +69,37 @@ namespace ET.Server {
                 if (target.UnitType == CardUnitType.ExclusionZone) continue;
                 int totalHurt = 0;
                 int hpHurt = 0;
-                if (target.AttributePowers.Contains(Power_Type.Bubbles)) {
+                if (target.AttributePowers.ContainsKey(Power_Type.Immunity)) {
+                    
+                } else if (target.AttributePowers.ContainsKey(Power_Type.Bubbles)) {
                     target.AttributePowers.Remove(Power_Type.Bubbles);
                 } else {
+                    int hurtNum = num;
+                    if (target.AttributePowers.ContainsKey(Power_Type.Metamorphosis)) {
+                        hurtNum = 1;
+                    }
                     if (target.CardType == CardType.Hero)
                     {
-                        if (target.Armor >= num) {
-                            target.Armor -= num;
+                        if (target.Armor >= hurtNum) {
+                            target.Armor -= hurtNum;
                             hpHurt = 0;
-                            totalHurt = num;
+                            totalHurt = hurtNum;
                         } else if (target.Armor > 0) {
-                            hpHurt = num - target.Armor;
-                            totalHurt = num;
+                            hpHurt = hurtNum - target.Armor;
+                            totalHurt = hurtNum;
                             target.Armor = 0;
                         } else {
-                            totalHurt = num;
-                            hpHurt = num;
+                            totalHurt = hurtNum;
+                            hpHurt = hurtNum;
                         }
                     } else {
-                        totalHurt = num;
-                        hpHurt = num;
+                        totalHurt = hurtNum;
+                        hpHurt = hurtNum;
                     }
                 }
 
                 if (totalHurt > 0) {
+                    allHurts += totalHurt;
                     target.HP -= hpHurt;
                     cardInfos.Add(target.RoomCard2UnitInfo());
                     hurts.Add(totalHurt);
@@ -106,6 +114,10 @@ namespace ET.Server {
                 // Todo 客户端执行受伤动作
                 Room2C_CardsGetDamage cardGetDamage = new() { Card = cardInfos, hurt = hurts };
                 RoomMessageHelper.BroadCast(room, cardGetDamage);
+            }
+
+            if (allHurts > 0 && actor.AttributePowers.ContainsKey(Power_Type.SuckBlood)) {
+                await roomEventTypeComponent.BroadEvent(GameEventFactory.TreatTarget(roomEventTypeComponent, actor, actor.GetOwner().GetHero(), allHurts), eventInfo);
             }
         }
     }

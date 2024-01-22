@@ -5,7 +5,7 @@ namespace ET.Server {
     [FriendOfAttribute(typeof(ET.RoomCard))]
     public static class GameEvent_AddCardToGroup
     {
-        public static async ETTask ToDo_AddCardToGroup(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, int baseId, int num, int att, bool isShow)
+        public static async ETTask ToDo_AddCardToGroupByBaseId(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, int baseId, int num, int att, bool isShow)
         {
             RoomPlayer player = actor.GetOwner();
             CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
@@ -40,6 +40,24 @@ namespace ET.Server {
                     RoomMessageHelper.ServerSendMessageToClient(player, myMessage);
                     RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
                 }
+            }
+        }
+
+        public static async ETTask ToDo_AddTargetCardToGroup(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, RoomCard target, bool isShow) {
+            RoomPlayer player = target.GetOwner();
+            CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
+            playerInfo.Groups.Insert(0, target.Id);
+            
+            if (isShow) {
+                Room2C_AddCardsToGroupShow myMessage = new Room2C_AddCardsToGroupShow() { Cards = { target.RoomCard2MyHandCardInfo() }, IsMy = true };
+                Room2C_AddCardsToGroupShow enemyMessage = new Room2C_AddCardsToGroupShow() { Cards = { target.RoomCard2MyHandCardInfo() }, IsMy = false };
+                RoomMessageHelper.ServerSendMessageToClient(player, myMessage);
+                RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
+            } else {
+                Room2C_AddCardsToGroupHide myMessage = new Room2C_AddCardsToGroupHide() { Num = 1, IsMy = true };
+                Room2C_AddCardsToGroupHide enemyMessage = new Room2C_AddCardsToGroupHide() { Num = 1, IsMy = false };
+                RoomMessageHelper.ServerSendMessageToClient(player, myMessage);
+                RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
             }
         }
     }

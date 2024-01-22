@@ -14,16 +14,10 @@ namespace ET.Server
         public List<long> Units = new List<long>();
         
         public int HandCardsCountMax;
-        public int GroupCountMax;
-        public int UnitCountMax;
-        public const int HandCardsCountMaxD = 10;
-        public const int GroupCountMaxD = 50;
-        public const int UnitCountMaxD = 8;
 
         public int Cost;
         public int CostTotal;
         public int CostMax;
-        public const int CostMaxD = 12;
 
         public int Red;
         public int Green;

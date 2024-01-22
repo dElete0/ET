@@ -6,6 +6,14 @@ namespace ET.Server {
     [FriendOfAttribute(typeof(ET.Server.PlayerEventTypeComponent))]
     public static class GameEventFactory
     {
+        public static GameEvent Instance() {
+            GameEvent gameEvent = new GameEvent();
+            gameEvent.ToDo = (ge, info) => {
+                Log.Error("此单例仅作为空的输入，如被调用，有bug");
+                return null;
+            };
+            return gameEvent;
+        }
         public static GameEvent GetHandCardsFromGroup(RoomEventTypeComponent room, RoomPlayer player, int count)
         {
             GameEvent gameEvent = new GameEvent(GameEventType.GetCardFromGroup);
@@ -66,12 +74,25 @@ namespace ET.Server {
             return gameEvent;
         }
         
-        public static GameEvent GetHandCards(RoomEventTypeComponent room, RoomPlayer player, List<RoomCard> cards)
+        public static GameEvent GetHandCards(RoomEventTypeComponent room, RoomPlayer player, RoomCard card, List<RoomCard> cards)
         {
             GameEvent gameEvent = new GameEvent(GameEventType.GetHandCard);
             gameEvent.ToDo = (ge, info) =>
             {
-                return room.ToDo_GetHandCards(player, cards);
+                if (cards != null) {
+                    return room.ToDo_GetHandCards(player, cards);
+                } else {
+                    return room.ToDo_GetHandCards(player, new List<RoomCard>(){card});
+                }
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent GetHandCardsByBaseIds(RoomEventTypeComponent room, RoomPlayer player, int baseId, int num, int att) {
+            GameEvent gameEvent = new GameEvent(GameEventType.GetHandCard);
+            gameEvent.ToDo = (ge, info) =>
+            {
+                return room.ToDo_GetHandCardsByBaseIds(player, baseId, num, att);
             };
             return gameEvent;
         }
@@ -323,18 +344,18 @@ namespace ET.Server {
             return gameEvent;
         }
         
-        public static GameEvent AddCardToGroupShow(RoomEventTypeComponent room, RoomCard actor, int baseId, int num, int att) {
-            GameEvent gameEvent = new GameEvent(GameEventType.AddCardToGroup);
+        public static GameEvent AddCardToGroupByBaseIdShow(RoomEventTypeComponent room, RoomCard actor, int baseId, int num, int att) {
+            GameEvent gameEvent = new GameEvent(GameEventType.AddCardToGroupByBaseId);
             gameEvent.ToDo = (ge, info) => {
-                return room.ToDo_AddCardToGroup(info, actor, baseId, num, att, true);
+                return room.ToDo_AddCardToGroupByBaseId(info, actor, baseId, num, att, true);
             };
             return gameEvent;
         }
         
-        public static GameEvent AddCardToGroupHide(RoomEventTypeComponent room, RoomCard actor, int baseId, int num, int att) {
-            GameEvent gameEvent = new GameEvent(GameEventType.AddCardToGroup);
+        public static GameEvent AddCardToGroupByBaseIdHide(RoomEventTypeComponent room, RoomCard actor, int baseId, int num, int att) {
+            GameEvent gameEvent = new GameEvent(GameEventType.AddCardToGroupByBaseId);
             gameEvent.ToDo = (ge, info) => {
-                return room.ToDo_AddCardToGroup(info, actor, baseId, num, att, false);
+                return room.ToDo_AddCardToGroupByBaseId(info, actor, baseId, num, att, false);
             };
             return gameEvent;
         }
@@ -433,7 +454,7 @@ namespace ET.Server {
             return gameEvent;
         }
 
-        public static GameEvent Remove(RoomEventTypeComponent roomEventTypeComponent, List<RoomCard> cards) {
+        public static GameEvent Remove(RoomEventTypeComponent roomEventTypeComponent, List<(RoomCard, RemoveType)> cards) {
             GameEvent gameEvent = new GameEvent(GameEventType.RemoveUnits);
             gameEvent.ToDo = (ge, info) =>
             {
@@ -453,11 +474,124 @@ namespace ET.Server {
             return gameEvent;
         }
 
-        public static GameEvent PowerToUseCard(RoomEventTypeComponent room, RoomCard actor, int baseId) {
+        public static GameEvent PowerToUseBaseCard(RoomEventTypeComponent room, RoomCard actor, int baseId) {
             GameEvent gameEvent = new GameEvent(GameEventType.PowerToUseCard);
             gameEvent.ToDo = (ge, info) =>
             {
-                return room.ToDo_PowerToUseCard(info, actor, baseId);
+                return room.ToDo_PowerToUseBaseCard(info, actor, baseId);
+            };
+            return gameEvent;
+        }
+        
+        public static GameEvent PowerToUseCard(RoomEventTypeComponent room, RoomCard actor, RoomCard target) {
+            GameEvent gameEvent = new GameEvent(GameEventType.PowerToUseCard);
+            gameEvent.ToDo = (ge, info) =>
+            {
+                return room.ToDo_PowerToUseCard(info, actor, target);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent DamageEnemyHero(RoomEventTypeComponent room, RoomCard actor, int num) {
+            GameEvent gameEvent = new GameEvent(GameEventType.Damage);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_HeroDamage(info, actor, actor.GetOwner().GetEnemy().GetHero(), num);
+            };
+            return gameEvent;
+        }
+        
+        public static GameEvent DamageMyHero(RoomEventTypeComponent room, RoomCard actor, int num) {
+            GameEvent gameEvent = new GameEvent(GameEventType.Damage);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_HeroDamage(info, actor, actor.GetOwner().GetHero(), num);
+            };
+            return gameEvent;
+        }
+        
+        public static GameEvent MyHeroGetAttackThisTurn(RoomEventTypeComponent room, RoomCard actor, int num) {
+            GameEvent gameEvent = new GameEvent(GameEventType.TargetGetAttackThisTurn);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_TargetGetAttackThisTurn(info, actor, actor.GetOwner().GetHero(), num);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent LoseAttack(RoomEventTypeComponent room, RoomCard actor, RoomCard target, int num) {
+            GameEvent gameEvent = new GameEvent(GameEventType.LoseAttack);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_LoseAttack(info, actor, target, num);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent UnitsGetAttribute(RoomEventTypeComponent room, RoomCard actor, int num, int type) {
+            GameEvent gameEvent = new GameEvent(GameEventType.UnitsGetAttribute);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_UnitsGetAttribute(actor, num, type);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent UnitsInGroupGetAttribute(RoomEventTypeComponent room, RoomCard actor, int baseId, int num) {
+            GameEvent gameEvent = new GameEvent(GameEventType.UnitsInGroupGetAttribute);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_UnitsInGroupGetAttribute(actor, baseId, num);
+            };
+            return gameEvent;
+        }
+        
+        public static GameEvent UnitsInGroupLoseAttributeAddDamageEnemyHero(RoomEventTypeComponent room, RoomCard actor, int baseId, int num) {
+            GameEvent gameEvent = new GameEvent(GameEventType.UnitsInGroupLoseAttributeAddDamageEnemyHero);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_UnitsInGroupLoseAttributeAddDamageEnemyHero(info, actor, baseId, num);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent TargetBackToHandCards(RoomEventTypeComponent room, RoomCard actor, RoomCard target) {
+            GameEvent gameEvent = new GameEvent(GameEventType.TargetBackToHandCards);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_TargetBackToHandCards(info, actor, target);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent TargetBackToGroup(RoomEventTypeComponent room, RoomCard actor, RoomCard target) {
+            GameEvent gameEvent = new GameEvent(GameEventType.TargetBackToGroup);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_TargetBackToGroup(info, actor, target);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent AddTargetCardToGroupShow(RoomEventTypeComponent room, RoomCard actor, RoomCard target) {
+            GameEvent gameEvent = new GameEvent(GameEventType.AddTargetCardToGroup);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_AddTargetCardToGroup(info, actor, target, true);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent Erosion(RoomEventTypeComponent room, RoomCard actor, int num) {
+            GameEvent gameEvent = new GameEvent(GameEventType.Erosion);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_Erosion(info, actor, num);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent MyHeroGetTargetPowerThisTurn(RoomEventTypeComponent room, RoomCard actor, Power_Type type) {
+            GameEvent gameEvent = new GameEvent(GameEventType.MyHeroGetTargetPowerThisTurn);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_MyHeroGetTargetPowerThisTurn(actor, type);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent TargetLosePower(RoomEventTypeComponent room, RoomCard actor, RoomCard target, Power_Type type, int num) {
+            GameEvent gameEvent = new GameEvent(GameEventType.TargetLosePower);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_TargetLosePower(actor, target, type, num);
             };
             return gameEvent;
         }
