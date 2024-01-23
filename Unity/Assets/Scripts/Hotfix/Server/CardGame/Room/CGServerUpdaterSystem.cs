@@ -9,10 +9,11 @@ namespace ET.Server
     public static partial class CGServerUpdaterSystem
     {
         [EntitySystem]
-        private static void Awake(this CGServerUpdater self)
+        private static void Awake(this CGServerUpdater self, GameRoomType type)
         {
             self.GameState = GameState.Build;
             self.TurnTimeMax = CGServerUpdater.TurmTimeD;
+            self.GameRoomType = type;
             self.TurnStartTime = TimeInfo.Instance.ServerFrameTime();
 
             // 初始化房间数据结构
@@ -32,18 +33,17 @@ namespace ET.Server
         [EntitySystem]
         private static void Update(this CGServerUpdater self)
         {
-            Room room = self.GetParent<Room>();
-            long timeNow = TimeInfo.Instance.ServerFrameTime();
+            if (self.GameRoomType == GameRoomType.Match) {
+                long timeNow = TimeInfo.Instance.ServerFrameTime();
 
-            if (timeNow < self.TurnTimeMax + self.TurnStartTime)
-            {
-                self.TurnStartTime = timeNow;
+                if (timeNow < self.TurnTimeMax + self.TurnStartTime)
+                {
+                    self.TurnStartTime = timeNow;
 
-                // todo 强制回合结束
-                return;
+                    // todo 强制回合结束
+                    return;
+                }
             }
-
-            //RoomMessageHelper.BroadCast(room, sendInput);
         }
     }
 }

@@ -54,6 +54,7 @@ namespace ET.Server {
             switch (powerType)
             {
                 case Power_Type.TargetGetAttribute:
+                case Power_Type.DamageMyHero:
                     return 1;
                 default:
                     return 0;

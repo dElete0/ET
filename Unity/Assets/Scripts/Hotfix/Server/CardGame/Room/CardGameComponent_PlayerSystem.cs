@@ -38,6 +38,19 @@ namespace ET.Server
             units.AddRange(enemyCards.Units);
             return units;
         }
+        
+        public static List<long> GetAllActors(this CardGameComponent_Player self) {
+            List<long> units = new List<long>(self.Units);
+            var enemyCards = self.GetParent<RoomPlayer>().GetEnemy().GetComponent<CardGameComponent_Player>();
+            units.AddRange(enemyCards.Units);
+            units.Add(self.Hero);
+            units.Add(enemyCards.Hero);
+            if (self.Agent1 > 0) units.Add(self.Agent1);
+            if (self.Agent2 > 0) units.Add(self.Agent2);
+            if (enemyCards.Agent1 > 0) units.Add(enemyCards.Agent1);
+            if (enemyCards.Agent2 > 0) units.Add(enemyCards.Agent2);
+            return units;
+        }
 
         public static bool Contains(this long[] self, long id) {
             foreach (var cardId in self) {
@@ -76,6 +89,84 @@ namespace ET.Server
             }
             return false;
         }
+
+        public static List<RoomCard> GetHandCards(this CardGameComponent_Player playerInfo, CardGameComponent_Cards cards) {
+            List<RoomCard> handCards = new List<RoomCard>();
+            foreach (var unitId in playerInfo.HandCards) {
+                handCards.Add(cards.GetChild<RoomCard>(unitId));
+            }
+            return handCards;
+        }
+
+        public static List<RoomCard> GetUnits(this CardGameComponent_Player playerInfo, CardGameComponent_Cards cards) {
+            List<RoomCard> units = new List<RoomCard>();
+            foreach (var unitId in playerInfo.Units) {
+                units.Add(cards.GetChild<RoomCard>(unitId));
+            }
+            return units;
+        }
+
+        public static List<RoomCard> GetUnitsByPower(this List<RoomCard> cards, Power_Type power) {
+            List<RoomCard> returnCards = new List<RoomCard>();
+            foreach (var card in cards) {
+                if (card.AttributePowers.ContainsKey(power)) {
+                    returnCards.Add(card);
+                }
+            }
+            return returnCards;
+        }
+
+        public static int GetHurtByAttack(this List<RoomCard> cards) {
+            int hurt = 0;
+            foreach (var card in cards) {
+                if (card.UnitType != CardUnitType.ExclusionZone) {
+                    hurt += card.Attack;
+                }
+            }
+            return hurt;
+        }
         
+        public static (int, List<RoomCard>) GetHurtByHandCards(this List<RoomCard> cards, int cost) {
+            int allHurt = 0;
+            List<RoomCard> returnCards = new List<RoomCard>();
+            foreach (var card in cards) {
+                int hurt = card.GetHurtByHandCard();
+                if (hurt > 0) {
+                    allHurt += hurt;
+                    returnCards.Add(card);
+                }
+            }
+            return (allHurt, returnCards);
+        }
+
+        public static int GetHurtByHandCard(this RoomCard card) {
+            int hurt = 0;
+            List<Power_Struct> powers = null;
+            if (card.CardType == CardType.Unit) {
+                if (card.AttributePowers.ContainsKey(Power_Type.Charge)) {
+                    hurt += card.Attack;
+                    if (card.AttributePowers.ContainsKey(Power_Type.AttackTwice)) {
+                        hurt += card.Attack;
+                    }
+                }
+                powers = card.GetArranges();
+            } else if (card.CardType == CardType.Plot || card.CardType == CardType.Magic) {
+                powers = card.GetRelease();
+            }
+
+            if (powers != null && powers.Count > 1) {
+                foreach (var power in powers) {
+                    switch (power.PowerType) {
+                        case Power_Type.DamageHurt:
+                        case Power_Type.DamageAllActor:
+                        case Power_Type.DamageEnemyHero:
+                            hurt += power.Count1;
+                            break;
+                    }
+                }
+            }
+
+            return hurt;
+        }
     }
 }

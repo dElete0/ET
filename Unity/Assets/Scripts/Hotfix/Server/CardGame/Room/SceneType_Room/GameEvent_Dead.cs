@@ -112,6 +112,7 @@ namespace ET.Server {
                 RoomMessageHelper.ServerSendMessageToClient(actor.GetOwner(), myMessage);
                 RoomMessageHelper.BroadCastWithOutPlayer(actor.GetOwner().GetEnemy(), enemyMessage);
             }
+            await ETTask.CompletedTask;
         }
     }
 }

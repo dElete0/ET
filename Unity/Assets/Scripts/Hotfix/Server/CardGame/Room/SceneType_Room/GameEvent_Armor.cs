@@ -5,9 +5,10 @@ namespace ET.Server {
     [FriendOfAttribute(typeof(ET.Server.CardEventTypeComponent))]
     public static class GameEvent_Armor
     {
-        public static async ETTask ToDo_GetArmor(this RoomEventTypeComponent roomEventTypeComponent, RoomCard actor, int num)
-        {
-            RoomPlayer player = actor.GetOwner();
+        public static async ETTask ToDo_GetArmor(this RoomEventTypeComponent roomEventTypeComponent, RoomCard actor, RoomPlayer player, int num) {
+            if (player == null) {
+                player = actor.GetOwner();
+            }
             CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
             RoomCard hero = roomEventTypeComponent.GetParent<Room>().GetComponent<CardGameComponent_Cards>().GetChild<RoomCard>(playerInfo.Hero);
             hero.Armor += num;
@@ -16,6 +17,7 @@ namespace ET.Server {
             Room2C_GetArmor enemyArmor = new Room2C_GetArmor() { Num = num, IsMy = false, Now = hero.Armor };
             RoomMessageHelper.ServerSendMessageToClient(player, MyArmor);
             RoomMessageHelper.BroadCastWithOutPlayer(player, enemyArmor);
+            await ETTask.CompletedTask;
         }
 
         public static async ETTask ToDo_TargetGetPower(this RoomEventTypeComponent roomEventTypeComponent, RoomCard actor, RoomCard target, Power_Type powerType)
@@ -31,6 +33,7 @@ namespace ET.Server {
 
             Room2C_FlashUnit message = new Room2C_FlashUnit() { Unit = target.RoomCard2UnitInfo() };
             RoomMessageHelper.BroadCast(roomEventTypeComponent.GetParent<Room>(), message);
+            await ETTask.CompletedTask;
         }
         
         public static async ETTask ToDo_TargetLosePower(this RoomEventTypeComponent roomEventTypeComponent, RoomCard actor, RoomCard target, Power_Type powerType, int num) {
@@ -54,6 +57,7 @@ namespace ET.Server {
                 Room2C_FlashUnit message = new Room2C_FlashUnit() { Unit = target.RoomCard2UnitInfo() };
                 RoomMessageHelper.BroadCast(roomEventTypeComponent.GetParent<Room>(), message);
             }
+            await ETTask.CompletedTask;
         }
 
         public static async ETTask ToDo_MyHeroGetTargetPowerThisTurn(this RoomEventTypeComponent roomEventTypeComponent, RoomCard actor, Power_Type type)
@@ -70,9 +74,25 @@ namespace ET.Server {
 
             Room2C_FlashUnit message = new Room2C_FlashUnit() { Unit = hero.RoomCard2HeroInfo() };
             RoomMessageHelper.BroadCast(roomEventTypeComponent.GetParent<Room>(), message);
+            await ETTask.CompletedTask;
         }
 
-        public static async ETTask ToDo_SwapArmor(this RoomEventTypeComponent roomEventTypeComponent, RoomCard actor)
+        public static async ETTask ToDo_RemoveArmorAndDamageThisNum(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor) {
+            RoomPlayer player = actor.GetOwner().GetEnemy();
+            RoomCard hero = player.GetHero();
+            int num = hero.Armor;
+            if (num > 0) {
+                hero.Armor = 0;
+                Room2C_LoseArmor myMessage = new Room2C_LoseArmor() { IsMy = true };
+                Room2C_LoseArmor enemyMessage = new Room2C_LoseArmor() { IsMy = false };
+                RoomMessageHelper.ServerSendMessageToClient(player, myMessage);
+                RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
+
+                await roomEventTypeComponent.BroadEvent(GameEventFactory.Damage(roomEventTypeComponent, actor, hero, num), eventInfo);
+            }
+        }
+
+        public static async ETTask ToDo_SwapArmor(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor)
         {
             RoomPlayer player = actor.GetOwner();
             RoomPlayer enemy = player.GetEnemy();
@@ -97,11 +117,7 @@ namespace ET.Server {
                 RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
                 if (enemyNow > 0)
                 {
-                    myHero.Armor = enemyNow;
-                    Room2C_GetArmor MyArmor = new Room2C_GetArmor() { Num = enemyNow, IsMy = true, Now = enemyNow };
-                    Room2C_GetArmor enemyArmor = new Room2C_GetArmor() { Num = enemyNow, IsMy = false, Now = enemyNow };
-                    RoomMessageHelper.ServerSendMessageToClient(player, MyArmor);
-                    RoomMessageHelper.BroadCastWithOutPlayer(player, enemyArmor);
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.GetArmor(roomEventTypeComponent, actor, player, enemyNow), eventInfo);
                 }
             }
 
@@ -114,15 +130,9 @@ namespace ET.Server {
                 RoomMessageHelper.BroadCastWithOutPlayer(enemy, enemyMessage);
                 if (myNow > 0)
                 {
-                    enemyHero.Armor = myNow;
-                    Room2C_GetArmor MyArmor = new Room2C_GetArmor() { Num = myNow, IsMy = true, Now = myNow };
-                    Room2C_GetArmor enemyArmor = new Room2C_GetArmor() { Num = myNow, IsMy = false, Now = myNow };
-                    RoomMessageHelper.ServerSendMessageToClient(enemy, MyArmor);
-                    RoomMessageHelper.BroadCastWithOutPlayer(enemy, enemyArmor);
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.GetArmor(roomEventTypeComponent, actor, enemy, myNow), eventInfo);
                 }
             }
-
-            await ETTask.CompletedTask;
         }
     }
 }

@@ -39,7 +39,7 @@ namespace ET.Server
                 self.Count++;
                 //如果触发了其中的事件，就直接ToDo事件,如果导致eventType失效，就不执行了
                 foreach (var eventTypeComponent in self.CardEventTypeComponents) {
-                    if (await eventTypeComponent.SendTriggeerEvent(eventType, eventInfo)) {
+                    if (await eventTypeComponent.IsEventBeOverByTriggeerEvent(eventType, eventInfo)) {
                         eventInfo.Count--;
                         return;
                     }

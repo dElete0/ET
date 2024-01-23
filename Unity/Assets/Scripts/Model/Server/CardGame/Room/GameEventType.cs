@@ -108,5 +108,6 @@ namespace ET.Server {
         Erosion = 162,
         MyHeroGetTargetPowerThisTurn = 163,
         TargetLosePower = 164,
+        Others = 165,
     }
 }

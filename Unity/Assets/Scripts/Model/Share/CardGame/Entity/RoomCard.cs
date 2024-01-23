@@ -229,7 +229,7 @@ namespace ET {
         // 你的对手无法拥有单位
         EnemyCantGetUnit = 1006,
         // 召唤指定单位
-        CallTargetUnit = 1007,
+        CallTargetUnitByBaseId = 1007,
         // 你的所有单位获得冲锋
         YourAllUnitsGetCharge = 1008,
         // 法术增强
@@ -305,5 +305,12 @@ namespace ET {
         MyHeroGetTargetPowerThisTurn = 1044,
         TreatMyHero = 1045,
         GetHandCardsByBaseIds = 1046,
+        RemoveArmorAndDamageThisNum = 1047,
+        SendUnitToEnemy = 1048,
+        CallTargetUnit = 1049,
+        EnemyCallTargetUnitByBaseId = 1050,
+        EnemyGetHandCardsByBaseId = 1051,
+        CallTargetUnitForAllByBaseId = 1052,
+        DamageAllActor = 1053,
     }
 }

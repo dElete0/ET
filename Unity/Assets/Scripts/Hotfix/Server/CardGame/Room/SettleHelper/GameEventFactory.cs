@@ -269,11 +269,27 @@ namespace ET.Server {
             };
             return gameEvent;
         }
+        
+        public static GameEvent DamageAllActor(RoomEventTypeComponent room, RoomCard actor, int num) {
+            GameEvent gameEvent = new GameEvent(GameEventType.DamageAllUnit);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_DamageAllActor(info, actor, num);
+            };
+            return gameEvent;
+        }
 
-        public static GameEvent CallTargetUnit(RoomEventTypeComponent room, RoomPlayer player, RoomCard actor, int cardId, int num) {
+        public static GameEvent CallTargetUnitByBaseId(RoomEventTypeComponent room, RoomPlayer player, RoomCard actor, int cardId, int num) {
             GameEvent gameEvent = new GameEvent(GameEventType.CallUnit);
             gameEvent.ToDo = (ge, info) => {
-                return room.ToDo_CalltargetUnit(info, player, actor, cardId, num, CallType.Nomal);
+                return room.ToDo_CalltargetUnitByBaseId(info, player, actor, cardId, num, CallType.Nomal);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent CallTargetUnitForAllByBaseId(RoomEventTypeComponent room, RoomCard actor, int baseId, int num, int att) {
+            GameEvent gameEvent = new GameEvent(GameEventType.Others);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_CallTargetUnitForAllByBaseId(info, actor, baseId, num, att);
             };
             return gameEvent;
         }
@@ -286,10 +302,10 @@ namespace ET.Server {
             return gameEvent;
         }
 
-        public static GameEvent GetArmor(RoomEventTypeComponent room, RoomCard actor, int num) {
+        public static GameEvent GetArmor(RoomEventTypeComponent room, RoomCard actor, RoomPlayer player, int num) {
             GameEvent gameEvent = new GameEvent(GameEventType.GetArmor);
             gameEvent.ToDo = (ge, info) => {
-                return room.ToDo_GetArmor(actor, num);
+                return room.ToDo_GetArmor(actor, player, num);
             };
             return gameEvent;
         }
@@ -323,7 +339,23 @@ namespace ET.Server {
         public static GameEvent CallRedDragon(RoomEventTypeComponent room, RoomPlayer player, RoomCard actor, int num) {
             GameEvent gameEvent = new GameEvent(GameEventType.CallUnit);
             gameEvent.ToDo = (ge, info) => {
-                return room.ToDo_CalltargetUnit(info, player, actor, 3000013, num, CallType.RedDragon);
+                return room.ToDo_CalltargetUnitByBaseId(info, player, actor, 3000013, num, CallType.RedDragon);
+            };
+            return gameEvent;
+        }
+        
+        public static GameEvent SendUnitToEnemy(RoomEventTypeComponent room, RoomCard actor, RoomCard target) {
+            GameEvent gameEvent = new GameEvent(GameEventType.Others);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_SendUnitToEnemy(info, actor, target);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent CallTargetUnit(RoomEventTypeComponent room, RoomPlayer player, RoomCard target, int pos) {
+            GameEvent gameEvent = new GameEvent(GameEventType.CallUnit);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_CallTargetUnit(info, player, target, pos);
             };
             return gameEvent;
         }
@@ -363,7 +395,7 @@ namespace ET.Server {
         public static GameEvent SwapArmor(RoomEventTypeComponent room, RoomCard actor) {
             GameEvent gameEvent = new GameEvent(GameEventType.SwapArmor);
             gameEvent.ToDo = (ge, info) => {
-                return room.ToDo_SwapArmor(actor);
+                return room.ToDo_SwapArmor(info, actor);
             };
             return gameEvent;
         }
@@ -592,6 +624,14 @@ namespace ET.Server {
             GameEvent gameEvent = new GameEvent(GameEventType.TargetLosePower);
             gameEvent.ToDo = (ge, info) => {
                 return room.ToDo_TargetLosePower(actor, target, type, num);
+            };
+            return gameEvent;
+        }
+
+        public static GameEvent RemoveArmorAndDamageThisNum(RoomEventTypeComponent room, RoomCard actor) {
+            GameEvent gameEvent = new GameEvent(GameEventType.Others);
+            gameEvent.ToDo = (ge, info) => {
+                return room.ToDo_RemoveArmorAndDamageThisNum(info, actor);
             };
             return gameEvent;
         }

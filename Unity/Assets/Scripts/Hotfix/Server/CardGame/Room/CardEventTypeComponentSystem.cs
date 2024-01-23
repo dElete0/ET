@@ -21,7 +21,7 @@ namespace ET.Server
             self.RoomEvent.CardEventTypeComponents.Remove(self);
         }
 
-        public static async ETTask<bool> SendTriggeerEvent(this ET.Server.CardEventTypeComponent self, GameEvent eventType, EventInfo eventInfo)
+        public static async ETTask<bool> IsEventBeOverByTriggeerEvent(this ET.Server.CardEventTypeComponent self, GameEvent eventType, EventInfo eventInfo)
         {
             //通知任意位置触发的监听器
             foreach (var kv in self.AllGameEventTypes)
@@ -36,6 +36,15 @@ namespace ET.Server
                     self.GetParent<RoomCard>().CardType == CardType.Hero ||
                     self.GetParent<Room>().GetComponent<CardGameComponent_Cards>().IsUnit(self.GetParent<RoomCard>()))) {
                 foreach (var kv in self.UnitGameEventTypes) {
+                    if (await SendTriggeerEventHelper(kv, eventType, eventInfo)) {
+                        return true;
+                    }
+                }
+            }
+            //手牌监听器
+            if (self.HanCardEventTypes.Count > 0 && 
+                (self.GetParent<Room>().GetComponent<CardGameComponent_Cards>().IsHandCards(self.GetParent<RoomCard>()))) {
+                foreach (var kv in self.HanCardEventTypes) {
                     if (await SendTriggeerEventHelper(kv, eventType, eventInfo)) {
                         return true;
                     }
@@ -72,8 +81,14 @@ namespace ET.Server
                 case Power_Type.DamageAllUnit:
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.DamageAllUnit(roomEventTypeComponent, actor, player, power.Count1), eventInfo);
                     break;
-                case Power_Type.CallTargetUnit:
-                    await roomEventTypeComponent.BroadEvent(GameEventFactory.CallTargetUnit(roomEventTypeComponent, player, target, power.Count1, power.Count2), eventInfo);
+                case Power_Type.DamageAllActor:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.DamageAllActor(roomEventTypeComponent, actor, power.Count1), eventInfo);
+                    break;
+                case Power_Type.CallTargetUnitByBaseId:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.CallTargetUnitByBaseId(roomEventTypeComponent, player, target, power.Count1, power.Count2), eventInfo);
+                    break;
+                case Power_Type.EnemyCallTargetUnitByBaseId:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.CallTargetUnitByBaseId(roomEventTypeComponent, actor.GetOwner().GetEnemy(), target, power.Count1, power.Count2), eventInfo);
                     break;
                 case Power_Type.SilentTarget:
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.SilentTarget(roomEventTypeComponent, actor, target), eventInfo);
@@ -97,7 +112,7 @@ namespace ET.Server
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.GetQualifications(roomEventTypeComponent, actor, power.Count1, power.Count2), eventInfo);
                     break;
                 case Power_Type.GetArmor:
-                    await roomEventTypeComponent.BroadEvent(GameEventFactory.GetArmor(roomEventTypeComponent, actor, power.Count1), eventInfo);
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.GetArmor(roomEventTypeComponent, actor, player, power.Count1), eventInfo);
                     break;
                 case Power_Type.TargetGetPower:
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.TargetGetPower(roomEventTypeComponent, actor, target, (Power_Type)power.Count1), eventInfo);
@@ -153,6 +168,9 @@ namespace ET.Server
                 case Power_Type.GetHandCards:
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.GetHandCards(roomEventTypeComponent, player, target, targets), eventInfo);
                     break;
+                case Power_Type.EnemyGetHandCardsByBaseId:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.GetHandCardsByBaseIds(roomEventTypeComponent, player.GetEnemy(), power.Count1, power.Count2, power.Count3), eventInfo);
+                    break;
                 case Power_Type.TargetBackToGroup:
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.TargetBackToGroup(roomEventTypeComponent, actor, target), eventInfo);
                     break;
@@ -167,6 +185,18 @@ namespace ET.Server
                     break;
                 case Power_Type.GetHandCardsByBaseIds:
                     await roomEventTypeComponent.BroadEvent(GameEventFactory.GetHandCardsByBaseIds(roomEventTypeComponent, actor.GetOwner(), power.Count1, power.Count2, power.Count3), eventInfo);
+                    break;
+                case Power_Type.RemoveArmorAndDamageThisNum:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.RemoveArmorAndDamageThisNum(roomEventTypeComponent, actor), eventInfo);
+                    break;
+                case Power_Type.SendUnitToEnemy:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.SendUnitToEnemy(roomEventTypeComponent, actor, target), eventInfo);
+                    break;
+                case Power_Type.CallTargetUnit:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.CallTargetUnit(roomEventTypeComponent, player, target, power.Count1), eventInfo);
+                    break;
+                case Power_Type.CallTargetUnitForAllByBaseId:
+                    await roomEventTypeComponent.BroadEvent(GameEventFactory.CallTargetUnitForAllByBaseId(roomEventTypeComponent, actor, power.Count1, power.Count2, power.Count3), eventInfo);
                     break;
             }
         }

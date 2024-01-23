@@ -117,6 +117,7 @@ namespace ET.Server {
                 Count1 = target.ConfigId,
                 Count2 = 1,
             }, actor, target, null, target.GetOwner()));
+            await ETTask.CompletedTask;
         }
 
         public static async ETTask ToDo_TargetBackToGroup(this RoomEventTypeComponent room, EventInfo eventInfo, RoomCard actor, RoomCard target) {
@@ -128,6 +129,7 @@ namespace ET.Server {
                 Count1 = target.ConfigId,
                 Count2 = 1,
             }, actor, null, null, target.GetOwner()));
+            await ETTask.CompletedTask;
         }
 
         public static List<RoomCardInfo> GetRoomCardInfos(this List<RoomCard> cards, int type)

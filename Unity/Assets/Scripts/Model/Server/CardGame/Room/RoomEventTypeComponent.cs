@@ -27,5 +27,6 @@ namespace ET.Server {
         Nomal = 0,
         BackToHandCards = 1,
         TargetBackToGroup = 2,
+        SendToEnemy = 3,
     }
 }

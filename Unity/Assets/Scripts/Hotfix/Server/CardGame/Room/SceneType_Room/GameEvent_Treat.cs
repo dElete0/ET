@@ -30,6 +30,7 @@ namespace ET.Server {
 
             Room2C_TreatTergets message = new Room2C_TreatTergets() { Cards = roomCardInfos, Nums = treatList };
             RoomMessageHelper.BroadCast(room, message);
+            await ETTask.CompletedTask;
         }
     }
 }

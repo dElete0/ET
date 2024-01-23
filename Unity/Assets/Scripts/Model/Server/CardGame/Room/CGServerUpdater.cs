@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace ET.Server
 {
     [ComponentOf(typeof(Room))]
-    public class CGServerUpdater: Entity, IAwake, IUpdate {
+    public class CGServerUpdater: Entity, IAwake<GameRoomType>, IUpdate {
         //房间状态
         public GameState GameState;
         //当前玩家(RoomPlayerId)
@@ -14,6 +14,8 @@ namespace ET.Server
         public long TurnStartTime;
         //默认一回合等待的时间
         public const long TurmTimeD = 60000;
+        //房间类型
+        public GameRoomType GameRoomType;
         /// <summary>
         /// 等待玩家选择发现或抉择效果
         /// -1:没有进行发现，正常打牌

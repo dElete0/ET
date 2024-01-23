@@ -28,6 +28,15 @@ namespace ET.Server {
 
             await roomEventTypeComponent.ToDo_DamageTargets(eventInfo, actor, units, num);
         }
+        
+        public static async ETTask ToDo_DamageAllActor(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, int num)
+        {
+            await ETTask.CompletedTask;
+            CardGameComponent_Player myCards = actor.GetOwner().GetComponent<CardGameComponent_Player>();
+            List<long> units = myCards.GetAllActors();
+
+            await roomEventTypeComponent.ToDo_DamageTargets(eventInfo, actor, units, num);
+        }
 
         public static async ETTask ToDo_Desecrate(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, int num, int loopCount)
         {

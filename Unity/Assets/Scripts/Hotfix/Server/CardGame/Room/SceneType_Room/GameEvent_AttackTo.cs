@@ -22,6 +22,7 @@ namespace ET.Server {
 
             Room2C_FlashUnit message = new Room2C_FlashUnit() { Unit = target.RoomCard2UnitInfo() };
             RoomMessageHelper.BroadCast(roomEventTypeComponent.GetParent<Room>(), message);
+            await ETTask.CompletedTask;
         }
 
         public static async ETTask ToDo_LoseAttack(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor,
@@ -31,6 +32,7 @@ namespace ET.Server {
 
             Room2C_FlashUnit message = new Room2C_FlashUnit() { Unit = target.RoomCard2UnitInfo() };
             RoomMessageHelper.BroadCast(roomEventTypeComponent.GetParent<Room>(), message);
+            await ETTask.CompletedTask;
         }
     }
 }

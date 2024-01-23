@@ -28,7 +28,7 @@ public static class GameEvent_Magic
         RoomPlayer player = actor.GetOwner();
         CardGameComponent_Player playerInfo = player.GetComponent<CardGameComponent_Player>();
         if (card.CardType == CardType.Unit) {
-            await roomEventTypeComponent.ToDo_CallUnitCard(eventInfo, player, card, playerInfo.Units.Count);
+            await roomEventTypeComponent.ToDo_CallTargetUnit(eventInfo, player, card, playerInfo.Units.Count);
         } else if (card.CardType == CardType.Magic || card.CardType == CardType.Plot) {
             RoomCard target = null;
             switch (card.UseCardType) {

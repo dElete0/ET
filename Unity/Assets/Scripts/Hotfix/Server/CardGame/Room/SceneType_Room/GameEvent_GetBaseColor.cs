@@ -86,6 +86,7 @@ namespace ET.Server {
             RoomMessageHelper.ServerSendMessageToClient(player, MyColor);
             Room2C_GetColor EnemyColor = new Room2C_GetColor() { Color = (int)count1, Num = num, IsMy = false };
             RoomMessageHelper.BroadCastWithOutPlayer(player, EnemyColor);
+            await ETTask.CompletedTask;
         }
 
         public static async ETTask ToDo_AllAttackCountClear(this CardGameComponent_Cards cardGameComponent, CardGameComponent_Player cards) {

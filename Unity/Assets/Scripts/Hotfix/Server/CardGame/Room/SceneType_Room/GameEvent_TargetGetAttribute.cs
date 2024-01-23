@@ -39,6 +39,7 @@ namespace ET.Server {
 
             Room2C_FlashUnits message = new Room2C_FlashUnits();
             RoomMessageHelper.BroadCast(room.GetParent<Room>(), message);
+            await ETTask.CompletedTask;
         }
 
         public static async ETTask ToDo_UnitsInGroupGetAttribute(this RoomEventTypeComponent room, RoomCard actor, int baseId, int num) {
@@ -49,6 +50,7 @@ namespace ET.Server {
                 card.HP += num;
                 card.HPMax += num;
             }
+            await ETTask.CompletedTask;
         }
         
         public static async ETTask ToDo_UnitsInGroupLoseAttributeAddDamageEnemyHero(this RoomEventTypeComponent room, EventInfo eventInfo, RoomCard actor, int baseId, int num) {

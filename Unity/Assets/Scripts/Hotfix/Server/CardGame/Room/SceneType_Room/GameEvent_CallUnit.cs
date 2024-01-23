@@ -31,7 +31,12 @@ namespace ET.Server {
             RoomMessageHelper.BroadCastWithOutPlayer(player, room2CEnemyCallUnit);
         }
 
-        public static async ETTask ToDo_CalltargetUnit(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomPlayer player, RoomCard actor, int baseId, int num, CallType type) {
+        public static async ETTask ToDo_CallTargetUnitForAllByBaseId(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, int baseId, int num, int att) {
+            await roomEventTypeComponent.BroadEvent(GameEventFactory.CallTargetUnitByBaseId(roomEventTypeComponent, actor.GetOwner(), actor, baseId, num), eventInfo);
+            await roomEventTypeComponent.BroadEvent(GameEventFactory.CallTargetUnitByBaseId(roomEventTypeComponent, actor.GetOwner().GetEnemy(), actor, baseId, num), eventInfo);
+        }
+
+        public static async ETTask ToDo_CalltargetUnitByBaseId(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomPlayer player, RoomCard actor, int baseId, int num, CallType type) {
             await ETTask.CompletedTask;
             CardGameComponent_Player playerCards = player.GetComponent<CardGameComponent_Player>();
             CardGameComponent_Cards cards = player.GetParent<Room>().GetComponent<CardGameComponent_Cards>();
@@ -57,7 +62,7 @@ namespace ET.Server {
                     card.SetRoomCardByCallType(type, playerCards);
                     unitInfos.Add(card.RoomCard2UnitInfo());
                     units.Add(card);
-                    await roomEventTypeComponent.ToDo_CallUnitCard(eventInfo, player, card, (j + (isleft? 1: 0)));
+                    await roomEventTypeComponent.ToDo_CallTargetUnit(eventInfo, player, card, (j + (isleft? 1: 0)));
                     isleft = !isleft;
                     if (!isleft) {
                         j++;
@@ -72,12 +77,21 @@ namespace ET.Server {
                     card.SetRoomCardByCallType(type, playerCards);
                     unitInfos.Add(card.RoomCard2UnitInfo());
                     units.Add(card);
-                    await roomEventTypeComponent.ToDo_CallUnitCard(eventInfo, player, card, playerCards.Units.Count);
+                    await roomEventTypeComponent.ToDo_CallTargetUnit(eventInfo, player, card, playerCards.Units.Count);
                 }
             }
         }
+
+        public static async ETTask ToDo_SendUnitToEnemy(this RoomEventTypeComponent room, EventInfo info, RoomCard actor, RoomCard target) {
+            info.RemoveList.Add((target, RemoveType.SendToEnemy));
+            info.PowerStructs.Add((new Power_Struct() {
+                PowerType = Power_Type.CallTargetUnit,
+                Count1 = actor.GetOwner().GetEnemy().GetComponent<CardGameComponent_Player>().Units.Count,
+            }, actor, target, null, actor.GetOwner().GetEnemy()));
+            await ETTask.CompletedTask;
+        }
         
-        public static async ETTask ToDo_CallUnitCard(this RoomEventTypeComponent room, EventInfo info, RoomPlayer player, RoomCard card, int pos) {
+        public static async ETTask ToDo_CallTargetUnit(this RoomEventTypeComponent room, EventInfo info, RoomPlayer player, RoomCard card, int pos) {
             await room.ToDo_UnitStand(player, card, pos);
             if (card.GetAura().Count > 0) {
                 await room.BroadEvent(GameEventFactory.AuraEffect(room, card, player), info);

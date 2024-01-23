@@ -41,6 +41,7 @@ namespace ET.Server {
                     RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
                 }
             }
+            await ETTask.CompletedTask;
         }
 
         public static async ETTask ToDo_AddTargetCardToGroup(this RoomEventTypeComponent roomEventTypeComponent, EventInfo eventInfo, RoomCard actor, RoomCard target, bool isShow) {
@@ -59,6 +60,7 @@ namespace ET.Server {
                 RoomMessageHelper.ServerSendMessageToClient(player, myMessage);
                 RoomMessageHelper.BroadCastWithOutPlayer(player, enemyMessage);
             }
+            await ETTask.CompletedTask;
         }
     }
 }
